@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('ENTDECKEN')}"></head>
+<body class="explore-page">
+<header th:replace="~{fragments :: nav('explore')}"></header>
+<main class="connections" th:attr="data-focus=${graph.focus}">
+    <header class="connections-heading">
+        <div>
+            <p class="eyebrow">Entdecken</p>
+            <h1>Verbindungen</h1>
+            <p>Bewege dich durch Werke, Menschen und Orte – <em>eine direkte Beziehung nach der anderen.</em></p>
+        </div>
+        <div class="connections-intro-meta" aria-label="So funktioniert diese Ansicht">
+            <span>Ein Fokus</span>
+            <span>Semantische Gruppen</span>
+            <span>Keine erfundenen Verbindungen</span>
+            <a href="/connect">Zwei Einträge verbinden ↗</a>
+        </div>
+    </header>
+
+    <section class="map-empty" th:if="${graph.focus == null}">
+        <p class="eyebrow">Noch keine Spur</p>
+        <h2>Keine öffentlichen Verbindungen.</h2>
+        <p>Veröffentliche im Adminbereich einen Eintrag und mindestens eine Beziehung, um das Archiv zu erkunden.</p>
+    </section>
+
+    <section class="connections-workspace" th:if="${graph.focus != null}">
+        <div class="network-stage">
+            <header class="network-toolbar">
+                <p id="thread-summary" aria-live="polite">Direkte Verbindungen werden geladen …</p>
+                <div class="network-toolbar-actions">
+                    <div class="network-legend" aria-label="Legende">
+                        <span><i class="legend-focus"></i>Aktueller Fokus</span>
+                        <span><i class="legend-cluster"></i>Zugehörige Gruppe</span>
+                    </div>
+                    <button class="network-control" id="cluster-back" type="button" hidden>← Alle Gruppen</button>
+                    <button class="network-control" id="view-reset" type="button">Ansicht zurücksetzen</button>
+                </div>
+            </header>
+            <div class="network-canvas-wrap">
+                <svg id="memory-canvas" viewBox="0 0 1400 720" preserveAspectRatio="xMidYMid meet"
+                     role="img" aria-labelledby="network-canvas-title network-canvas-desc">
+                    <title id="network-canvas-title">Direkte Verbindungen</title>
+                    <desc id="network-canvas-desc">Der gewählte Archiveintrag ist von direkt verbundenen öffentlichen Einträgen umgeben, gruppiert nach ihrer semantischen Rolle.</desc>
+                </svg>
+                <p class="network-status" id="network-status" role="status" hidden></p>
+            </div>
+        </div>
+
+        <aside class="thread-panel" id="thread-panel" aria-live="polite">
+            <div class="thread-focus">
+                <p class="eyebrow">Aktuelle Spur</p>
+                <figure class="focus-portrait" id="focus-portrait" hidden><img id="focus-portrait-img" alt=""></figure>
+                <span class="panel-type" id="focus-type">Archiveintrag</span>
+                <h2 id="focus-title">Wird geladen …</h2>
+                <p id="focus-meta"></p>
+                <a id="focus-detail" class="focus-detail" href="#" hidden>Eintrag ansehen →</a>
+            </div>
+            <div class="thread-relations">
+                <div class="thread-relations-heading">
+                    <p class="eyebrow">Direkte Verbindungen</p>
+                    <span id="relation-count">0</span>
+                </div>
+                <ol id="relation-list">
+                    <li th:each="link : ${graph.links}">
+                        <button type="button" class="thread-card"
+                                th:attr="data-focus=${link.source == graph.focus ? link.target : link.source}">
+                            <span th:text="${labels.of(link.type)}">Verwandt mit</span>
+                            <strong th:text="${link.source == graph.focus ? link.targetTitle : link.sourceTitle}">Ziel</strong>
+                        </button>
+                    </li>
+                </ol>
+            </div>
+        </aside>
+    </section>
+</main>
+<script src="/webjars/d3/7.9.0/dist/d3.min.js"></script>
+<script type="module" src="/js/explore.js"></script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: afterimage
+      POSTGRES_USER: afterimage
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-afterimage-local}
+    volumes:
+      - afterimage-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U afterimage -d afterimage"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/afterimage
+      SPRING_DATASOURCE_USERNAME: afterimage
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-afterimage-local}
+      AFTERIMAGE_ADMIN_USERNAME: ${AFTERIMAGE_ADMIN_USERNAME:-admin}
+      AFTERIMAGE_ADMIN_PASSWORD: ${AFTERIMAGE_ADMIN_PASSWORD:-change-me-locally}
+      AFTERIMAGE_MEDIA_ROOT: /app/media
+      AFTERIMAGE_WIKI_BASE_URL: ${AFTERIMAGE_WIKI_BASE_URL:-https://wiki.fotosvorju.de}
+      AFTERIMAGE_WIKI_API_URL: ${AFTERIMAGE_WIKI_API_URL:-https://wiki.fotosvorju.de/w/api.php}
+      AFTERIMAGE_WIKI_USERNAME: ${AFTERIMAGE_WIKI_USERNAME:-}
+      AFTERIMAGE_WIKI_PASSWORD: ${AFTERIMAGE_WIKI_PASSWORD:-}
+      AFTERIMAGE_WIKI_SYNC_CATEGORY: ${AFTERIMAGE_WIKI_SYNC_CATEGORY:-}
+      AFTERIMAGE_WIKI_CONTENT_ENABLED: ${AFTERIMAGE_WIKI_CONTENT_ENABLED:-true}
+      AFTERIMAGE_PIWIGO_BASE_URL: ${AFTERIMAGE_PIWIGO_BASE_URL:-https://galerie.fotosvorju.de}
+      AFTERIMAGE_PIWIGO_ENABLED: ${AFTERIMAGE_PIWIGO_ENABLED:-true}
+      AFTERIMAGE_PIWIGO_API_URL: ${AFTERIMAGE_PIWIGO_API_URL:-https://galerie.fotosvorju.de/ws.php}
+      AFTERIMAGE_PIWIGO_API_KEY: ${AFTERIMAGE_PIWIGO_API_KEY:-}
+      AFTERIMAGE_PIWIGO_USERNAME: ${AFTERIMAGE_PIWIGO_USERNAME:-}
+      AFTERIMAGE_PIWIGO_PASSWORD: ${AFTERIMAGE_PIWIGO_PASSWORD:-}
+      AFTERIMAGE_PIWIGO_DEFAULT_PAGE_SIZE: ${AFTERIMAGE_PIWIGO_DEFAULT_PAGE_SIZE:-50}
+    ports:
+      - "8080:8080"
+    volumes:
+      - afterimage-media:/app/media
+volumes:
+  afterimage-postgres:
+  afterimage-media:

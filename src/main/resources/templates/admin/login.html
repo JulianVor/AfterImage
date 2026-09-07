@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Admin — AFTERIMAGE</title><link rel="stylesheet" href="/css/admin.css"></head>
+<body class="login-page">
+<main class="login-card">
+    <p>AFTERIMAGE / ADMIN</p>
+    <h1>Archivzugang</h1>
+    <p class="error" th:if="${param.error}">Anmeldung fehlgeschlagen.</p>
+    <form method="post" action="/admin/login" class="stack">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+        <label>Benutzername <input name="username" autocomplete="username" required autofocus></label>
+        <label>Passwort <input name="password" type="password" autocomplete="current-password" required></label>
+        <button type="submit">Anmelden</button>
+    </form>
+    <p><a href="/">← Öffentliche Website</a></p>
+</main>
+</body>
+</html>

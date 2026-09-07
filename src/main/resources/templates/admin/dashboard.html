@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Admin — AFTERIMAGE</title><link rel="stylesheet" href="/css/admin.css"></head>
+<body>
+<header class="admin-header"><strong>AFTERIMAGE / ADMIN</strong><nav><a href="/" target="_blank">Website ansehen</a><form method="post" action="/admin/logout"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button--quiet">Abmelden</button></form></nav></header>
+<main class="admin-shell">
+    <h1>Archivsteuerung</h1>
+    <p class="message" th:if="${message}" th:text="${message}"></p>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+    <nav class="admin-tools" aria-label="Archivwerkzeuge">
+        <a href="/admin/homepage"><span>Redaktion</span><strong>Startseite</strong><small>Bands, Projekte und Geschichten hervorheben →</small></a>
+        <a href="/admin/trails"><span>Redaktion</span><strong>Geschichten</strong><small>Pfade, Fotoessays, Dossiers und Chroniken bauen →</small></a>
+        <a href="/admin/health"><span>Pflege</span><strong>Archivzustand</strong><small>Strukturelle Lücken und schwache Verbindungen finden →</small></a>
+        <a href="/connect" target="_blank"><span>Öffentliches Werkzeug</span><strong>Verbindungsfinder</strong><small>Wege durch den veröffentlichten Graphen testen ↗</small></a>
+    </nav>
+    <div class="admin-grid">
+        <div class="stack">
+            <section class="panel" th:if="${wikiStatus.available}">
+                <h2>MediaWiki synchronisieren</h2>
+                <p><span class="badge badge--public">Verbunden</span> <span th:text="${wikiStatus.siteName}">Wiki</span></p>
+                <p th:if="${wikiStatus.importReady and wikiStatus.category == null}"><strong th:text="${wikiStatus.pageCount}">0</strong> lesbare Seiten im Hauptnamensraum gefunden. Seiten ohne unterstützten Seitentyp werden übersprungen; private Titelpfade bleiben gesperrt.</p>
+                <p th:if="${wikiStatus.importReady and wikiStatus.category != null}"><strong th:text="${wikiStatus.pageCount}">0</strong> Seiten in der Kategorie <strong th:text="${wikiStatus.category}">Afterimage</strong> gefunden. Die Synchronisierung ist idempotent; private Titelpfade bleiben gesperrt.</p>
+                <div th:unless="${wikiStatus.importReady}">
+                    <p class="error" th:text="${wikiStatus.message}">Die Kategorie enthält keine Seiten.</p>
+                    <p th:if="${wikiStatus.category != null}">Füge die konfigurierte Kategorie jeder Wiki-Seite hinzu, die synchronisiert werden soll.</p>
+                </div>
+                <form th:if="${wikiStatus.importReady}" method="post" action="/admin/sync/wiki" class="stack">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit">Jetzt synchronisieren</button>
+                </form>
+            </section>
+            <section class="panel" th:unless="${wikiStatus.available}">
+                <h2>Wiki-XML importieren</h2>
+                <p class="error" th:text="${wikiStatus.message}">Wiki-API nicht verfügbar.</p>
+                <p>XML-Ausweichlösung. Importe sind idempotent; private Titelpfade bleiben gesperrt.</p>
+                <form method="post" action="/admin/import" enctype="multipart/form-data" class="stack">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label>MediaWiki XML <input type="file" name="file" accept=".xml,application/xml,text/xml" required></label>
+                    <button type="submit">Analysieren und importieren</button>
+                </form>
+            </section>
+            <section class="panel">
+                <h2>Eintrag erstellen</h2>
+                <form method="post" action="/admin/entities" class="stack">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label>Titel <input name="title" required></label>
+                    <label>Typ <select name="entityType"><option th:each="type : ${entityTypes}" th:value="${type}" th:text="${labels.of(type)}"></option></select></label>
+                    <button type="submit">Öffentlichen Eintrag erstellen</button>
+                </form>
+            </section>
+        </div>
+        <section class="panel">
+            <h2>Einträge <span class="badge" th:text="${entities.size()}">0</span></h2>
+            <table class="admin-table">
+                <thead><tr><th>Titel</th><th>Typ</th><th>Sichtbarkeit</th><th>Hervorgehoben</th></tr></thead>
+                <tbody>
+                <tr th:each="entity : ${entities}">
+                    <td><a th:href="@{/admin/entities/{id}(id=${entity.id})}" th:text="${entity.title}">Titel</a><br><small th:text="${entity.sourceTitle}"></small></td>
+                    <td th:text="${labels.of(entity.projectType ?: entity.eventType ?: entity.entityType)}">Typ</td>
+                    <td><span class="badge" th:classappend="${entity.visibility.name() == 'PUBLIC'} ? 'badge--public' : 'badge--private'" th:text="${labels.of(entity.visibility)}">PRIVAT</span></td>
+                    <td th:text="${entity.featured ? 'Ja' : '—'}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+    <section class="panel" style="margin-top:2rem">
+        <h2>Importläufe</h2>
+        <table class="admin-table"><thead><tr><th>Gestartet</th><th>Datei</th><th>Status</th><th>Importiert</th><th>Aktualisiert</th><th>Unverändert</th></tr></thead>
+            <tbody><tr th:each="run : ${runs}"><td><a th:href="@{/admin/imports/{id}(id=${run.id})}" th:text="${run.startedAt}">Datum</a></td><td th:text="${run.filename}">Datei</td><td th:text="${labels.of(run.status)}">Fertig</td><td th:text="${run.importedPages}">0</td><td th:text="${run.updatedPages}">0</td><td th:text="${run.unchangedPages}">0</td></tr></tbody></table>
+    </section>
+</main>
+</body>
+</html>

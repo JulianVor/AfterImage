@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('ARCHIV')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('archive')}"></header>
+<main class="archive-page">
+    <header>
+        <p class="eyebrow">Öffentlicher Index</p>
+        <h1>Archiv</h1>
+        <p>Hier erscheinen nur veröffentlichte Ausschnitte. Die vollständigen Produktionsgeschichten bleiben im Wiki.</p>
+    </header>
+    <ol class="archive-index">
+        <li th:each="entry : ${entries.content}">
+            <span th:text="${entry.year ?: '—'}">2024</span>
+            <a th:if="${entry.entityType.name() == 'PROJECT' || entry.entityType.name() == 'BAND'}" th:href="@{/entry/{slug}(slug=${entry.slug})}"
+               th:text="${entry.displayTitle ?: entry.title}">Titel</a>
+            <span th:unless="${entry.entityType.name() == 'PROJECT' || entry.entityType.name() == 'BAND'}" th:text="${entry.displayTitle ?: entry.title}">Titel</span>
+            <small th:text="${labels.of(entry.entityType)}">Typ</small>
+        </li>
+    </ol>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

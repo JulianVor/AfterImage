@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('VERBINDEN')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('explore')}"></header>
+<main class="connect-page">
+    <header class="connect-heading">
+        <p class="eyebrow">Was verbindet …?</p>
+        <h1>Finde den roten Faden.</h1>
+        <p>Wähle zwei Einträge. Das Archiv zeigt die kürzeste Kette dokumentierter Beziehungen zwischen ihnen.</p>
+    </header>
+
+    <form class="connection-form" method="get" action="/connect">
+        <label>Von
+            <select name="from" required>
+                <option value="">Eintrag wählen</option>
+                <option th:each="entry : ${entries}" th:value="${entry.slug}"
+                        th:selected="${entry.slug == from}"
+                        th:text="${(entry.displayTitle ?: entry.title) + ' · ' + labels.of(entry.entityType)}">Eintrag</option>
+            </select>
+        </label>
+        <span class="connection-form-mark" aria-hidden="true">↝</span>
+        <label>Nach
+            <select name="to" required>
+                <option value="">Eintrag wählen</option>
+                <option th:each="entry : ${entries}" th:value="${entry.slug}"
+                        th:selected="${entry.slug == to}"
+                        th:text="${(entry.displayTitle ?: entry.title) + ' · ' + labels.of(entry.entityType)}">Eintrag</option>
+            </select>
+        </label>
+        <button type="submit">Verbindung verfolgen</button>
+    </form>
+
+    <section class="path-result" th:if="${path.status.name() == 'FOUND'}">
+        <header>
+            <p class="eyebrow">Kürzester dokumentierter Weg</p>
+            <h2><span th:text="${path.degrees}">2</span> <span th:text="${path.degrees == 1 ? 'Schritt' : 'Schritte'}">Schritte</span> voneinander entfernt.</h2>
+            <a th:href="@{/connect(from=${to},to=${from})}">Weg umkehren ↔</a>
+            <p class="path-fallback" th:if="${path.fallbackRoute}">Kein Weg führt an <strong th:text="${path.hubTitle}">dem Archivinhaber</strong> vorbei; dies ist die dokumentierte Ausweichroute.</p>
+        </header>
+        <ol class="path-chain">
+            <li class="path-node path-node--origin">
+                <a th:href="@{/explore(focus=${'entity:' + path.source.slug})}">
+                    <small th:text="${labels.of(path.source.entityType)}">Typ</small>
+                    <strong th:text="${path.source.displayTitle ?: path.source.title}">Quelle</strong>
+                    <span th:text="${path.source.year ?: 'Start'}">Start</span>
+                </a>
+            </li>
+            <li th:each="hop : ${path.hops}" class="path-hop">
+                <div class="path-relation">
+                    <span th:text="${hop.forward ? '→' : '←'}">→</span>
+                    <em th:text="${labels.relationship(hop.type)}">Verwandt mit</em>
+                </div>
+                <div class="path-node">
+                    <a th:href="@{/explore(focus=${'entity:' + hop.to.slug})}">
+                        <small th:text="${labels.of(hop.to.entityType)}">Typ</small>
+                        <strong th:text="${hop.to.displayTitle ?: hop.to.title}">Ziel</strong>
+                        <span th:text="${hop.to.year ?: 'Archiv'}">Archiv</span>
+                    </a>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <section class="connection-state" th:if="${path.status.name() == 'SAME_ENTRY'}">
+        <p class="eyebrow">Null Schritte</p><h2>Das ist bereits derselbe Eintrag.</h2>
+    </section>
+    <section class="connection-state" th:if="${path.status.name() == 'NOT_CONNECTED'}">
+        <p class="eyebrow">Kein dokumentierter Weg</p><h2>Diese Erinnerungen treffen sich noch nicht.</h2>
+        <p>Das Archiv erfindet keine Verbindung. Eine bekannte Beziehung kann im Adminbereich ergänzt werden.</p>
+    </section>
+    <section class="connection-state" th:if="${path.status.name() == 'INVALID'}">
+        <p class="eyebrow">Eintrag nicht verfügbar</p><h2>Wähle zwei öffentliche Einträge.</h2>
+    </section>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

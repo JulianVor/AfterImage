@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(pageTitle)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="description" content="Julian Vornfeld — Film, Fotografie und visuelle Welten.">
+    <title th:text="${pageTitle + ' — ' + site.title}">AFTERIMAGE</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+<header class="site-header" th:fragment="nav(active)">
+    <a class="wordmark" href="/" th:text="${site.title}">AFTERIMAGE</a>
+    <nav aria-label="Hauptnavigation">
+        <a href="/show" th:classappend="${active == 'show'} ? 'is-active'"><em>01</em><span>Auswahl</span></a>
+        <a href="/explore" th:classappend="${active == 'explore'} ? 'is-active'"><em>02</em><span>Entdecken</span></a>
+        <a href="/chronicle" th:classappend="${active == 'chronicle'} ? 'is-active'"><em>03</em><span>Chronik</span></a>
+        <a href="/trails" th:classappend="${active == 'trails'} ? 'is-active'"><em>04</em><span>Geschichten</span></a>
+        <a href="/about" th:classappend="${active == 'about'} ? 'is-active'"><em>05</em><span>Über</span></a>
+        <a href="/archive" th:classappend="${active == 'archive'} ? 'is-active'"><em>06</em><span>Archiv</span></a>
+    </nav>
+    <a class="search-link" href="/search" aria-label="Archiv durchsuchen">Suche</a>
+</header>
+<footer class="site-footer" th:fragment="footer">
+    <p th:text="${site.owner}">Julian Vornfeld</p>
+    <p>Film · Fotografie · Visuelle Welten</p>
+    <a href="/admin">Admin</a>
+</footer>
+</body>
+</html>

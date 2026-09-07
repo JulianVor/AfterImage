@@ -1,0 +1,26 @@
+{
+  "name": "AfterimageMediaApi",
+  "version": "1.0.0",
+  "author": [
+    "AFTERIMAGE"
+  ],
+  "url": "https://wiki.fotosvorju.de/",
+  "descriptionmsg": "afterimagemediaapi-desc",
+  "license-name": "MIT",
+  "type": "api",
+  "requires": {
+    "MediaWiki": ">= 1.43"
+  },
+  "AutoloadClasses": {
+    "ApiAfterimageImage": "includes/ApiAfterimageImage.php"
+  },
+  "APIModules": {
+    "afterimageimage": "ApiAfterimageImage"
+  },
+  "MessagesDirs": {
+    "AfterimageMediaApi": [
+      "i18n"
+    ]
+  },
+  "manifest_version": 2
+}

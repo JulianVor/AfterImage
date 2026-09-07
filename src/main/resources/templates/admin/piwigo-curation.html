@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${'Fotoauswahl · ' + curation.album.name}">Fotoauswahl</title>
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+<header class="admin-header"><strong>AFTERIMAGE / ADMIN</strong><nav><a href="/admin">Übersicht</a></nav></header>
+<main class="admin-shell curation-page">
+    <p><a th:href="@{/admin/entities/{id}(id=${entity.id})}">← Zurück zu <span th:text="${entity.title}">Eintrag</span></a></p>
+    <header class="curation-heading">
+        <div><p class="eyebrow">Piwigo-Fotogalerie</p><h1 th:text="${curation.album.name}">Album</h1></div>
+        <p><strong th:text="${curation.selected.size() + ' von 12'}">0 von 12</strong><br>Fotos für die Projektseite ausgewählt</p>
+    </header>
+    <p class="message" th:if="${message}" th:text="${message}"></p>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+
+    <section class="panel curated-selection">
+        <header><div><p class="eyebrow">Öffentliche Vorschau</p><h2>Ausgewählte Fotos</h2></div>
+            <p th:if="${curation.selected.isEmpty()}">Ohne Auswahl verwendet Afterimage die ersten zwölf Fotos der Piwigo-Reihenfolge.</p></header>
+        <form method="post" class="curation-order-form" th:if="${!curation.selected.isEmpty()}"
+              th:action="@{/admin/entities/{entityId}/piwigo-albums/{linkId}/order(entityId=${entity.id},linkId=${curation.album.linkId})}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <input type="hidden" name="page" th:value="${curation.imagePage.page}">
+            <ol class="curated-grid" data-curated-list>
+                <li th:each="image, state : ${curation.selected}" draggable="true" th:attr="data-image-id=${image.id}">
+                    <input type="hidden" name="imageIds" th:value="${image.id}">
+                    <span class="curation-rank" th:text="${state.count}">1</span>
+                    <img th:src="${image.thumbnailUrl}" th:alt="${image.title}" loading="lazy">
+                    <strong th:text="${image.title == null || image.title.isBlank() ? 'Foto ' + image.id : image.title}">Foto</strong>
+                    <div class="curation-controls">
+                        <button type="button" class="button--quiet" data-move="up" aria-label="Foto nach vorne verschieben">←</button>
+                        <button type="button" class="button--quiet" data-move="down" aria-label="Foto nach hinten verschieben">→</button>
+                    </div>
+                </li>
+            </ol>
+            <button type="submit">Reihenfolge speichern</button>
+        </form>
+        <form method="post" th:if="${!curation.selected.isEmpty()}"
+              th:action="@{/admin/entities/{entityId}/piwigo-albums/{linkId}/reset(entityId=${entity.id},linkId=${curation.album.linkId})}">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            <button type="submit" class="button--quiet">Auswahl zurücksetzen</button>
+        </form>
+    </section>
+
+    <section class="panel album-browser">
+        <header><div><p class="eyebrow">Album durchsuchen</p><h2>Fotos auswählen</h2></div>
+            <p th:text="${curation.imagePage.totalCount + ' Fotos im Album'}">Fotos im Album</p></header>
+        <div class="curation-browser-grid">
+            <article th:each="image : ${curation.imagePage.images}" th:classappend="${curation.selectedIds.contains(image.id) ? ' is-selected' : ''}">
+                <img th:src="${image.thumbnailUrl}" th:alt="${image.title}" loading="lazy">
+                <div><strong th:text="${image.title == null || image.title.isBlank() ? 'Foto ' + image.id : image.title}">Foto</strong>
+                    <span th:if="${curation.selectedIds.contains(image.id)}">Ausgewählt</span></div>
+                <form method="post" th:if="${!curation.selectedIds.contains(image.id)}"
+                      th:action="@{/admin/entities/{entityId}/piwigo-albums/{linkId}/select(entityId=${entity.id},linkId=${curation.album.linkId})}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <input type="hidden" name="imageId" th:value="${image.id}"><input type="hidden" name="page" th:value="${curation.imagePage.page}">
+                    <button type="submit" th:disabled="${curation.selected.size() >= 12}">☆ Auswählen</button>
+                </form>
+                <form method="post" th:if="${curation.selectedIds.contains(image.id)}"
+                      th:action="@{/admin/entities/{entityId}/piwigo-albums/{linkId}/deselect(entityId=${entity.id},linkId=${curation.album.linkId})}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <input type="hidden" name="imageId" th:value="${image.id}"><input type="hidden" name="page" th:value="${curation.imagePage.page}">
+                    <button type="submit" class="button--quiet">★ Entfernen</button>
+                </form>
+            </article>
+        </div>
+        <nav class="curation-pagination" aria-label="Albumseiten">
+            <a class="button button--quiet" th:if="${curation.imagePage.page > 0}"
+               th:href="@{/admin/entities/{entityId}/piwigo-albums/{linkId}(entityId=${entity.id},linkId=${curation.album.linkId},page=${curation.imagePage.page - 1})}">← Vorherige</a>
+            <span th:text="${'Seite ' + (curation.imagePage.page + 1) + ' von ' + curation.imagePage.pageCount}">Seite</span>
+            <a class="button button--quiet" th:if="${curation.imagePage.page + 1 < curation.imagePage.pageCount}"
+               th:href="@{/admin/entities/{entityId}/piwigo-albums/{linkId}(entityId=${entity.id},linkId=${curation.album.linkId},page=${curation.imagePage.page + 1})}">Nächste →</a>
+        </nav>
+    </section>
+</main>
+<script type="module" src="/js/piwigo-curation.js"></script>
+</body>
+</html>

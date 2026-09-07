@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('AUSWAHL')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('show')}"></header>
+<main>
+    <section class="show-intro" aria-labelledby="show-title">
+        <p class="eyebrow">Ausgewählte Arbeiten · 2019—heute</p>
+        <h1 id="show-title">Bilder, die<br><em>zurückbleiben.</em></h1>
+        <div class="intro-meta">
+            <p th:text="${site.owner}">Julian Vornfeld</p>
+            <p th:text="${site.subtitle}">Film · Fotografie · Visuelle Welten</p>
+        </div>
+        <a class="thread-link" href="/explore">Den Verbindungen folgen <span aria-hidden="true">↘</span></a>
+        <dl class="stat-strip" th:if="${stats.total > 0}">
+            <div><dt th:text="${stats.total}">0</dt><dd>Archivierte Einträge</dd></div>
+            <div><dt th:text="${stats.bands}">0</dt><dd>Bands</dd></div>
+            <div><dt th:text="${stats.projects}">0</dt><dd>Produktionen</dd></div>
+            <div th:if="${stats.earliestYear != null}">
+                <dt th:text="${stats.earliestYear == stats.latestYear ? stats.earliestYear : stats.earliestYear + '–' + stats.latestYear}">0</dt>
+                <dd>Zeitspanne</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="project-reel" aria-label="Ausgewählte Highlights" th:if="${!highlights.isEmpty()}">
+        <article class="project-card" th:each="item, stat : ${highlights}"
+                 th:classappend="${item.layoutVariant}">
+            <a th:href="${item.href}">
+                <img class="project-image" th:if="${item.heroMedia != null}"
+                     th:src="@{/media/{id}(id=${item.heroMedia.id})}"
+                     th:alt="${item.heroMedia.altText ?: item.title}"
+                     th:attr="width=${item.heroMedia.width},height=${item.heroMedia.height}"
+                     loading="lazy">
+                <div class="project-plate" th:unless="${item.heroMedia != null}" th:attr="data-index=${#numbers.formatInteger(stat.count, 2)}">
+                    <span th:text="${item.kindLabel}">Archivbild</span>
+                    <small>Kein Wiki-Bild verfügbar</small>
+                </div>
+                <div class="project-caption">
+                    <div>
+                        <h2 th:text="${item.title}">Projekt</h2>
+                        <p th:text="${item.subtitle}">Band</p>
+                    </div>
+                    <p><span th:text="${item.meta}">Musikvideo · 2024</span></p>
+                </div>
+            </a>
+            <div class="project-chips" th:if="${!item.chips.isEmpty()}">
+                <a th:each="chip : ${item.chips}" th:href="@{/entry/{slug}(slug=${chip.slug})}" th:text="${chip.title}">Band</a>
+            </div>
+        </article>
+    </section>
+
+    <section class="project-reel project-reel--fallback" aria-label="Zuletzt archiviert" th:if="${highlights.isEmpty() && !fallbackHighlights.isEmpty()}">
+        <p class="fallback-note">Noch keine Arbeit für die Auswahl hervorgehoben — hier stattdessen die zuletzt archivierten Produktionen. <a href="/admin/homepage">Kuratierung öffnen →</a></p>
+        <article class="project-card" th:each="item, stat : ${fallbackHighlights}"
+                 th:classappend="${item.layoutVariant}">
+            <a th:href="${item.href}">
+                <img class="project-image" th:if="${item.heroMedia != null}"
+                     th:src="@{/media/{id}(id=${item.heroMedia.id})}"
+                     th:alt="${item.heroMedia.altText ?: item.title}"
+                     th:attr="width=${item.heroMedia.width},height=${item.heroMedia.height}"
+                     loading="lazy">
+                <div class="project-plate" th:unless="${item.heroMedia != null}" th:attr="data-index=${#numbers.formatInteger(stat.count, 2)}">
+                    <span th:text="${item.kindLabel}">Archivbild</span>
+                    <small>Kein Wiki-Bild verfügbar</small>
+                </div>
+                <div class="project-caption">
+                    <div>
+                        <h2 th:text="${item.title}">Projekt</h2>
+                        <p th:text="${item.subtitle}">Band</p>
+                    </div>
+                    <p><span th:text="${item.meta}">Musikvideo · 2024</span></p>
+                </div>
+            </a>
+            <div class="project-chips" th:if="${!item.chips.isEmpty()}">
+                <a th:each="chip : ${item.chips}" th:href="@{/entry/{slug}(slug=${chip.slug})}" th:text="${chip.title}">Band</a>
+            </div>
+        </article>
+    </section>
+
+    <section class="empty-curation" th:if="${highlights.isEmpty() && fallbackHighlights.isEmpty()}">
+        <p class="eyebrow">Das Archiv ist bereit</p>
+        <h2>Noch wurde keine Arbeit hervorgehoben.</h2>
+        <p>Importierte Einträge sind öffentlich, erscheinen aber erst nach dem Hervorheben in dieser Auswahl.</p>
+        <a href="/admin/homepage">Kuratierung öffnen</a>
+    </section>
+
+    <section class="memory-invite">
+        <p class="eyebrow">Das Archiv entdecken</p>
+        <h2>Ein Werk ist nie<br>nur ein Werk.</h2>
+        <p>Menschen, Orte, Bands und Momente bilden eine lebendige Chronologie.</p>
+        <a href="/explore">Verbindungen entdecken →</a>
+    </section>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

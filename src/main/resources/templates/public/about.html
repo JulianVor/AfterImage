@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('ÜBER')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('about')}"></header>
+<main class="about-page">
+    <p class="eyebrow">Über dieses Archiv</p>
+    <h1>Ein Werkarchiv<br><em>und das Leben darum herum.</em></h1>
+    <div class="about-grid">
+        <p class="lead">AFTERIMAGE ist die kuratierte Oberfläche für Julian Vornfelds Arbeiten aus Film, Fotografie und visueller Gestaltung.</p>
+        <div>
+            <p>AUSWAHL zeigt eine bewusste Zusammenstellung. ENTDECKEN macht die Menschen, Bands, Orte und Momente dahinter sichtbar. Das MediaWiki bleibt das ausführliche Produktionsarchiv.</p>
+            <p>Welche Einträge hervorgehoben und miteinander erzählt werden, bleibt eine bewusste redaktionelle Entscheidung.</p>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

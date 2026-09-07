@@ -1,0 +1,9 @@
+ALTER TABLE story
+    ADD COLUMN story_type VARCHAR(24) NOT NULL DEFAULT 'PATH';
+
+ALTER TABLE story_step
+    ALTER COLUMN entity_id DROP NOT NULL;
+
+ALTER TABLE story_step ADD COLUMN block_type VARCHAR(24) NOT NULL DEFAULT 'ENTRY';
+ALTER TABLE story_step ADD COLUMN heading VARCHAR(500);
+ALTER TABLE story_step ADD COLUMN event_date DATE;

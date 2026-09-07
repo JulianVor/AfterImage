@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${project.displayTitle ?: project.title})}"></head>
+<body>
+<header th:replace="~{fragments :: nav('show')}"></header>
+<main class="exhibition">
+    <header class="project-hero">
+        <div class="project-hero-copy">
+            <div class="project-kicker">
+                <span th:text="${project.entityType.name() == 'PROJECT' && project.projectType != null ? labels.of(project.projectType) : labels.of(project.entityType)}">Musikvideo</span>
+                <span th:if="${project.year != null}" th:text="${project.year}">2024</span>
+            </div>
+            <h1 th:text="${project.displayTitle ?: project.title}">Projekt</h1>
+            <p th:if="${project.subtitle != null}" th:text="${project.subtitle}">Künstler</p>
+            <div class="project-actions">
+                <a class="project-wiki-link" th:if="${project.wikiUrl != null && !project.wikiUrl.isBlank()}"
+                   th:href="${project.wikiUrl}" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a2 2 0 0 1 2 2v15a2 2 0 0 0-2-2H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/>
+                        <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v17a2 2 0 0 1 2-2h2.5a2.5 2.5 0 0 1 2.5 2.5v-15Z"/>
+                    </svg>
+                    <span>Wiki-Artikel</span>
+                    <span aria-hidden="true">↗</span>
+                </a>
+                <a class="project-explore-link" th:href="@{/explore(focus=${'entity:' + project.slug})}">
+                    <span>Verbindungen entdecken</span><span aria-hidden="true">↘</span>
+                </a>
+            </div>
+        </div>
+        <div class="project-hero-media">
+            <img class="hero-frame" th:if="${heroMedia.isPresent() && heroMedia.get().type().name() == 'IMAGE'}"
+                 th:src="@{/media/{id}(id=${heroMedia.get().id()})}"
+                 th:alt="${heroMedia.get().altText() ?: project.title}"
+                 th:attr="width=${heroMedia.get().width()},height=${heroMedia.get().height()}" loading="eager">
+            <video class="hero-frame" th:if="${heroMedia.isPresent() && heroMedia.get().type().name() == 'VIDEO'}"
+                   th:src="@{/media/{id}(id=${heroMedia.get().id()})}" controls preload="metadata"></video>
+            <div class="hero-frame project-plate" th:if="${heroMedia.isEmpty()}">
+                <span>Titelmedium wartet auf Kuratierung</span>
+                <small>Das Wiki-XML enthält Metadaten, aber keine Bilddateien.</small>
+            </div>
+        </div>
+    </header>
+
+    <dl class="colophon" th:if="${!credits.isEmpty()}">
+        <div class="colophon-item" th:each="credit : ${credits}">
+            <dt th:text="${credit.roles}">Rolle</dt>
+            <dd><a th:href="@{/entry/{slug}(slug=${credit.target.slug})}" th:text="${credit.target.displayTitle ?: credit.target.title}">Name</a></dd>
+        </div>
+    </dl>
+
+    <nav class="detail-nav" aria-label="Inhalte dieser Seite">
+        <a th:each="item, stat : ${navItems}" th:href="${'#' + item.anchor}">
+            <em th:text="${#numbers.formatInteger(stat.count, 2)}">01</em><span th:text="${item.label}">Überblick</span>
+        </a>
+    </nav>
+
+    <section id="ueberblick" class="exhibition-copy" th:if="${project.shortDescription != null || project.description != null}">
+        <p class="eyebrow">Überblick</p>
+        <p class="lead" th:text="${project.shortDescription}"></p>
+        <p th:text="${project.description}"></p>
+    </section>
+
+    <section id="mitglieder" class="related-bands" th:if="${!members.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Besetzung</p><h2>Mitglieder</h2></div>
+            <p th:text="${members.size() == 1 ? 'Ein dokumentiertes Mitglied.' : members.size() + ' dokumentierte Mitglieder.'}">Mitglieder.</p>
+        </header>
+        <div class="related-band-grid">
+            <article th:each="member, stat : ${members}">
+                <a th:href="@{/entry/{slug}(slug=${member.person.slug})}">
+                    <div class="related-band-visual">
+                        <img th:if="${member.image != null}" th:src="@{/media/{id}(id=${member.image.id})}"
+                             th:alt="${member.image.altText ?: member.person.title}"
+                             th:attr="width=${member.image.width},height=${member.image.height}" loading="lazy">
+                        <div class="related-band-plate" th:unless="${member.image != null}"
+                             th:attr="data-index=${#numbers.formatInteger(stat.count, 2)}">
+                            <span>Archivbild</span>
+                        </div>
+                    </div>
+                    <div class="related-band-caption">
+                        <div>
+                            <h3 th:text="${member.person.displayTitle ?: member.person.title}">Person</h3>
+                            <small th:if="${member.former}">Ehemaliges Mitglied</small>
+                        </div>
+                        <span>Person ansehen <span aria-hidden="true">↗</span></span>
+                    </div>
+                </a>
+            </article>
+        </div>
+    </section>
+
+    <section id="rollen" class="related" th:if="${!personRoles.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Mitwirkung</p><h2>Rollen im Archiv</h2></div>
+            <p th:text="${personRoles.size() == 1 ? 'Eine dokumentierte Rolle.' : personRoles.size() + ' dokumentierte Rollen.'}">Rollen.</p>
+        </header>
+        <ul class="relation-list">
+            <li th:each="group : ${personRoles}">
+                <span th:text="${group.role}">Rolle</span>
+                <span>
+                    <th:block th:each="work, stat : ${group.works}"
+                              ><a th:href="@{/entry/{slug}(slug=${work.slug})}" th:text="${work.displayTitle ?: work.title}">Werk</a><span th:unless="${stat.last}">, </span></th:block>
+                </span>
+            </li>
+        </ul>
+    </section>
+
+    <section id="video" class="project-video" th:if="${!youtubeVideos.isEmpty()}">
+        <header><p class="eyebrow">Film</p><h2>Video ansehen</h2></header>
+        <div class="video-embeds">
+            <iframe th:each="video : ${youtubeVideos}" th:src="${video.embedUrl}"
+                    th:title="${'YouTube-Video zu ' + (project.displayTitle ?: project.title)}"
+                    loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen></iframe>
+        </div>
+    </section>
+
+    <section id="fotos" class="photo-galleries" th:if="${!photoGalleries.isEmpty()}">
+        <header><div><p class="eyebrow">Fotografie</p><h2>Fotos</h2></div></header>
+        <article class="photo-gallery" th:each="gallery : ${photoGalleries}">
+            <div class="photo-gallery-heading">
+                <div><h3 th:text="${gallery.album.name}">Album</h3>
+                    <p th:if="${gallery.imagePage != null}" th:text="${gallery.imagePage.totalCount + ' Aufnahmen'}">Aufnahmen</p></div>
+                <a th:if="${gallery.album.url != null && !gallery.album.url.isBlank()}" th:href="${gallery.album.url}"
+                   target="_blank" rel="noopener">In Piwigo öffnen ↗</a>
+            </div>
+            <p class="gallery-unavailable" th:if="${gallery.error != null}" th:text="${gallery.error}">Nicht erreichbar.</p>
+            <p class="gallery-unavailable" th:if="${gallery.imagePage != null && gallery.imagePage.images.isEmpty()}">Keine Fotos vorhanden.</p>
+            <div class="photo-grid" th:if="${gallery.imagePage != null && !gallery.imagePage.images.isEmpty()}">
+                <button type="button" class="photo-tile" th:each="image : ${gallery.imagePage.images}"
+                        th:with="photoAlbum=${#strings.isEmpty(image.albumName) ? gallery.album.name : image.albumName}"
+                        th:attr="data-full=${image.fullUrl},data-title=${photoAlbum}">
+                    <img th:if="${image.thumbnailUrl != null && !image.thumbnailUrl.isBlank()}"
+                         th:src="${image.thumbnailUrl}" th:alt="${'Foto aus dem Album ' + photoAlbum}" loading="lazy"
+                         th:attr="width=${image.width},height=${image.height}">
+                    <span th:text="${photoAlbum}">Album</span>
+                </button>
+            </div>
+        </article>
+    </section>
+    <dialog class="photo-lightbox" id="photo-lightbox" aria-label="Fotoansicht">
+        <button type="button" class="photo-lightbox-close" aria-label="Fotoansicht schließen">Schließen ×</button>
+        <div class="photo-lightbox-stage" aria-live="polite" aria-busy="false">
+            <div class="photo-lightbox-loading" role="status">
+                <span aria-hidden="true"></span>
+                <p>Foto wird geladen …</p>
+            </div>
+            <p class="photo-lightbox-error" hidden>Das Foto konnte nicht geladen werden.</p>
+            <img alt="" hidden>
+        </div>
+        <p class="photo-lightbox-caption"></p>
+    </dialog>
+
+    <section id="chronik" class="entity-timeline" th:if="${!timeline.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Chronik</p><h2>Was wann geschah</h2></div>
+            <p th:text="${timeline.size() == 1 ? 'Ein datierter Moment.' : timeline.size() + ' datierte Momente.'}">Datierte Momente.</p>
+        </header>
+        <ol>
+            <li th:each="item : ${timeline}">
+                <time th:datetime="${item.date}" th:text="${item.dateLabel}">2024</time>
+                <span class="timeline-mark" aria-hidden="true"></span>
+                <div th:if="${item.title != null}">
+                    <small th:text="${item.event}">Ereignis</small>
+                    <a th:if="${item.url != null}" th:href="${item.url}" th:text="${item.title}">Titel</a>
+                    <strong th:unless="${item.url != null}" th:text="${item.title}">Titel</strong>
+                </div>
+                <div th:unless="${item.title != null}">
+                    <strong th:text="${item.event}">Ereignis</strong>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <section id="musikvideos" class="related-bands related-videos" th:if="${!musicVideos.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Filmografie</p><h2>Musikvideos</h2></div>
+            <p th:text="${musicVideos.size() == 1 ? 'Ein verbundenes Musikvideo.' : musicVideos.size() + ' verbundene Musikvideos.'}">Verbundene Musikvideos.</p>
+        </header>
+        <div class="related-band-grid">
+            <article th:each="card, stat : ${musicVideos}">
+                <a th:href="@{/entry/{slug}(slug=${card.project.slug})}">
+                    <div class="related-band-visual">
+                        <img th:if="${card.image != null}" th:src="@{/media/{id}(id=${card.image.id})}"
+                             th:alt="${card.image.altText ?: card.project.title}"
+                             th:attr="width=${card.image.width},height=${card.image.height}" loading="lazy">
+                        <div class="related-band-plate" th:unless="${card.image != null}"
+                             th:attr="data-index=${#numbers.formatInteger(stat.count, 2)}">
+                            <span>Archivbild</span>
+                        </div>
+                    </div>
+                    <div class="related-band-caption">
+                        <div>
+                            <h3 th:text="${card.project.displayTitle ?: card.project.title}">Musikvideo</h3>
+                            <small th:if="${card.project.year != null}" th:text="${card.project.year}">2024</small>
+                        </div>
+                        <span>Video ansehen <span aria-hidden="true">↗</span></span>
+                    </div>
+                </a>
+            </article>
+        </div>
+    </section>
+
+    <section id="wiki-texte" class="narrative-sections" th:if="${!textSections.isEmpty()}">
+        <header class="narrative-heading">
+            <div><p class="eyebrow">Aus dem Wiki</p><h2>Hintergründe und Entstehung</h2></div>
+            <p th:text="${textSections.size() == 1 ? 'Ein vertiefender Abschnitt.' : textSections.size() + ' vertiefende Kapitel.'}">Vertiefende Kapitel.</p>
+        </header>
+        <div class="narrative-layout">
+            <nav class="narrative-index" aria-label="Wiki-Kapitel">
+                <a th:each="section, stat : ${textSections}" th:href="${'#wiki-section-' + stat.index}">
+                    <span th:text="${#numbers.formatInteger(stat.count, 2)}">01</span>
+                    <span th:text="${section.title}">Handlung</span>
+                </a>
+            </nav>
+            <div class="narrative-document">
+            <article th:each="section, stat : ${textSections}" th:id="${'wiki-section-' + stat.index}">
+                <header><h3 th:text="${section.title}">Handlung</h3></header>
+                <div class="narrative-body">
+                    <th:block th:each="block : ${section.blocks}">
+                        <p th:if="${block.type == 'PARAGRAPH'}" th:utext="${block.html}">Text</p>
+                        <ul th:if="${block.type == 'UNORDERED_LIST'}"><li th:each="item : ${block.items}" th:utext="${item}">Punkt</li></ul>
+                        <ol th:if="${block.type == 'ORDERED_LIST'}"><li th:each="item : ${block.items}" th:utext="${item}">Punkt</li></ol>
+                    </th:block>
+                    <section class="narrative-subsection" th:each="subsection : ${section.subsections}">
+                        <h4 th:text="${subsection.title}">Unterabschnitt</h4>
+                        <th:block th:each="block : ${subsection.blocks}">
+                            <p th:if="${block.type == 'PARAGRAPH'}" th:utext="${block.html}">Text</p>
+                            <ul th:if="${block.type == 'UNORDERED_LIST'}"><li th:each="item : ${block.items}" th:utext="${item}">Punkt</li></ul>
+                            <ol th:if="${block.type == 'ORDERED_LIST'}"><li th:each="item : ${block.items}" th:utext="${item}">Punkt</li></ol>
+                        </th:block>
+                    </section>
+                </div>
+            </article>
+            </div>
+        </div>
+    </section>
+
+    <section id="bands" class="related-bands" th:if="${!relatedBands.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Im Umfeld</p><h2>Verwandte Bands</h2></div>
+            <p th:text="${relatedBands.size() == 1 ? 'Eine direkt verknüpfte Band.' : relatedBands.size() + ' direkt verknüpfte Bands.'}">Direkt verknüpfte Bands.</p>
+        </header>
+        <div class="related-band-grid">
+            <article th:each="card, stat : ${relatedBands}">
+                <a th:href="@{/entry/{slug}(slug=${card.band.slug})}">
+                    <div class="related-band-visual">
+                        <img th:if="${card.image != null}" th:src="@{/media/{id}(id=${card.image.id})}"
+                             th:alt="${card.image.altText ?: card.band.title}"
+                             th:attr="width=${card.image.width},height=${card.image.height}" loading="lazy">
+                        <div class="related-band-plate" th:unless="${card.image != null}"
+                             th:attr="data-index=${#numbers.formatInteger(stat.count, 2)}">
+                            <span>Archivbild</span>
+                        </div>
+                    </div>
+                    <div class="related-band-caption">
+                        <h3 th:text="${card.band.displayTitle ?: card.band.title}">Band</h3>
+                        <span>Band ansehen <span aria-hidden="true">↗</span></span>
+                    </div>
+                </a>
+            </article>
+        </div>
+    </section>
+
+    <section id="drehorte" class="project-locations" th:if="${!filmingLocations.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Drehorte</p><h2 th:text="${filmingLocations.size() == 1 ? 'Wo es entstand' : 'Orte der Produktion'}">Orte der Produktion</h2></div>
+            <p th:text="${filmingLocations.size() == 1 ? 'Ein dokumentierter Drehort.' : filmingLocations.size() + ' dokumentierte Drehorte.'}">Dokumentierte Drehorte.</p>
+        </header>
+        <div class="location-maps">
+            <article th:each="location : ${filmingLocations}">
+                <iframe th:src="${location.embedUrl}" th:title="${'Karte: ' + location.title}"
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div>
+                    <h3 th:text="${location.title}">Drehort</h3>
+                    <a th:href="@{/explore(focus=${'entity:' + location.slug})}">Verbindungen dieses Ortes entdecken →</a>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section id="karte" class="project-locations" th:if="${ownMapUrl.isPresent() || !placeAppearances.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Ort</p><h2>Auf der Karte</h2></div>
+            <p th:if="${!placeAppearances.isEmpty()}"
+               th:text="${placeAppearances.size() == 1 ? 'Eine dokumentierte Arbeit entstand hier.' : placeAppearances.size() + ' dokumentierte Arbeiten entstanden hier.'}">Arbeiten.</p>
+        </header>
+        <div class="location-maps">
+            <article th:if="${ownMapUrl.isPresent()}">
+                <iframe th:src="${ownMapUrl.get()}" th:title="${'Karte: ' + (project.displayTitle ?: project.title)}"
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div>
+                    <h3 th:text="${project.displayTitle ?: project.title}">Ort</h3>
+                    <a th:href="@{/explore(focus=${'entity:' + project.slug})}">Verbindungen dieses Ortes entdecken →</a>
+                </div>
+            </article>
+        </div>
+        <ul class="relation-list" th:if="${!placeAppearances.isEmpty()}">
+            <li th:each="appearance : ${placeAppearances}">
+                <span th:text="${appearance.role}">Rolle</span>
+                <a th:href="@{/entry/{slug}(slug=${appearance.work.slug})}" th:text="${appearance.work.displayTitle ?: appearance.work.title}">Werk</a>
+            </li>
+        </ul>
+    </section>
+
+    <details id="archivzustand" class="archive-state" th:if="${!properties.isEmpty() || !relations.isEmpty()}">
+        <summary><span>Kamera, Software und weitere technische Angaben</span><strong>Technik &amp; Archivdaten öffnen</strong></summary>
+        <div class="archive-state-content">
+            <section class="credits" th:if="${!properties.isEmpty()}">
+                <p class="eyebrow">Technik</p>
+                <dl>
+                    <div th:each="property : ${properties}">
+                        <dt th:text="${property.key}">Rolle</dt>
+                        <dd th:text="${#strings.listJoin(property.value, ' · ')}">Wert</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <section class="related" th:if="${!relations.isEmpty()}">
+                <p class="eyebrow">Weitere Spuren</p>
+                <h2>Verbunden mit</h2>
+                <ul class="relation-list">
+                    <li th:each="relation : ${relations}" th:with="other=${relation.sourceEntity.id == project.id ? relation.targetEntity : relation.sourceEntity}">
+                        <span th:text="${labels.relationship(relation.type)}">Verwandt mit</span>
+                        <a th:if="${other.isPubliclyVisible()}" th:href="@{/entry/{slug}(slug=${other.slug})}"
+                           th:text="${other.displayTitle ?: other.title}">Ziel</a>
+                        <span th:unless="${other.isPubliclyVisible()}" th:text="${other.displayTitle ?: other.title}">Ziel</span>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </details>
+
+    <a class="archive-jump" th:if="${project.wikiUrl != null}" th:href="${project.wikiUrl}" rel="noopener">
+        <span>Vollständige Produktionsgeschichte</span>
+        <strong>Vollständigen Archiveintrag öffnen →</strong>
+    </a>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+<script type="module" src="/js/piwigo-gallery.js" th:if="${!photoGalleries.isEmpty()}"></script>
+</body>
+</html>

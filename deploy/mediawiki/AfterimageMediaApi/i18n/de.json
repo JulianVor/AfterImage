@@ -1,0 +1,18 @@
+{
+  "@metadata": {
+    "authors": [
+      "AFTERIMAGE"
+    ]
+  },
+  "afterimagemediaapi-desc": "Ermöglicht AFTERIMAGE den authentifizierten Abruf begrenzter Rasterbild-Vorschaubilder",
+  "apihelp-afterimageimage-summary": "Liefert einem angemeldeten Leser ein begrenztes Rasterbild-Vorschaubild",
+  "apihelp-afterimageimage-param-title": "Abzurufender Dateititel",
+  "apihelp-afterimageimage-param-width": "Gewünschte Breite des Vorschaubilds in Pixeln (maximal 2000)",
+  "afterimagemediaapi-login-required": "Für diesen Bild-Endpunkt musst du angemeldet sein.",
+  "afterimagemediaapi-invalid-title": "Der angegebene Titel ist kein gültiger Dateititel.",
+  "afterimagemediaapi-file-missing": "Die angeforderte Datei existiert nicht.",
+  "afterimagemediaapi-unsupported": "Es können nur Rasterbilder ausgeliefert werden.",
+  "afterimagemediaapi-transform-failed": "Das Vorschaubild konnte nicht erzeugt werden.",
+  "afterimagemediaapi-read-failed": "Das Vorschaubild konnte nicht gelesen werden.",
+  "afterimagemediaapi-too-large": "Das Vorschaubild überschreitet die Grenze von 25 MB."
+}

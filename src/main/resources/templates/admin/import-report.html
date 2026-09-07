@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Importbericht — AFTERIMAGE</title><link rel="stylesheet" href="/css/admin.css"></head>
+<body>
+<header class="admin-header"><strong>AFTERIMAGE / ADMIN</strong><nav><a href="/admin">Übersicht</a></nav></header>
+<main class="admin-shell">
+    <p><a href="/admin">← Übersicht</a></p><h1>Importbericht</h1>
+    <p class="message" th:if="${message}" th:text="${message}"></p>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+    <section class="panel"><dl><dt>Status</dt><dd th:text="${labels.of(run.status)}"></dd><dt>Datei</dt><dd th:text="${run.filename}"></dd><dt>Wiki</dt><dd th:text="${run.siteName + ' · ' + run.generator}"></dd><dt>Importiert / aktualisiert / unverändert / übersprungen</dt><dd th:text="${run.importedPages + ' / ' + run.updatedPages + ' / ' + run.unchangedPages + ' / ' + run.skippedPages}"></dd><dt>Verarbeitete Beziehungen</dt><dd th:text="${run.relationships}"></dd></dl></section>
+    <section class="panel import-result">
+        <p class="eyebrow">Importdiagnose</p>
+        <h2 th:if="${errorCount == 0}">Import ohne blockierende Fehler abgeschlossen</h2>
+        <h2 th:unless="${errorCount == 0}">Der Import braucht Aufmerksamkeit</h2>
+        <p th:if="${errorCount == 0}"><strong th:text="${warningCount}">0</strong> Warnungen müssen geprüft werden. Die übrigen <strong th:text="${infoCount}">0</strong> Einträge sind informative Prüfhinweise.</p>
+        <p th:unless="${errorCount == 0}"><strong th:text="${errorCount}">0</strong> Fehler und <strong th:text="${warningCount}">0</strong> Warnungen wurden erfasst.</p>
+    </section>
+
+    <section class="issue-summary-grid" aria-label="Problemübersicht">
+        <article class="issue-summary" th:each="group : ${issueGroups}">
+            <div><span class="badge" th:classappend="${'issue-' + #strings.toLowerCase(group.severity)}" th:text="${labels.of(group.severity)}">HINWEIS</span><strong th:text="${group.count}">0</strong></div>
+            <h2 th:text="${labels.code(group.code)}">Problemcode</h2>
+            <p th:text="${group.description}">Beschreibung</p>
+        </article>
+    </section>
+
+    <section class="panel issue-section">
+        <h2>Prüfung erforderlich <span class="badge" th:text="${actionableIssues.size()}">0</span></h2>
+        <p class="empty-note" th:if="${actionableIssues.isEmpty()}">Keine Warnungen oder Fehler.</p>
+        <div class="table-wrap" th:unless="${actionableIssues.isEmpty()}">
+            <table class="admin-table"><thead><tr><th>Stufe</th><th>Code</th><th>Seite</th><th>Eigenschaft/Wert</th><th>Lösung</th></tr></thead><tbody><tr th:each="issue : ${actionableIssues}"><td th:class="${'issue-' + #strings.toLowerCase(issue.severity)}" th:text="${labels.of(issue.severity)}"></td><td th:text="${labels.code(issue.code)}"></td><td th:text="${issue.pageTitle}"></td><td><span th:text="${issue.propertyName}"></span><br><small th:text="${issue.rawValue}"></small></td><td><span th:text="${issueGuidance[issue.id]}">Quelle prüfen</span><br><small th:text="${labels.message(issue.message)}"></small><form class="wiki-property-form" th:if="${issue.code == 'MISSING_RECOMMENDED_PROPERTY' and wikiWriteConfigured}" method="post" th:action="@{/admin/imports/{runId}/issues/{issueId}/wiki-property(runId=${run.id},issueId=${issue.id})}"><label>Eigenschaft<select name="propertyName" required><option th:each="option : ${issuePropertyOptions[issue.id]}" th:value="${option}" th:text="${option}"></option></select></label><label>Wert<input name="value" maxlength="500" required autocomplete="off"></label><button type="submit">Zum Wiki hinzufügen und synchronisieren</button></form><small th:if="${issue.code == 'MISSING_RECOMMENDED_PROPERTY' and !wikiWriteConfigured}">Konfiguriere die Wiki-API-Zugangsdaten, um diese Eigenschaft direkt hinzuzufügen.</small><br><a th:if="${issueWikiEditUrls[issue.id]}" th:href="${issueWikiEditUrls[issue.id]}" target="_blank" rel="noopener">Vollständige Seite im Wiki bearbeiten ↗</a></td></tr></tbody></table>
+        </div>
+    </section>
+
+    <section class="panel issue-section info-section">
+        <h2>Prüfhinweise <span class="badge" th:text="${infoCount}">0</span></h2>
+        <p>Fehlende Linkziele sind bei einem unvollständigen Wiki-Export normal. Sie bleiben als Prüfhinweise erhalten und gelten nicht als fehlgeschlagene Importe.</p>
+        <a class="button button--quiet" th:unless="${showInfo}" th:href="@{/admin/imports/{id}(id=${run.id},showInfo=true)}">Prüfhinweise anzeigen</a>
+        <div th:if="${showInfo}">
+            <div class="info-pagination">
+                <span th:text="${'Seite ' + (infoPage + 1) + ' von ' + infoPageCount}">Seite 1 von 1</span>
+                <div>
+                    <a class="button button--quiet" th:if="${infoPage > 0}" th:href="@{/admin/imports/{id}(id=${run.id},showInfo=true,infoPage=${infoPage - 1})}">← Zurück</a>
+                    <a class="button button--quiet" th:if="${infoPage + 1 < infoPageCount}" th:href="@{/admin/imports/{id}(id=${run.id},showInfo=true,infoPage=${infoPage + 1})}">Weiter →</a>
+                </div>
+            </div>
+            <div class="table-wrap"><table class="admin-table"><thead><tr><th>Code</th><th>Seite</th><th>Eigenschaft/Wert</th><th>Meldung</th></tr></thead><tbody><tr th:each="issue : ${infoIssues}"><td th:text="${labels.code(issue.code)}"></td><td th:text="${issue.pageTitle}"></td><td><span th:text="${issue.propertyName}"></span><br><small th:text="${issue.rawValue}"></small></td><td th:text="${labels.message(issue.message)}"></td></tr></tbody></table></div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

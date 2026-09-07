@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Archivzustand — AFTERIMAGE</title><link rel="stylesheet" href="/css/admin.css"></head>
+<body>
+<header class="admin-header"><strong>AFTERIMAGE / ZUSTAND</strong><nav><a href="/admin">Übersicht</a><a href="/explore" target="_blank">Graph ansehen</a><form method="post" action="/admin/logout"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button--quiet">Abmelden</button></form></nav></header>
+<main class="admin-shell">
+    <div class="health-hero">
+        <div><p class="eyebrow">Archivzustand</p><h1><span th:text="${report.score}">82</span><small>/100</small></h1></div>
+        <div><h2 th:text="${report.publicEntries == 0 ? 'Das Archiv ist noch leer.' : report.score >= 85 ? 'Gut vernetzt.' : report.score >= 60 ? 'Eine gesunde Grundlage.' : 'Das Archiv braucht Pflege.'}">Eine gesunde Grundlage.</h2><p>Die Bewertung berücksichtigt Auffindbarkeit, Kontext, Medien und semantische Struktur. Daten werden dabei nie automatisch verändert.</p></div>
+    </div>
+    <section class="health-metrics">
+        <article><strong th:text="${report.publicEntries}">0</strong><span>öffentliche Einträge</span></article>
+        <article><strong th:text="${report.publicRelationships}">0</strong><span>öffentliche Beziehungen</span></article>
+        <article><strong th:text="${report.components}">0</strong><span>getrennte Gruppen</span></article>
+        <article><strong th:text="${report.largestComponent}">0</strong><span>Einträge in der größten Gruppe</span></article>
+    </section>
+    <section class="panel content-profiles">
+        <header>
+            <div><p class="eyebrow">Generalisierte Inhaltsstruktur</p><h2>Inhaltsprofile</h2></div>
+            <p>Zeigt, ob die gemeinsamen und typabhängigen Bereiche für die öffentliche Darstellung ausreichend befüllt sind.</p>
+        </header>
+        <p class="empty-note" th:if="${report.profiles.isEmpty()}">Noch keine öffentlichen Einträge für die Profilanalyse.</p>
+        <div class="profile-grid" th:unless="${report.profiles.isEmpty()}">
+            <article th:each="profile : ${report.profiles}">
+                <header>
+                    <div><span th:text="${labels.of(profile.type)}">Projekt</span><small><strong th:text="${profile.entries}">0</strong> Einträge</small></div>
+                    <strong th:text="${profile.coverage + '%'}">75%</strong>
+                </header>
+                <div class="profile-total" role="meter" aria-label="Gesamtabdeckung"
+                     aria-valuemin="0" aria-valuemax="100" th:attr="aria-valuenow=${profile.coverage}">
+                    <i th:style="${'width:' + profile.coverage + '%'}"></i>
+                </div>
+                <ul>
+                    <li th:each="section : ${profile.sections}">
+                        <span th:text="${section.name}">Überblick</span>
+                        <div><i th:style="${'width:' + section.coverage + '%'}"></i></div>
+                        <small th:text="${section.filled + '/' + section.total}">3/4</small>
+                    </li>
+                </ul>
+            </article>
+        </div>
+    </section>
+    <section class="panel health-findings">
+        <header><div><p class="eyebrow">Warteschlange zur Datenpflege</p><h2>Was Aufmerksamkeit verdient</h2></div><div class="health-counts"><span class="health-high"><strong th:text="${report.highCount}">0</strong> hoch</span><span class="health-medium"><strong th:text="${report.mediumCount}">0</strong> mittel</span><span><strong th:text="${report.lowCount}">0</strong> niedrig</span></div></header>
+        <p class="empty-note" th:if="${report.findingGroups.isEmpty()}">Keine strukturellen Probleme erkannt.</p>
+        <div class="health-groups" th:unless="${report.findingGroups.isEmpty()}">
+            <details class="health-group" th:each="group : ${report.findingGroups}"
+                      th:classappend="${'health-group--' + #strings.toLowerCase(group.severity.name())}"
+                      th:attr="open=${group.severity.name() == 'HIGH' ? 'open' : null}">
+                <summary>
+                    <span class="health-group-severity" th:text="${labels.of(group.severity)}">HOCH</span>
+                    <span class="health-group-title" th:text="${labels.code(group.code)}">Problem</span>
+                    <span class="health-group-recommendation" th:text="${group.recommendation}">Empfehlung</span>
+                    <span class="health-group-count" th:text="${group.count}">66</span>
+                </summary>
+                <ol>
+                    <li th:each="finding : ${group.findings}">
+                        <a th:href="@{/admin/entities/{id}(id=${finding.entityId})}" th:text="${finding.entityTitle}">Eintrag</a>
+                        <small th:if="${finding.code == 'GENERIC_RELATIONSHIP'}" th:text="${finding.detail}"></small>
+                    </li>
+                </ol>
+            </details>
+        </div>
+    </section>
+</main>
+</body>
+</html>

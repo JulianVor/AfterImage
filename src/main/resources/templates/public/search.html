@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('SUCHE')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('')}"></header>
+<main class="archive-page search-page">
+    <header><p class="eyebrow">Eine Spur finden</p><h1>Suche</h1></header>
+    <form action="/search" method="get" class="search-form" role="search">
+        <label for="q">Projekte, Bands, Menschen, Orte oder Jahre</label>
+        <div><input id="q" name="q" type="search" th:value="${query}" autofocus><button>Suchen</button></div>
+    </form>
+    <ol class="archive-index" th:if="${!query.isBlank()}">
+        <li th:each="entry : ${entries.content}">
+            <span th:text="${entry.year ?: '—'}">2024</span>
+            <a th:if="${entry.entityType.name() == 'PROJECT' || entry.entityType.name() == 'BAND'}" th:href="@{/entry/{slug}(slug=${entry.slug})}"
+               th:text="${entry.title}">Titel</a>
+            <span th:unless="${entry.entityType.name() == 'PROJECT' || entry.entityType.name() == 'BAND'}" th:text="${entry.title}">Titel</span>
+            <small th:text="${labels.of(entry.entityType)}">Typ</small>
+        </li>
+    </ol>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

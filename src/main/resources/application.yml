@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: afterimage
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/afterimage}
+    username: ${SPRING_DATASOURCE_USERNAME:afterimage}
+    password: ${SPRING_DATASOURCE_PASSWORD:afterimage-local}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 32MB
+      max-request-size: 34MB
+  thymeleaf:
+    cache: ${THYMELEAF_CACHE:true}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+afterimage:
+  site:
+    title: ${AFTERIMAGE_SITE_TITLE:AFTERIMAGE}
+    owner: ${AFTERIMAGE_SITE_OWNER:Julian Vornfeld}
+    owner-slug: ${AFTERIMAGE_SITE_OWNER_SLUG:julian-vornfeld}
+    subtitle: ${AFTERIMAGE_SITE_SUBTITLE:Film · Fotografie · Visuelle Welten}
+  wiki:
+    base-url: ${AFTERIMAGE_WIKI_BASE_URL:https://wiki.fotosvorju.de}
+    api-url: ${AFTERIMAGE_WIKI_API_URL:https://wiki.fotosvorju.de/w/api.php}
+    username: ${AFTERIMAGE_WIKI_USERNAME:}
+    password: ${AFTERIMAGE_WIKI_PASSWORD:}
+    sync-category: ${AFTERIMAGE_WIKI_SYNC_CATEGORY:}
+    content-enabled: ${AFTERIMAGE_WIKI_CONTENT_ENABLED:true}
+    connect-timeout: ${AFTERIMAGE_WIKI_CONNECT_TIMEOUT:10s}
+    request-timeout: ${AFTERIMAGE_WIKI_REQUEST_TIMEOUT:30s}
+  piwigo:
+    enabled: ${AFTERIMAGE_PIWIGO_ENABLED:true}
+    base-url: ${AFTERIMAGE_PIWIGO_BASE_URL:https://galerie.fotosvorju.de}
+    api-url: ${AFTERIMAGE_PIWIGO_API_URL:https://galerie.fotosvorju.de/ws.php}
+    api-key: ${AFTERIMAGE_PIWIGO_API_KEY:}
+    username: ${AFTERIMAGE_PIWIGO_USERNAME:}
+    password: ${AFTERIMAGE_PIWIGO_PASSWORD:}
+    default-page-size: ${AFTERIMAGE_PIWIGO_DEFAULT_PAGE_SIZE:50}
+    connect-timeout: ${AFTERIMAGE_PIWIGO_CONNECT_TIMEOUT:10s}
+    request-timeout: ${AFTERIMAGE_PIWIGO_REQUEST_TIMEOUT:30s}
+  media:
+    root: ${AFTERIMAGE_MEDIA_ROOT:media}
+  admin:
+    username: ${AFTERIMAGE_ADMIN_USERNAME:admin}
+    password: ${AFTERIMAGE_ADMIN_PASSWORD:change-me-locally}
+  import:
+    max-pages: ${AFTERIMAGE_IMPORT_MAX_PAGES:8000}

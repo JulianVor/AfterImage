@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${trail.title})}"></head>
+<body>
+<header th:replace="~{fragments :: nav('trails')}"></header>
+<main class="trail-page story-page" th:classappend="${' story-page--' + #strings.toLowerCase(trail.storyType.name())}">
+    <header class="trail-hero" th:classappend="${heroMedia.isPresent()} ? 'trail-hero--with-image' : ''">
+        <div class="trail-hero-copy">
+            <p class="eyebrow"><span th:text="${labels.of(trail.storyType)}">Pfad</span> · <span th:text="${trail.steps.size()}">3</span> Bausteine</p>
+            <h1 th:text="${trail.title}">Geschichtentitel</h1>
+            <p th:if="${leadDescription}" th:text="${leadDescription}">Beschreibung</p>
+            <p class="trail-main-entry" th:if="${trail.mainEntity != null}">Basierend auf <strong th:text="${trail.mainEntity.displayTitle ?: trail.mainEntity.title}">Haupteintrag</strong></p>
+            <a href="#story-start" th:text="${trail.storyType.name() == 'PATH' ? 'Pfad beginnen ↓' : 'Geschichte öffnen ↓'}">Geschichte öffnen ↓</a>
+        </div>
+        <figure class="trail-hero-visual" th:if="${heroMedia.isPresent()}">
+            <img th:src="@{/media/{id}(id=${heroMedia.get().id()})}" th:alt="${heroMedia.get().altText() ?: trail.title}"
+                 th:attr="width=${heroMedia.get().width()},height=${heroMedia.get().height()}" loading="eager">
+        </figure>
+    </header>
+
+    <ol class="trail-steps" id="story-start" th:if="${trail.storyType.name() == 'PATH'}">
+        <li th:each="step, state : ${storyBlocks}" th:classappend="${state.even ? 'trail-step--reverse' : ''}">
+            <div class="trail-step-visual" th:if="${step.blockType.name() == 'ENTRY' || step.blockType.name() == 'GALLERY'}">
+                <img th:if="${blockMedia[step.id] != null}" th:src="@{/media/{id}(id=${blockMedia[step.id].id})}" th:alt="${blockMedia[step.id].altText ?: step.entity.title}">
+                <div th:unless="${blockMedia[step.id] != null}" class="trail-step-plate" th:attr="data-type=${step.entity != null ? step.entity.entityType : step.blockType}"><span th:text="${#numbers.formatInteger(state.count, 2)}">01</span></div>
+            </div>
+            <article th:classappend="${step.blockType.name() == 'QUOTE' ? 'story-quote' : ''}">
+                <p class="eyebrow"><span th:text="${#numbers.formatInteger(state.count, 2)}">01</span> · <span th:text="${labels.of(step.blockType)}">Archiveintrag</span></p>
+                <h2 th:if="${step.heading != null || step.entity != null}" th:text="${step.heading ?: (step.entity.displayTitle ?: step.entity.title)}">Eintrag</h2>
+                <p class="trail-step-meta" th:if="${step.eventDate != null || step.cameraFocus != null || (step.entity != null && step.entity.year != null)}" th:text="${step.eventDate ?: (step.cameraFocus ?: step.entity.year)}">2024</p>
+                <p class="trail-step-copy" th:if="${step.blockType.name() != 'ENTRY' && step.text}" th:text="${step.text}">Erzählung</p>
+                <p class="trail-step-copy" th:if="${step.entity != null && (step.blockType.name() == 'ENTRY' || step.text == null)}" th:text="${step.entity.shortDescription}">Beschreibung</p>
+                <a th:if="${step.entity != null}" th:href="@{/entry/{slug}(slug=${step.entity.slug})}">Archiveintrag öffnen →</a>
+            </article>
+        </li>
+    </ol>
+
+    <div class="akte" id="story-start" th:if="${trail.storyType.name() == 'DOSSIER'}">
+        <nav class="akte-register" aria-label="Abschnitte" th:if="${dossierSections.size() > 1}">
+            <a class="akte-register-link" th:each="section : ${dossierSections}" th:if="${section.heading != null}"
+               th:href="${'#dossier-section-' + section.number}">
+                <em th:text="${#numbers.formatInteger(section.number, 2)}">01</em>
+                <span th:text="${section.heading.heading}">Abschnitt</span>
+            </a>
+        </nav>
+        <div class="akte-column">
+            <section class="akte-section" th:each="section : ${dossierSections}" th:id="${section.heading != null ? 'dossier-section-' + section.number : null}">
+                <header class="akte-divider" th:if="${section.heading != null}">
+                    <span class="akte-folio" th:text="${#numbers.formatInteger(section.number, 2)}">01</span>
+                    <h2 th:text="${section.heading.heading}">Abschnittstitel</h2>
+                    <p th:if="${section.heading.text}" th:text="${section.heading.text}">Einleitung</p>
+                </header>
+                <div class="akte-narrative">
+                    <div th:each="step : ${section.chapters}" th:id="${'dossier-chapter-' + step.id}"
+                         th:class="${'akte-block akte-block--' + #strings.toLowerCase(step.blockType.name())}">
+
+                        <div class="akte-exhibit" th:if="${step.blockType.name() == 'ENTRY' && step.entity != null}">
+                            <div class="akte-exhibit-plate">
+                                <img th:if="${blockMedia[step.id] != null}" th:src="@{/media/{id}(id=${blockMedia[step.id].id})}" th:alt="${blockMedia[step.id].altText ?: step.entity.title}" loading="lazy">
+                                <span th:unless="${blockMedia[step.id] != null}" class="akte-exhibit-glyph" th:text="${#strings.toUpperCase(#strings.substring(step.entity.displayTitle ?: step.entity.title, 0, 1))}">A</span>
+                            </div>
+                            <div class="akte-exhibit-caption">
+                                <div>
+                                    <p class="eyebrow" th:text="${'Archiveintrag · ' + labels.of(step.entity.projectType != null ? step.entity.projectType : step.entity.entityType)}">Archiveintrag · Typ</p>
+                                    <h4 th:text="${step.entity.displayTitle ?: step.entity.title}">Titel</h4>
+                                </div>
+                                <a th:href="@{/entry/{slug}(slug=${step.entity.slug})}">Im Archiv öffnen →</a>
+                            </div>
+                        </div>
+
+                        <blockquote class="akte-pull" th:if="${step.blockType.name() == 'QUOTE'}">
+                            <p th:text="${step.text ?: (step.entity != null ? step.entity.shortDescription : '')}">Zitat</p>
+                            <a class="akte-pull-source" th:if="${step.entity != null}" th:href="@{/entry/{slug}(slug=${step.entity.slug})}" th:text="${'— ' + (step.entity.displayTitle ?: step.entity.title)}">— Quelle</a>
+                        </blockquote>
+
+                        <div class="akte-gallery" th:if="${step.blockType.name() == 'GALLERY'}">
+                            <div class="story-gallery" th:each="gallery : ${galleriesByBlock[step.id]}">
+                                <div class="story-gallery-heading"><span th:text="${gallery.album.name}">Album</span><a th:if="${gallery.album.url}" th:href="${gallery.album.url}" target="_blank" rel="noopener">In Piwigo öffnen ↗</a></div>
+                                <p class="gallery-unavailable" th:if="${gallery.error}" th:text="${gallery.error}">Nicht erreichbar.</p>
+                                <div class="story-photo-grid" th:if="${gallery.imagePage != null}">
+                                    <button type="button" class="photo-tile" th:each="image : ${gallery.imagePage.images}" th:with="photoAlbum=${#strings.isEmpty(image.albumName) ? gallery.album.name : image.albumName}" th:attr="data-full=${image.fullUrl},data-title=${photoAlbum}">
+                                        <img th:if="${image.thumbnailUrl}" th:src="${image.thumbnailUrl}" th:alt="${'Foto aus dem Album ' + photoAlbum}" loading="lazy" th:attr="width=${image.width},height=${image.height}">
+                                        <span th:text="${photoAlbum}">Album</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="akte-chapter" th:if="${step.blockType.name() == 'TEXT'}">
+                            <p class="eyebrow" th:if="${step.cameraFocus}" th:text="${step.cameraFocus}">Fokus</p>
+                            <h3 th:if="${step.heading != null || step.entity != null}" th:text="${step.heading ?: (step.entity.displayTitle ?: step.entity.title)}">Kapitel</h3>
+                            <p th:if="${step.text}" th:text="${step.text}">Text</p>
+                            <p th:if="${step.text == null && step.entity != null}" th:text="${step.entity.shortDescription}">Beschreibung</p>
+                            <a class="akte-chapter-link" th:if="${step.entity != null}" th:href="@{/entry/{slug}(slug=${step.entity.slug})}"><span th:text="${labels.of(step.entity.entityType)}">Eintrag</span> im Archiv öffnen →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <ol class="story-chronicle" id="story-start" th:if="${trail.storyType.name() == 'CHRONICLE'}">
+        <li th:each="step, state : ${storyBlocks}">
+            <div class="story-chronicle-date">
+                <time th:if="${step.eventDate}" th:datetime="${step.eventDate}" th:text="${eventDateLabels[step.id]}">12. August 2022</time>
+                <span th:unless="${step.eventDate}" th:text="${step.entity != null && step.entity.year != null ? step.entity.year : 'Ohne Datum'}">Ohne Datum</span>
+            </div>
+            <span class="story-chronicle-mark" aria-hidden="true"></span>
+            <article>
+                <p class="eyebrow" th:text="${step.cameraFocus ?: labels.of(step.blockType)}">Ereignis</p>
+                <h2 th:if="${step.heading != null || step.entity != null}" th:text="${step.heading ?: (step.entity.displayTitle ?: step.entity.title)}">Moment</h2>
+                <p th:if="${step.blockType.name() != 'ENTRY' && step.text}" th:text="${step.text}">Text</p>
+                <p th:if="${step.entity != null && (step.blockType.name() == 'ENTRY' || step.text == null)}" th:text="${step.entity.shortDescription}">Beschreibung</p>
+                <img th:if="${blockMedia[step.id] != null}" th:src="@{/media/{id}(id=${blockMedia[step.id].id})}" th:alt="${blockMedia[step.id].altText ?: step.entity.title}" loading="lazy">
+                <a th:if="${step.entity != null}" th:href="@{/entry/{slug}(slug=${step.entity.slug})}">Archiveintrag öffnen →</a>
+            </article>
+        </li>
+    </ol>
+
+    <div class="photo-essay-story" id="story-start" th:if="${trail.storyType.name() == 'PHOTO_ESSAY'}">
+        <section class="photo-essay-block" th:each="step, state : ${storyBlocks}" th:classappend="${' photo-essay-block--' + #strings.toLowerCase(step.blockType.name())}">
+            <div class="photo-essay-copy" th:if="${step.heading != null || step.text != null || step.entity != null}">
+                <p class="eyebrow"><span th:text="${#numbers.formatInteger(state.count, 2)}">01</span> · <span th:text="${labels.of(step.blockType)}">Fotostrecke</span></p>
+                <h2 th:if="${step.heading != null || step.entity != null}" th:text="${step.heading ?: (step.entity.displayTitle ?: step.entity.title)}">Kapitel</h2>
+                <p th:if="${step.blockType.name() != 'ENTRY' && step.text}" th:text="${step.text}">Text</p>
+                <p th:if="${step.entity != null && step.blockType.name() != 'GALLERY' && (step.blockType.name() == 'ENTRY' || step.text == null)}" th:text="${step.entity.shortDescription}">Beschreibung</p>
+            </div>
+            <img class="photo-essay-entry-image" th:if="${step.blockType.name() != 'GALLERY' && blockMedia[step.id] != null}" th:src="@{/media/{id}(id=${blockMedia[step.id].id})}" th:alt="${blockMedia[step.id].altText ?: step.entity.title}" loading="lazy">
+            <div class="story-gallery" th:if="${step.blockType.name() == 'GALLERY'}" th:each="gallery : ${galleriesByBlock[step.id]}">
+                <div class="story-gallery-heading"><span th:text="${gallery.album.name}">Album</span><a th:if="${gallery.album.url}" th:href="${gallery.album.url}" target="_blank" rel="noopener">In Piwigo öffnen ↗</a></div>
+                <p class="gallery-unavailable" th:if="${gallery.error}" th:text="${gallery.error}">Nicht erreichbar.</p>
+                <div class="story-photo-grid" th:if="${gallery.imagePage != null}">
+                    <button type="button" class="photo-tile" th:each="image : ${gallery.imagePage.images}" th:with="photoAlbum=${#strings.isEmpty(image.albumName) ? gallery.album.name : image.albumName}" th:attr="data-full=${image.fullUrl},data-title=${photoAlbum}">
+                        <img th:if="${image.thumbnailUrl}" th:src="${image.thumbnailUrl}" th:alt="${'Foto aus dem Album ' + photoAlbum}" loading="lazy" th:attr="width=${image.width},height=${image.height}">
+                        <span th:text="${photoAlbum}">Album</span>
+                    </button>
+                </div>
+            </div>
+            <a class="photo-essay-entry-link" th:if="${step.entity != null}" th:href="@{/entry/{slug}(slug=${step.entity.slug})}">Archiveintrag öffnen →</a>
+        </section>
+    </div>
+
+    <dialog class="photo-lightbox" id="photo-lightbox" aria-label="Fotoansicht">
+        <button type="button" class="photo-lightbox-close" aria-label="Fotoansicht schließen">Schließen ×</button>
+        <div class="photo-lightbox-stage" aria-live="polite" aria-busy="false"><div class="photo-lightbox-loading" role="status"><span aria-hidden="true"></span><p>Foto wird geladen …</p></div><p class="photo-lightbox-error" hidden>Das Foto konnte nicht geladen werden.</p><img alt="" hidden></div>
+        <p class="photo-lightbox-caption"></p>
+    </dialog>
+
+    <nav class="trail-end" aria-label="Ende der Geschichte">
+        <span>Ende der Geschichte</span><a href="/trails">Eine andere Geschichte wählen</a><a href="/connect">Eine eigene Verbindung verfolgen</a>
+    </nav>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+<script src="/js/piwigo-gallery.js" defer></script>
+<script src="/js/dossier-register.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('CHRONIK')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('chronicle')}"></header>
+<main class="chronicle-page">
+    <header class="chronicle-intro">
+        <p class="eyebrow">Das Archiv nach Jahren</p>
+        <h1 th:text="${chronicle.selectedYear ?: 'Chronik'}">2024</h1>
+        <p>Projekte, Veröffentlichungen, Drehs, Konzerte und Wendepunkte, die zur selben Zeit stattfanden.</p>
+    </header>
+    <nav class="year-index" aria-label="Jahr auswählen" th:if="${!chronicle.years.isEmpty()}">
+        <a th:each="availableYear : ${chronicle.years}" th:href="@{/chronicle(year=${availableYear})}"
+           th:text="${availableYear}" th:classappend="${availableYear == chronicle.selectedYear ? 'is-active' : ''}">2024</a>
+    </nav>
+    <p class="chronicle-empty" th:if="${chronicle.moments.isEmpty()}">Noch keine datierten Archivmomente vorhanden.</p>
+    <ol class="chronicle-list" th:unless="${chronicle.moments.isEmpty()}">
+        <li th:each="moment, state : ${chronicle.moments}">
+            <time th:datetime="${moment.date}" th:text="${moment.dateLabel}">4. Mai</time>
+            <span class="chronicle-number" th:text="${#numbers.formatInteger(state.count, 2)}">01</span>
+            <a th:href="${moment.url}">
+                <small><span th:text="${moment.event}">Veröffentlichung</span> · <span th:text="${labels.of(moment.type)}">Projekt</span></small>
+                <strong th:text="${moment.title}">Titel</strong>
+            </a>
+        </li>
+    </ol>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

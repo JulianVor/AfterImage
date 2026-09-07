@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title th:text="${entity.title + ' — Admin'}">Bearbeiten</title><link rel="stylesheet" href="/css/admin.css"></head>
+<body>
+<header class="admin-header"><strong>AFTERIMAGE / ADMIN</strong><nav><a href="/admin">Übersicht</a><a th:if="${entity.visibility.name() == 'PUBLIC' && (entity.entityType.name() == 'PROJECT' || entity.entityType.name() == 'BAND')}" th:href="@{/entry/{slug}(slug=${entity.slug})}" target="_blank">Eintrag ansehen</a></nav></header>
+<main class="admin-shell">
+    <p><a href="/admin">← Alle Einträge</a></p><h1 th:text="${entity.title}">Eintrag</h1>
+    <p class="message" th:if="${message}" th:text="${message}"></p>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+    <div class="edit-grid">
+        <section class="panel">
+            <h2>Redaktionelle Felder</h2>
+            <form method="post" th:action="@{/admin/entities/{id}(id=${entity.id})}" class="stack">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                <label>Titel <input name="title" th:value="${entity.title}" required></label>
+                <label>Untertitel <input name="subtitle" th:value="${entity.subtitle}"></label>
+                <label>Kurzbeschreibung <textarea name="shortDescription" th:text="${entity.shortDescription}"></textarea></label>
+                <label>Beschreibung <textarea name="description" th:text="${entity.description}"></textarea></label>
+                <label>Sichtbarkeit <select name="visibility"><option th:each="value : ${visibilities}" th:value="${value}" th:text="${labels.of(value)}" th:selected="${value == entity.visibility}"></option></select></label>
+                <label><span>Hervorgehoben</span><input type="checkbox" name="featured" value="true" th:checked="${entity.featured}"></label>
+                <label>Sortierreihenfolge <input type="number" name="sortOrder" th:value="${entity.sortOrder}"></label>
+                <label>Wiki URL <input type="url" name="wikiUrl" th:value="${entity.wikiUrl}"></label>
+                <button type="submit">Eintrag speichern</button>
+            </form>
+        </section>
+        <div class="stack">
+            <section class="panel">
+                <h2>Herkunft</h2>
+                <dl><dt>Quelle</dt><dd th:text="${labels.of(entity.source)}"></dd><dt>Wiki-Titel</dt><dd th:text="${entity.sourceTitle}"></dd><dt>Seite / Version</dt><dd th:text="${entity.sourcePageId + ' / ' + entity.sourceRevisionId}"></dd><dt>Slug</dt><dd th:text="${entity.slug}"></dd></dl>
+            </section>
+            <section class="panel" th:if="${entity.wikiUrl == null}">
+                <h2>Wiki-Seite anlegen</h2>
+                <p th:unless="${wikiWriteConfigured}" class="error">Die Wiki-API-Zugangsdaten sind nicht konfiguriert. Setze <code>AFTERIMAGE_WIKI_USERNAME</code> und <code>AFTERIMAGE_WIKI_PASSWORD</code>, um Seiten anzulegen.</p>
+                <form th:if="${wikiWriteConfigured}" method="post" th:action="@{/admin/entities/{id}/wiki-page(id=${entity.id})}" class="stack">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label>Seitentitel <input name="wikiTitle" th:value="${entity.title}" required></label>
+                    <label>Seitentyp <small>(optional, semantisches „Page type“-Property)</small> <input name="pageType" th:value="${suggestedPageType}" placeholder="z. B. Person, Band, Video …"></label>
+                    <label>Inhalt <textarea name="content" required th:text="${entity.description ?: entity.shortDescription}" placeholder="Wikitext für die neue Seite"></textarea></label>
+                    <p><small>Legt unter dem Seitentitel eine neue Seite im echten Wiki an und verknüpft sie automatisch mit diesem Eintrag. Eine bereits bestehende Seite mit demselben Titel wird nicht überschrieben.</small></p>
+                    <button type="submit">Wiki-Seite anlegen</button>
+                </form>
+            </section>
+            <section class="panel">
+                <h2>Piwigo-Fotogalerien</h2>
+                <p th:if="${!piwigoAvailable}" class="error">Piwigo ist momentan nicht erreichbar. Vorhandene Verknüpfungen bleiben erhalten.</p>
+                <div class="admin-item" th:each="album : ${piwigoLinks}">
+                    <p><strong th:text="${album.name}">Album</strong><br>
+                        <small th:text="${'Piwigo-ID ' + album.id + ' · ' + album.selectedCount + ' von 12 ausgewählt'}">ID</small></p>
+                    <a class="button" th:href="@{/admin/entities/{entityId}/piwigo-albums/{linkId}(entityId=${entity.id},linkId=${album.linkId})}">Fotoauswahl bearbeiten</a>
+                    <form method="post" th:action="@{/admin/entities/{entityId}/piwigo-albums/{linkId}/delete(entityId=${entity.id},linkId=${album.linkId})}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button class="button--quiet" type="submit">Verknüpfung entfernen</button>
+                    </form>
+                </div>
+                <form method="post" th:if="${piwigoAvailable && !piwigoAlbums.isEmpty()}"
+                      th:action="@{/admin/entities/{id}/piwigo-albums(id=${entity.id})}" class="stack compact-form">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label>Album
+                        <select name="albumId" required>
+                            <option value="">Piwigo-Album auswählen …</option>
+                            <option th:each="album : ${piwigoAlbums}" th:value="${album.id}"
+                                    th:text="${album.name + ' · ' + album.imageCount + ' Fotos'}"></option>
+                        </select>
+                    </label>
+                    <button type="submit">Album verknüpfen</button>
+                </form>
+                <p th:if="${piwigoAvailable && piwigoAlbums.isEmpty()}">Keine verfügbaren Alben gefunden.</p>
+            </section>
+            <section class="panel">
+                <h2>Medium hochladen</h2>
+                <form method="post" enctype="multipart/form-data" th:action="@{/admin/entities/{id}/media(id=${entity.id})}" class="stack">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label>Datei <input type="file" name="file" required></label>
+                    <label>Variante <select name="variant"><option th:each="variant : ${mediaVariants}" th:value="${variant}" th:text="${labels.of(variant)}"></option></select></label>
+                    <label>Alternativtext <input name="altText"></label>
+                    <button type="submit">Privat hochladen</button>
+                </form>
+                <div class="admin-item" th:each="asset : ${media}">
+                    <form method="post" th:action="@{/admin/entities/{entityId}/media/{mediaId}(entityId=${entity.id},mediaId=${asset.id})}" class="stack compact-form">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <strong th:text="${asset.originalFilename}">Datei</strong>
+                        <label>Variante <select name="variant"><option th:each="variant : ${mediaVariants}" th:value="${variant}" th:text="${labels.of(variant)}" th:selected="${variant == asset.mediaVariant}"></option></select></label>
+                        <label>Sichtbarkeit <select name="visibility"><option th:each="value : ${visibilities}" th:value="${value}" th:text="${labels.of(value)}" th:selected="${value == asset.visibility}"></option></select></label>
+                        <label>Alternativtext <input name="altText" th:value="${asset.altText}"></label>
+                        <label>Sortierung <input type="number" name="sortOrder" th:value="${asset.sortOrder}"></label>
+                        <label><span>Titelbild</span><input type="checkbox" name="hero" value="true" th:checked="${entity.heroMediaId == asset.id}"></label>
+                        <button type="submit">Medium aktualisieren</button>
+                    </form>
+                </div>
+            </section>
+            <section class="panel">
+                <h2>Kuratorische Motive</h2>
+                <ul class="admin-chip-list">
+                    <li th:each="motif : ${entity.motifs}"><span th:text="${motif.title}">Motiv</span>
+                        <form method="post" th:action="@{/admin/entities/{entityId}/motifs/{motifId}/delete(entityId=${entity.id},motifId=${motif.id})}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button--quiet" aria-label="Motiv entfernen">×</button></form>
+                    </li>
+                </ul>
+                <form method="post" class="inline-form" th:if="${!motifs.isEmpty()}" th:action="@{/admin/entities/{entityId}/motifs(entityId=${entity.id})}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <label>Vorhandenes Motiv <select name="motifId"><option th:each="motif : ${motifs}" th:value="${motif.id}" th:text="${motif.title}"></option></select></label>
+                    <button type="submit">Zuweisen</button>
+                </form>
+                <form method="post" action="/admin/motifs" class="stack compact-form">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="returnTo" th:value="${entity.id}">
+                    <label>Neues Motiv <input name="title" required></label>
+                    <label>Beschreibung <input name="description"></label>
+                    <label>Sichtbarkeit <select name="visibility"><option th:each="value : ${visibilities}" th:value="${value}" th:text="${labels.of(value)}"></option></select></label>
+                    <button type="submit">Erstellen und zuweisen</button>
+                </form>
+            </section>
+        </div>
+    </div>
+    <section class="panel" style="margin-top:2rem">
+        <h2>Beziehungen</h2>
+        <div class="admin-item" th:each="relation : ${relations}">
+            <p><strong th:text="${relation.sourceEntity.title}">Quelle</strong> → <strong th:text="${relation.targetEntity.title}">Ziel</strong></p>
+            <form method="post" th:action="@{/admin/relationships/{id}(id=${relation.id})}" class="inline-form">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="returnTo" th:value="${entity.id}">
+                <label>Typ <select name="type"><option th:each="type : ${relationshipTypes}" th:value="${type}" th:text="${labels.of(type)}" th:selected="${type == relation.type}"></option></select></label>
+                <label>Beschriftung <input name="label" th:value="${relation.label}"></label>
+                <label>Sichtbarkeit <select name="visibility"><option th:each="value : ${visibilities}" th:value="${value}" th:text="${labels.of(value)}" th:selected="${value == relation.visibility}"></option></select></label>
+                <label>Stärke <input type="number" name="strength" min="1" max="100" th:value="${relation.strength}"></label>
+                <button type="submit">Speichern</button>
+            </form>
+            <form method="post" th:action="@{/admin/relationships/{id}/delete(id=${relation.id})}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="returnTo" th:value="${entity.id}"><button class="button--quiet">Beziehung löschen</button></form>
+        </div>
+        <h3>Beziehung hinzufügen</h3>
+        <form method="post" action="/admin/relationships" class="inline-form">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><input type="hidden" name="sourceId" th:value="${entity.id}">
+            <label>Ziel <select name="targetId"><option th:each="target : ${entities}" th:unless="${target.id == entity.id}" th:value="${target.id}" th:text="${target.title}"></option></select></label>
+            <label>Typ <select name="type"><option th:each="type : ${relationshipTypes}" th:value="${type}" th:text="${labels.of(type)}"></option></select></label>
+            <label>Beschriftung <input name="label"></label>
+            <label>Sichtbarkeit <select name="visibility"><option th:each="value : ${visibilities}" th:value="${value}" th:text="${labels.of(value)}" th:selected="${value.name() == 'PUBLIC'}"></option></select></label>
+            <label>Stärke <input type="number" name="strength" min="1" max="100" value="50"></label>
+            <button type="submit">Hinzufügen</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

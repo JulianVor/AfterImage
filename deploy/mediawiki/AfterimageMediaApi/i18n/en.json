@@ -1,0 +1,18 @@
+{
+  "@metadata": {
+    "authors": [
+      "AFTERIMAGE"
+    ]
+  },
+  "afterimagemediaapi-desc": "Provides authenticated access to bounded raster thumbnails for AFTERIMAGE synchronization",
+  "apihelp-afterimageimage-summary": "Returns a bounded raster thumbnail to an authenticated reader",
+  "apihelp-afterimageimage-param-title": "File title to read",
+  "apihelp-afterimageimage-param-width": "Requested thumbnail width in pixels (maximum 2000)",
+  "afterimagemediaapi-login-required": "You must be logged in to use this image endpoint.",
+  "afterimagemediaapi-invalid-title": "The supplied title is not a valid file title.",
+  "afterimagemediaapi-file-missing": "The requested file does not exist.",
+  "afterimagemediaapi-unsupported": "Only raster images can be returned.",
+  "afterimagemediaapi-transform-failed": "The image thumbnail could not be generated.",
+  "afterimagemediaapi-read-failed": "The image thumbnail could not be read.",
+  "afterimagemediaapi-too-large": "The image thumbnail exceeds the 25 MB limit."
+}

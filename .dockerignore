@@ -1,0 +1,6 @@
+target/
+.git/
+.idea/
+media/
+docs/wiki-audit.json
+

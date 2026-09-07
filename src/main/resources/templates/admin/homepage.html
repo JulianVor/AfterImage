@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Startseite kuratieren — AFTERIMAGE</title><link rel="stylesheet" href="/css/admin.css"></head>
+<body>
+<header class="admin-header"><strong>AFTERIMAGE / ADMIN</strong><nav><a href="/admin">Übersicht</a><a href="/" target="_blank">Website ansehen</a></nav></header>
+<main class="admin-shell">
+    <p><a href="/admin">← Zurück zur Übersicht</a></p>
+    <h1>Startseite kuratieren</h1>
+    <p>Bands, Projekte und Geschichten, die hier hervorgehoben sind, erscheinen in dieser Reihenfolge auf der Startseite. Ohne Auswahl zeigt die Startseite ersatzweise die zuletzt archivierten Produktionen.</p>
+    <p class="message" th:if="${message}" th:text="${message}"></p>
+    <p class="error" th:if="${error}" th:text="${error}"></p>
+
+    <section class="panel">
+        <h2>Auf der Startseite <span class="badge" th:text="${featured.size()}">0</span></h2>
+        <p th:if="${featured.isEmpty()}">Noch nichts hervorgehoben — wähle unten Einträge aus der verfügbaren Liste aus.</p>
+        <table class="admin-table" th:unless="${featured.isEmpty()}">
+            <thead><tr><th>Titel</th><th>Art</th><th>Reihenfolge</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="item, stat : ${featured}">
+                <td th:text="${item.title}">Titel</td>
+                <td><span class="badge" th:text="${item.subtitle}">Band</span></td>
+                <td>
+                    <form method="post" action="/admin/homepage/move" style="display:inline">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input type="hidden" name="kind" th:value="${item.kind}">
+                        <input type="hidden" name="id" th:value="${item.id}">
+                        <input type="hidden" name="direction" value="up">
+                        <button type="submit" class="button--quiet" th:disabled="${stat.first}" aria-label="Nach oben verschieben">↑</button>
+                    </form>
+                    <form method="post" action="/admin/homepage/move" style="display:inline">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input type="hidden" name="kind" th:value="${item.kind}">
+                        <input type="hidden" name="id" th:value="${item.id}">
+                        <input type="hidden" name="direction" value="down">
+                        <button type="submit" class="button--quiet" th:disabled="${stat.last}" aria-label="Nach unten verschieben">↓</button>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="/admin/homepage/unfeature">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input type="hidden" name="kind" th:value="${item.kind}">
+                        <input type="hidden" name="id" th:value="${item.id}">
+                        <button type="submit" class="button--quiet">Entfernen</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="panel" style="margin-top:2rem">
+        <h2>Verfügbar <span class="badge" th:text="${available.size()}">0</span></h2>
+        <p>Öffentliche Bands, Projekte und Geschichten mit Inhalt. Geschichten ohne Bausteine oder mit privaten Einträgen erscheinen erst, wenn sie veröffentlichungsbereit sind.</p>
+        <table class="admin-table" th:unless="${available.isEmpty()}">
+            <thead><tr><th>Titel</th><th>Art</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="item : ${available}">
+                <td th:text="${item.title}">Titel</td>
+                <td><span class="badge" th:text="${item.subtitle}">Band</span></td>
+                <td>
+                    <form method="post" action="/admin/homepage/feature">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <input type="hidden" name="kind" th:value="${item.kind}">
+                        <input type="hidden" name="id" th:value="${item.id}">
+                        <button type="submit">Hervorheben</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</main>
+</body>
+</html>
