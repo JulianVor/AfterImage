@@ -30,7 +30,7 @@ management:
 
 afterimage:
   site:
-    title: ${AFTERIMAGE_SITE_TITLE:AFTERIMAGE}
+    title: ${AFTERIMAGE_SITE_TITLE:FotosVorJu}
     owner: ${AFTERIMAGE_SITE_OWNER:Julian Vornfeld}
     owner-slug: ${AFTERIMAGE_SITE_OWNER_SLUG:julian-vornfeld}
     subtitle: ${AFTERIMAGE_SITE_SUBTITLE:Film · Fotografie · Visuelle Welten}

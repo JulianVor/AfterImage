@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
     <meta name="description" content="Julian Vornfeld — Film, Fotografie und visuelle Welten.">
-    <title th:text="${pageTitle + ' — ' + site.title}">AFTERIMAGE</title>
+    <title th:text="${pageTitle + ' — ' + site.title}">FotosVorJu</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
 </head>
 <body>
 <header class="site-header" th:fragment="nav(active)">
-    <a class="wordmark" href="/" th:text="${site.title}">AFTERIMAGE</a>
+    <a class="wordmark" href="/" th:text="${site.title}">FotosVorJu</a>
     <nav aria-label="Hauptnavigation">
         <a href="/show" th:classappend="${active == 'show'} ? 'is-active'"><em>01</em><span>Auswahl</span></a>
         <a href="/explore" th:classappend="${active == 'explore'} ? 'is-active'"><em>02</em><span>Entdecken</span></a>

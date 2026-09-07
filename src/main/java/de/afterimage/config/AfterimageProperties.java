@@ -10,7 +10,7 @@ import java.time.Duration;
 public record AfterimageProperties(Site site, Wiki wiki, Piwigo piwigo, Media media, Admin admin, Import importer) {
 
     public AfterimageProperties {
-        site = site == null ? new Site("AFTERIMAGE", "Julian Vornfeld", "julian-vornfeld", "Film · Photography · Visual Worlds") : site;
+        site = site == null ? new Site("FotosVorJu", "Julian Vornfeld", "julian-vornfeld", "Film · Photography · Visual Worlds") : site;
         wiki = wiki == null ? new Wiki(
                 URI.create("https://wiki.fotosvorju.de"),
                 URI.create("https://wiki.fotosvorju.de/w/api.php"),

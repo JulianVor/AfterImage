@@ -2,7 +2,7 @@
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title th:text="${entity.title + ' — Admin'}">Bearbeiten</title><link rel="stylesheet" href="/css/admin.css"></head>
 <body>
-<header class="admin-header"><strong>AFTERIMAGE / ADMIN</strong><nav><a href="/admin">Übersicht</a><a th:if="${entity.visibility.name() == 'PUBLIC' && (entity.entityType.name() == 'PROJECT' || entity.entityType.name() == 'BAND')}" th:href="@{/entry/{slug}(slug=${entity.slug})}" target="_blank">Eintrag ansehen</a></nav></header>
+<header class="admin-header"><strong>FotosVorJu / ADMIN</strong><nav><a href="/admin">Übersicht</a><a th:if="${entity.visibility.name() == 'PUBLIC' && (entity.entityType.name() == 'PROJECT' || entity.entityType.name() == 'BAND')}" th:href="@{/entry/{slug}(slug=${entity.slug})}" target="_blank">Eintrag ansehen</a></nav></header>
 <main class="admin-shell">
     <p><a href="/admin">← Alle Einträge</a></p><h1 th:text="${entity.title}">Eintrag</h1>
     <p class="message" th:if="${message}" th:text="${message}"></p>

@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Archivzustand — AFTERIMAGE</title><link rel="stylesheet" href="/css/admin.css"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Archivzustand — FotosVorJu</title><link rel="stylesheet" href="/css/admin.css"></head>
 <body>
-<header class="admin-header"><strong>AFTERIMAGE / ZUSTAND</strong><nav><a href="/admin">Übersicht</a><a href="/explore" target="_blank">Graph ansehen</a><form method="post" action="/admin/logout"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button--quiet">Abmelden</button></form></nav></header>
+<header class="admin-header"><strong>FotosVorJu / ZUSTAND</strong><nav><a href="/admin">Übersicht</a><a href="/explore" target="_blank">Graph ansehen</a><form method="post" action="/admin/logout"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="button--quiet">Abmelden</button></form></nav></header>
 <main class="admin-shell">
     <div class="health-hero">
         <div><p class="eyebrow">Archivzustand</p><h1><span th:text="${report.score}">82</span><small>/100</small></h1></div>
