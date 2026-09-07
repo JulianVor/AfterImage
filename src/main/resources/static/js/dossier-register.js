@@ -6,8 +6,18 @@ if (register) {
         .map(link => document.querySelector(link.getAttribute('href')))
         .filter(Boolean);
 
+    let activeId = null;
+
     const activate = (id) => {
-        links.forEach(link => link.classList.toggle('is-active', link.getAttribute('href') === '#' + id));
+        if (id === activeId) return;
+        activeId = id;
+        let activeLink = null;
+        links.forEach(link => {
+            const isActive = link.getAttribute('href') === '#' + id;
+            link.classList.toggle('is-active', isActive);
+            if (isActive) activeLink = link;
+        });
+        if (activeLink) activeLink.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
     };
 
     const observer = new IntersectionObserver((entries) => {
