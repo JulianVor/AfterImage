@@ -6,8 +6,8 @@
 <main class="trails-page stories-page">
     <header class="trails-heading stories-heading">
         <p class="eyebrow">Kuratierte Geschichten</p>
-        <h1>Das Archiv erzählt.</h1>
-        <p>Pfade, Fotoessays, Dossiers und Chroniken verbinden Bilder, Werke, Menschen und Orte zu einer neuen Perspektive.</p>
+        <h1>Geschichten aus dem Archiv<br><em>in vier Formen.</em></h1>
+        <p>Pfade, Fotoessays, Dossiers und Chroniken ordnen Bilder, Werke, Menschen und Orte in einen Zusammenhang.</p>
     </header>
     <nav class="story-type-key" aria-label="Erzählformen" th:if="${!trails.isEmpty()}">
         <span th:each="type : ${storyTypes}" th:text="${labels.of(type)}">Pfad</span>
@@ -31,7 +31,7 @@
         </li>
     </ol>
     <section class="connection-state" th:if="${trails.isEmpty()}">
-        <p class="eyebrow">Demnächst</p><h2>Noch wurde keine öffentliche Geschichte kuratiert.</h2>
+        <p class="eyebrow">Noch keine Geschichten</p><h2>Noch wurde keine öffentliche Geschichte kuratiert.</h2>
     </section>
     <aside class="trail-connect-invite">
         <span>Möchtest du Anfang und Ende selbst wählen?</span>

@@ -6,12 +6,12 @@
 <main>
     <section class="show-intro" aria-labelledby="show-title">
         <p class="eyebrow">Ausgewählte Arbeiten · 2019—heute</p>
-        <h1 id="show-title">Bilder, die<br><em>zurückbleiben.</em></h1>
+        <h1 id="show-title">Musikvideos, Fotografie<br><em>und die Bands dahinter.</em></h1>
         <div class="intro-meta">
             <p th:text="${site.owner}">Julian Vornfeld</p>
             <p th:text="${site.subtitle}">Film · Fotografie · Visuelle Welten</p>
         </div>
-        <a class="thread-link" href="/explore">Den Verbindungen folgen <span aria-hidden="true">↘</span></a>
+        <a class="thread-link" href="/explore">Verbindungen entdecken <span aria-hidden="true">↘</span></a>
         <dl class="stat-strip" th:if="${stats.total > 0}">
             <div><dt th:text="${stats.total}">0</dt><dd>Archivierte Einträge</dd></div>
             <div><dt th:text="${stats.bands}">0</dt><dd>Bands</dd></div>
@@ -79,7 +79,7 @@
     </section>
 
     <section class="empty-curation" th:if="${highlights.isEmpty() && fallbackHighlights.isEmpty()}">
-        <p class="eyebrow">Das Archiv ist bereit</p>
+        <p class="eyebrow">Noch keine Auswahl</p>
         <h2>Noch wurde keine Arbeit hervorgehoben.</h2>
         <p>Importierte Einträge sind öffentlich, erscheinen aber erst nach dem Hervorheben in dieser Auswahl.</p>
         <a href="/admin/homepage">Kuratierung öffnen</a>
@@ -87,8 +87,8 @@
 
     <section class="memory-invite">
         <p class="eyebrow">Das Archiv entdecken</p>
-        <h2>Ein Werk ist nie<br>nur ein Werk.</h2>
-        <p>Menschen, Orte, Bands und Momente bilden eine lebendige Chronologie.</p>
+        <h2>Bands, Personen und Orte<br>sind miteinander verknüpft.</h2>
+        <p>Jeder Eintrag ist über dokumentierte Beziehungen mit anderen verbunden – Mitgliedschaften, Drehorte, Auftritte.</p>
         <a href="/explore">Verbindungen entdecken →</a>
     </section>
 </main>

@@ -6,7 +6,7 @@
 <main class="connect-page">
     <header class="connect-heading">
         <p class="eyebrow">Was verbindet …?</p>
-        <h1>Finde den roten Faden.</h1>
+        <h1>Zwei Einträge<br><em>verbinden.</em></h1>
         <p>Wähle zwei Einträge. Das Archiv zeigt die kürzeste Kette dokumentierter Beziehungen zwischen ihnen.</p>
     </header>
 
@@ -66,7 +66,7 @@
         <p class="eyebrow">Null Schritte</p><h2>Das ist bereits derselbe Eintrag.</h2>
     </section>
     <section class="connection-state" th:if="${path.status.name() == 'NOT_CONNECTED'}">
-        <p class="eyebrow">Kein dokumentierter Weg</p><h2>Diese Erinnerungen treffen sich noch nicht.</h2>
+        <p class="eyebrow">Kein dokumentierter Weg</p><h2>Keine dokumentierte Verbindung gefunden.</h2>
         <p>Das Archiv erfindet keine Verbindung. Eine bekannte Beziehung kann im Adminbereich ergänzt werden.</p>
     </section>
     <section class="connection-state" th:if="${path.status.name() == 'INVALID'}">

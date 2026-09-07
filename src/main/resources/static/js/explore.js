@@ -345,7 +345,7 @@ if (root && svgElement && window.d3) {
         const glow = defs.append('filter').attr('id', 'focus-glow').attr('x', '-50%').attr('y', '-50%')
             .attr('width', '200%').attr('height', '200%');
         glow.append('feGaussianBlur').attr('stdDeviation', 12).attr('result', 'blur');
-        glow.append('feFlood').attr('flood-color', '#b66d49').attr('flood-opacity', .22);
+        glow.append('feFlood').attr('flood-color', '#c8431c').attr('flood-opacity', .22);
         glow.append('feComposite').attr('in2', 'blur').attr('operator', 'in');
         const merge = glow.append('feMerge');
         merge.append('feMergeNode');
