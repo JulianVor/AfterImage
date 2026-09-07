@@ -20,6 +20,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.List;
 import java.util.Comparator;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -68,9 +71,9 @@ public class TrailController {
         model.addAttribute("storyBlocks", blocks);
         model.addAttribute("dossierSections", dossierSections(blocks));
         var blockMedia = new LinkedHashMap<UUID, PublicMediaService.PublicMediaMetadata>();
-        var galleries = new LinkedHashMap<UUID, List<PiwigoGalleryService.Gallery>>();
         var eventDateLabels = new LinkedHashMap<UUID, String>();
         DateTimeFormatter germanDate = DateTimeFormatter.ofPattern("d. MMMM uuuu", Locale.GERMAN);
+        List<StoryStep> galleryBlocks = new ArrayList<>();
         for (StoryStep block : blocks) {
             if (block.getEventDate() != null) {
                 eventDateLabels.put(block.getId(), germanDate.format(block.getEventDate()));
@@ -80,14 +83,54 @@ public class TrailController {
                         .filter(item -> item.type() == MediaType.IMAGE)
                         .ifPresent(item -> blockMedia.put(block.getId(), item));
             }
-            if (block.getBlockType() == StoryBlockType.GALLERY && block.getEntity() != null) {
-                galleries.put(block.getId(), piwigo.galleries(block.getEntity(), 12));
+            boolean hasGalleryContent = (block.getPiwigoAlbumPath() != null && !block.getPiwigoAlbumPath().isBlank())
+                    || block.getEntity() != null;
+            if (block.getBlockType() == StoryBlockType.GALLERY && hasGalleryContent) {
+                galleryBlocks.add(block);
             }
         }
         model.addAttribute("blockMedia", blockMedia);
-        model.addAttribute("galleriesByBlock", galleries);
+        model.addAttribute("galleriesByBlock", fetchGalleries(galleryBlocks));
         model.addAttribute("eventDateLabels", eventDateLabels);
         return "public/trail";
+    }
+
+    /**
+     * Fetches each GALLERY block's photos concurrently instead of one after another - a dossier or
+     * entity with several linked/referenced Piwigo albums used to pay for every album's network
+     * round-trip in sequence, so load time grew linearly with the number of albums. Each call
+     * (album-path lookup or entity-linked albums) is independent and I/O-bound, so virtual threads
+     * let them all run at once; total time then tracks the slowest single album, not the sum.
+     */
+    private LinkedHashMap<UUID, List<PiwigoGalleryService.Gallery>> fetchGalleries(List<StoryStep> galleryBlocks) {
+        var galleries = new LinkedHashMap<UUID, List<PiwigoGalleryService.Gallery>>();
+        if (galleryBlocks.isEmpty()) {
+            return galleries;
+        }
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            var futures = new LinkedHashMap<UUID, CompletableFuture<List<PiwigoGalleryService.Gallery>>>();
+            for (StoryStep block : galleryBlocks) {
+                int limit = photoLimit(block);
+                String albumPath = block.getPiwigoAlbumPath();
+                var entity = block.getEntity();
+                futures.put(block.getId(), CompletableFuture.supplyAsync(() ->
+                        albumPath != null && !albumPath.isBlank()
+                                ? List.of(piwigo.galleryForPath(albumPath, limit))
+                                : piwigo.galleries(entity, limit),
+                        executor));
+            }
+            futures.forEach((blockId, future) -> galleries.put(blockId, future.join()));
+        }
+        return galleries;
+    }
+
+    private static final int DEFAULT_GALLERY_PHOTO_LIMIT = 12;
+    private static final int MAX_GALLERY_PHOTO_LIMIT = 48;
+
+    private static int photoLimit(StoryStep block) {
+        Integer configured = block.getPhotoLimit();
+        if (configured == null || configured < 1) return DEFAULT_GALLERY_PHOTO_LIMIT;
+        return Math.min(configured, MAX_GALLERY_PHOTO_LIMIT);
     }
 
     private static List<StoryStep> displayBlocks(Story story) {

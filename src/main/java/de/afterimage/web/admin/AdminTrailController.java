@@ -112,8 +112,11 @@ public class AdminTrailController {
                    @RequestParam(required = false) String text,
                    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate eventDate,
                    @RequestParam(required = false) String cameraFocus,
-                   @RequestParam(required = false) String visualizationHint) {
-        trails.addBlock(id, blockType, entityId, heading, text, eventDate, cameraFocus, visualizationHint);
+                   @RequestParam(required = false) String visualizationHint,
+                   @RequestParam(required = false) String piwigoAlbumPath,
+                   @RequestParam(required = false) Integer photoLimit) {
+        trails.addBlock(id, blockType, entityId, heading, text, eventDate, cameraFocus, visualizationHint,
+                piwigoAlbumPath, photoLimit);
         return "redirect:/admin/trails/" + id;
     }
 
@@ -126,9 +129,11 @@ public class AdminTrailController {
                       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate eventDate,
                       @RequestParam(required = false) String cameraFocus,
                       @RequestParam(required = false) String visualizationHint,
+                      @RequestParam(required = false) String piwigoAlbumPath,
+                      @RequestParam(required = false) Integer photoLimit,
                       RedirectAttributes redirect) {
         trails.updateBlock(id, stepId, blockType, entityId, heading, text, eventDate,
-                cameraFocus, visualizationHint);
+                cameraFocus, visualizationHint, piwigoAlbumPath, photoLimit);
         redirect.addFlashAttribute("message", "Baustein gespeichert.");
         return "redirect:/admin/trails/" + id;
     }

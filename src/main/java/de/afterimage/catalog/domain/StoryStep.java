@@ -51,6 +51,12 @@ public class StoryStep {
     @Column(name = "visualization_hint", length = 500)
     private String visualizationHint;
 
+    @Column(name = "piwigo_album_path", length = 500)
+    private String piwigoAlbumPath;
+
+    @Column(name = "photo_limit")
+    private Integer photoLimit;
+
     protected StoryStep() {}
 
     public StoryStep(Story story, ArchiveEntity entity, int sequenceNumber) {
@@ -77,4 +83,8 @@ public class StoryStep {
     public void setCameraFocus(String cameraFocus) { this.cameraFocus = cameraFocus; }
     public String getVisualizationHint() { return visualizationHint; }
     public void setVisualizationHint(String visualizationHint) { this.visualizationHint = visualizationHint; }
+    public String getPiwigoAlbumPath() { return piwigoAlbumPath; }
+    public void setPiwigoAlbumPath(String piwigoAlbumPath) { this.piwigoAlbumPath = piwigoAlbumPath; }
+    public Integer getPhotoLimit() { return photoLimit; }
+    public void setPhotoLimit(Integer photoLimit) { this.photoLimit = photoLimit; }
 }

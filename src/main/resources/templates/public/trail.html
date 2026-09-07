@@ -27,7 +27,7 @@
             <article th:classappend="${step.blockType.name() == 'QUOTE' ? 'story-quote' : ''}">
                 <p class="eyebrow"><span th:text="${#numbers.formatInteger(state.count, 2)}">01</span> · <span th:text="${labels.of(step.blockType)}">Archiveintrag</span></p>
                 <h2 th:if="${step.heading != null || step.entity != null}" th:text="${step.heading ?: (step.entity.displayTitle ?: step.entity.title)}">Eintrag</h2>
-                <p class="trail-step-meta" th:if="${step.eventDate != null || step.cameraFocus != null || (step.entity != null && step.entity.year != null)}" th:text="${step.eventDate ?: (step.cameraFocus ?: step.entity.year)}">2024</p>
+                <p class="trail-step-meta" th:if="${step.eventDate != null || (step.entity != null && step.entity.year != null)}" th:text="${step.eventDate ?: step.entity.year}">2024</p>
                 <p class="trail-step-copy" th:if="${step.blockType.name() != 'ENTRY' && step.text != null}" th:text="${step.text}">Erzählung</p>
                 <p class="trail-step-copy" th:if="${step.entity != null && (step.blockType.name() == 'ENTRY' || step.text == null)}" th:text="${step.entity.shortDescription}">Beschreibung</p>
                 <a th:if="${step.entity != null}" th:href="@{/entry/{slug}(slug=${step.entity.slug})}">Archiveintrag öffnen →</a>
@@ -87,7 +87,6 @@
                         </div>
 
                         <div class="akte-chapter" th:if="${step.blockType.name() == 'TEXT'}">
-                            <p class="eyebrow" th:if="${step.cameraFocus}" th:text="${step.cameraFocus}">Fokus</p>
                             <h3 th:if="${step.heading != null || step.entity != null}" th:text="${step.heading ?: (step.entity.displayTitle ?: step.entity.title)}">Kapitel</h3>
                             <p th:if="${step.text}" th:text="${step.text}">Text</p>
                             <p th:if="${step.text == null && step.entity != null}" th:text="${step.entity.shortDescription}">Beschreibung</p>
@@ -107,7 +106,7 @@
             </div>
             <span class="story-chronicle-mark" aria-hidden="true"></span>
             <article>
-                <p class="eyebrow" th:text="${step.cameraFocus ?: labels.of(step.blockType)}">Ereignis</p>
+                <p class="eyebrow" th:text="${labels.of(step.blockType)}">Ereignis</p>
                 <h2 th:if="${step.heading != null || step.entity != null}" th:text="${step.heading ?: (step.entity.displayTitle ?: step.entity.title)}">Moment</h2>
                 <p th:if="${step.blockType.name() != 'ENTRY' && step.text != null}" th:text="${step.text}">Text</p>
                 <p th:if="${step.entity != null && (step.blockType.name() == 'ENTRY' || step.text == null)}" th:text="${step.entity.shortDescription}">Beschreibung</p>

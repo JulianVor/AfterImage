@@ -50,12 +50,14 @@
                                 <p class="story-block-purpose" data-block-purpose></p>
                                 <div class="inline-form story-fields-primary">
                                     <label class="story-field story-field--entity"><span data-field-label>Archiveintrag</span> <select name="entityId"><option value="">Eintrag auswählen</option><option th:each="entity : ${entities}" th:value="${entity.id}" th:selected="${step.entity != null && step.entity.id == entity.id}" th:text="${entity.title + ' · ' + labels.of(entity.entityType)}"></option></select><small>Bild, Titel, Beschreibung und Link kommen automatisch aus dem Archiv.</small></label>
+                                    <label class="story-field story-field--album-path"><span data-field-label>Piwigo-Album</span> <input name="piwigoAlbumPath" th:value="${step.piwigoAlbumPath}" placeholder="z. B. Konzerte/Redestruction/2023"><small>Alternativ zum Archiveintrag: direkter Pfad zu einem Piwigo-Album.</small></label>
+                                    <label class="story-field story-field--photo-limit"><span data-field-label>Anzahl Fotos</span> <input type="number" name="photoLimit" min="1" max="48" th:value="${step.photoLimit}" placeholder="12"><small>Standard: 12. Höchstens 48.</small></label>
                                     <label class="story-field story-field--heading"><span data-field-label>Überschrift</span> <input name="heading" th:value="${step.heading}" placeholder="Kapitelüberschrift"></label>
                                 </div>
                                 <label class="story-field story-field--date"><span data-field-label>Datum</span> <input type="date" name="eventDate" th:value="${step.eventDate}"></label>
                                 <label class="story-field story-field--text"><span data-field-label>Text</span> <textarea name="text" th:text="${step.blockType.name() == 'ENTRY' ? null : step.text}" placeholder="Erzähltext, Bildlegende oder Zitat"></textarea><small data-field-help></small></label>
                                 <details class="story-block-advanced"><summary>Redaktionelle Notizen</summary><div class="inline-form">
-                                    <label>Fokus <input name="cameraFocus" th:value="${step.cameraFocus}" placeholder="z. B. Die erste Zusammenarbeit"></label>
+                                    <label>Fokus <input name="cameraFocus" th:value="${step.cameraFocus}" placeholder="z. B. Die erste Zusammenarbeit"><small>Nur für die Redaktion, wird auf der Seite nicht angezeigt.</small></label>
                                     <label>Visueller Hinweis <input name="visualizationHint" th:value="${step.visualizationHint}" placeholder="Interne Notiz zur Gestaltung"></label>
                                 </div></details>
                                 <button type="submit">Änderungen speichern</button>
@@ -78,7 +80,7 @@
                 <p><strong>Archiveintrag</strong> ist eine automatische Archivkarte: Titel, Bild, Beschreibung und Link stammen vollständig aus dem gewählten Eintrag.</p>
                 <p><strong>Text</strong> ist ein freies Kapitel mit eigener Überschrift und eigenem Fließtext – ohne Archivverknüpfung.</p>
                 <p><strong>Abschnitt</strong> bündelt die nachfolgenden Kapitel bis zum nächsten Abschnitt unter einer gemeinsamen Überschrift.</p>
-                <p><strong>Fotostrecke</strong> nutzt die kuratierten oder zufälligen Piwigo-Fotos eines Eintrags.</p>
+                <p><strong>Fotostrecke</strong> nutzt die kuratierten oder zufälligen Piwigo-Fotos eines Eintrags – oder, alternativ, die Fotos aus einem direkt angegebenen Piwigo-Album (z. B. wenn es keinen passenden Archiveintrag gibt).</p>
                 <p><strong>Zitat</strong> hebt eine Aussage groß hervor.</p>
                 </div>
             </details>
@@ -89,6 +91,8 @@
                     <label>Baustein <select name="blockType" data-block-type-select><option th:each="type : ${blockTypes}" th:value="${type}" th:text="${labels.of(type)}"></option></select></label>
                     <p class="story-block-purpose" data-block-purpose></p>
                     <label class="story-field story-field--entity"><span data-field-label>Archiveintrag</span> <select name="entityId"><option value="">Eintrag auswählen</option><option th:each="entity : ${entities}" th:value="${entity.id}" th:text="${entity.title + ' · ' + labels.of(entity.entityType)}"></option></select><small>Bild, Titel, Beschreibung und Link kommen automatisch aus dem Archiv.</small></label>
+                    <label class="story-field story-field--album-path"><span data-field-label>Piwigo-Album</span> <input name="piwigoAlbumPath" placeholder="z. B. Konzerte/Redestruction/2023"><small>Alternativ zum Archiveintrag: direkter Pfad zu einem Piwigo-Album.</small></label>
+                    <label class="story-field story-field--photo-limit"><span data-field-label>Anzahl Fotos</span> <input type="number" name="photoLimit" min="1" max="48" placeholder="12"><small>Standard: 12. Höchstens 48.</small></label>
                     <label class="story-field story-field--heading"><span data-field-label>Überschrift</span> <input name="heading" placeholder="Kapitelüberschrift"></label>
                     <label class="story-field story-field--date"><span data-field-label>Datum</span> <input type="date" name="eventDate"><small>Nur in Chroniken sichtbar.</small></label>
                     <label class="story-field story-field--text"><span data-field-label>Text</span> <textarea name="text" placeholder="Optional; kann später ergänzt werden"></textarea><small data-field-help></small></label>

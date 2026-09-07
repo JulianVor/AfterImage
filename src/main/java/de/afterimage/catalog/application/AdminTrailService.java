@@ -81,21 +81,24 @@ public class AdminTrailService {
     public void addStep(UUID storyId, UUID entityId, String text,
                         String cameraFocus, String visualizationHint) {
         addBlock(storyId, StoryBlockType.ENTRY, entityId, null, text, null,
-                cameraFocus, visualizationHint);
+                cameraFocus, visualizationHint, null, null);
     }
 
     @Transactional
     public void addBlock(UUID storyId, StoryBlockType blockType, UUID entityId, String heading,
-                         String text, LocalDate eventDate, String cameraFocus, String visualizationHint) {
+                         String text, LocalDate eventDate, String cameraFocus, String visualizationHint,
+                         String piwigoAlbumPath, Integer photoLimit) {
         Story story = stories.findDetailedById(storyId).orElseThrow();
         StoryBlockType resolvedType = blockType == null ? StoryBlockType.ENTRY : blockType;
         ArchiveEntity entity = entityId == null ? null : entities.findById(entityId).orElseThrow();
         entity = compatibleEntity(resolvedType, entity);
+        String albumPath = compatiblePiwigoAlbumPath(resolvedType, piwigoAlbumPath);
+        requireGalleryContent(resolvedType, entity, albumPath);
         requireCompatibleEntity(resolvedType, entity);
         requireCompatibleHeading(resolvedType, heading);
         int sequence = story.getSteps().stream().mapToInt(StoryStep::getSequenceNumber).max().orElse(0) + 1;
         StoryStep step = new StoryStep(story, entity, sequence);
-        apply(step, resolvedType, entity, heading, text, eventDate, cameraFocus, visualizationHint);
+        apply(step, resolvedType, entity, heading, text, eventDate, cameraFocus, visualizationHint, albumPath, photoLimit);
         steps.save(step);
     }
 
@@ -104,20 +107,23 @@ public class AdminTrailService {
                            String cameraFocus, String visualizationHint) {
         StoryStep step = ownedStep(storyId, stepId);
         apply(step, step.getBlockType(), step.getEntity(), step.getHeading(), text,
-                step.getEventDate(), cameraFocus, visualizationHint);
+                step.getEventDate(), cameraFocus, visualizationHint, step.getPiwigoAlbumPath(), step.getPhotoLimit());
     }
 
     @Transactional
     public void updateBlock(UUID storyId, UUID stepId, StoryBlockType blockType, UUID entityId,
                             String heading, String text, LocalDate eventDate,
-                            String cameraFocus, String visualizationHint) {
+                            String cameraFocus, String visualizationHint, String piwigoAlbumPath,
+                            Integer photoLimit) {
         StoryStep step = ownedStep(storyId, stepId);
         StoryBlockType resolvedType = blockType == null ? StoryBlockType.ENTRY : blockType;
         ArchiveEntity entity = entityId == null ? null : entities.findById(entityId).orElseThrow();
         entity = compatibleEntity(resolvedType, entity);
+        String albumPath = compatiblePiwigoAlbumPath(resolvedType, piwigoAlbumPath);
+        requireGalleryContent(resolvedType, entity, albumPath);
         requireCompatibleEntity(resolvedType, entity);
         requireCompatibleHeading(resolvedType, heading);
-        apply(step, resolvedType, entity, heading, text, eventDate, cameraFocus, visualizationHint);
+        apply(step, resolvedType, entity, heading, text, eventDate, cameraFocus, visualizationHint, albumPath, photoLimit);
     }
 
     @Transactional
@@ -174,7 +180,8 @@ public class AdminTrailService {
                 .map(step -> new StepExport(step.getBlockType().name(),
                         step.getEntity() == null ? null : step.getEntity().getSlug(),
                         step.getHeading(), step.getText(), step.getEventDate(),
-                        step.getCameraFocus(), step.getVisualizationHint()))
+                        step.getCameraFocus(), step.getVisualizationHint(), step.getPiwigoAlbumPath(),
+                        step.getPhotoLimit()))
                 .toList();
         return new StoryExport(story.getSlug(), story.getTitle(), story.getTeaser(),
                 story.getStoryType().name(),
@@ -217,11 +224,14 @@ public class AdminTrailService {
             StepExport stepExport = stepData.get(index);
             StoryBlockType blockType = parseEnum(StoryBlockType.class, stepExport.blockType(), StoryBlockType.TEXT);
             ArchiveEntity entity = compatibleEntity(blockType, stepEntities.get(index));
+            String albumPath = compatiblePiwigoAlbumPath(blockType, stepExport.piwigoAlbumPath());
             requireCompatibleEntity(blockType, entity);
+            requireGalleryContent(blockType, entity, albumPath);
             requireCompatibleHeading(blockType, stepExport.heading());
             StoryStep step = new StoryStep(story, entity, index + 1);
             apply(step, blockType, entity, stepExport.heading(), stepExport.text(),
-                    stepExport.eventDate(), stepExport.cameraFocus(), stepExport.visualizationHint());
+                    stepExport.eventDate(), stepExport.cameraFocus(), stepExport.visualizationHint(), albumPath,
+                    stepExport.photoLimit());
             steps.save(step);
         }
         return story;
@@ -253,7 +263,8 @@ public class AdminTrailService {
                               String mainEntitySlug, String visibility, List<StepExport> steps) {}
 
     public record StepExport(String blockType, String entitySlug, String heading, String text,
-                             LocalDate eventDate, String cameraFocus, String visualizationHint) {}
+                             LocalDate eventDate, String cameraFocus, String visualizationHint,
+                             String piwigoAlbumPath, Integer photoLimit) {}
 
     private StoryStep ownedStep(UUID storyId, UUID stepId) {
         StoryStep step = steps.findById(stepId).orElseThrow();
@@ -265,7 +276,8 @@ public class AdminTrailService {
 
     private static void apply(StoryStep step, StoryBlockType blockType, ArchiveEntity entity,
                               String heading, String text, LocalDate eventDate,
-                              String cameraFocus, String visualizationHint) {
+                              String cameraFocus, String visualizationHint, String piwigoAlbumPath,
+                              Integer photoLimit) {
         step.setBlockType(blockType);
         step.setEntity(compatibleEntity(blockType, entity));
         step.setHeading(blockType == StoryBlockType.ENTRY || blockType == StoryBlockType.QUOTE
@@ -274,17 +286,30 @@ public class AdminTrailService {
         step.setEventDate(eventDate);
         step.setCameraFocus(blankToNull(cameraFocus));
         step.setVisualizationHint(blankToNull(visualizationHint));
+        step.setPiwigoAlbumPath(compatiblePiwigoAlbumPath(blockType, piwigoAlbumPath));
+        step.setPhotoLimit(blockType == StoryBlockType.GALLERY && photoLimit != null && photoLimit >= 1
+                ? photoLimit : null);
     }
 
     private static void requireCompatibleEntity(StoryBlockType blockType, ArchiveEntity entity) {
-        if ((blockType == StoryBlockType.ENTRY || blockType == StoryBlockType.GALLERY) && entity == null) {
+        if (blockType == StoryBlockType.ENTRY && entity == null) {
             throw new IllegalArgumentException("Dieser Baustein braucht einen Archiveintrag.");
+        }
+    }
+
+    private static void requireGalleryContent(StoryBlockType blockType, ArchiveEntity entity, String piwigoAlbumPath) {
+        if (blockType == StoryBlockType.GALLERY && entity == null && (piwigoAlbumPath == null || piwigoAlbumPath.isBlank())) {
+            throw new IllegalArgumentException("Eine Fotostrecke braucht entweder einen Archiveintrag oder einen Piwigo-Album-Pfad.");
         }
     }
 
     private static ArchiveEntity compatibleEntity(StoryBlockType blockType, ArchiveEntity entity) {
         return blockType == StoryBlockType.TEXT || blockType == StoryBlockType.QUOTE
                 || blockType == StoryBlockType.SECTION ? null : entity;
+    }
+
+    private static String compatiblePiwigoAlbumPath(StoryBlockType blockType, String piwigoAlbumPath) {
+        return blockType == StoryBlockType.GALLERY ? blankToNull(piwigoAlbumPath) : null;
     }
 
     private static void requireCompatibleHeading(StoryBlockType blockType, String heading) {

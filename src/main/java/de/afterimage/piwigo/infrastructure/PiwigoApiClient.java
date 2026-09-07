@@ -17,6 +17,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -25,10 +27,21 @@ import java.util.Map;
 
 @Component
 public class PiwigoApiClient implements PiwigoGateway {
+    // pwg.categories.getList(recursive=true) walks the whole album tree and is by far the most
+    // expensive Piwigo call; every image/album lookup used to trigger it fresh, so a page with many
+    // galleries paid for it once per gallery. Caching briefly means one page load - even one that
+    // fans requests out across virtual threads - shares a single fetch of the (rarely changing) tree.
+    private static final Duration ALBUMS_CACHE_TTL = Duration.ofSeconds(30);
+
     private final AfterimageProperties.Piwigo configuration;
     private final ObjectMapper json;
     private final HttpClient http;
     private volatile boolean authenticated;
+    private volatile CachedAlbums cachedAlbums;
+
+    private record CachedAlbums(List<Album> albums, Instant fetchedAt) {
+        boolean isFresh() { return Duration.between(fetchedAt, Instant.now()).compareTo(ALBUMS_CACHE_TTL) < 0; }
+    }
 
     @Autowired
     public PiwigoApiClient(AfterimageProperties properties, ObjectMapper json) {
@@ -45,6 +58,18 @@ public class PiwigoApiClient implements PiwigoGateway {
 
     @Override
     public List<Album> albums() {
+        CachedAlbums cached = cachedAlbums;
+        if (cached != null && cached.isFresh()) return cached.albums();
+        synchronized (this) {
+            cached = cachedAlbums;
+            if (cached != null && cached.isFresh()) return cached.albums();
+            List<Album> fetched = fetchAlbums();
+            cachedAlbums = new CachedAlbums(fetched, Instant.now());
+            return fetched;
+        }
+    }
+
+    private List<Album> fetchAlbums() {
         JsonNode categories = call("pwg.categories.getList", Map.of("recursive", "true"))
                 .path("categories");
         List<Album> result = new ArrayList<>();

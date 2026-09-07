@@ -13,8 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 public class PiwigoGalleryService {
@@ -32,6 +37,54 @@ public class PiwigoGalleryService {
     }
 
     public List<PiwigoGateway.Album> albums() { return configuration.piwigo().enabled() ? piwigo.albums() : List.of(); }
+
+    /**
+     * Resolves a human-written album path like "Konzerte/Redestruction/2023" against the live
+     * Piwigo category tree (path segments joined by "/", matched case-insensitively against each
+     * album's full breadcrumb). Used by story GALLERY blocks that reference an album directly
+     * instead of through a curated {@link PiwigoAlbumLink} on an archive entity.
+     */
+    @Transactional(readOnly = true)
+    public Optional<PiwigoGateway.Album> resolveAlbumByPath(String path) {
+        if (path == null || path.isBlank() || !configuration.piwigo().enabled()) return Optional.empty();
+        String wanted = normalizePath(path);
+        List<PiwigoGateway.Album> all = piwigo.albums();
+        Map<Long, PiwigoGateway.Album> byId = all.stream()
+                .collect(java.util.stream.Collectors.toMap(PiwigoGateway.Album::id, album -> album));
+        return all.stream().filter(album -> normalizePath(fullPath(album, byId)).equalsIgnoreCase(wanted)).findFirst();
+    }
+
+    @Transactional(readOnly = true)
+    public Gallery galleryForPath(String albumPath, int previewSize) {
+        Optional<PiwigoGateway.Album> resolved = resolveAlbumByPath(albumPath);
+        if (resolved.isEmpty()) {
+            return new Gallery(new LinkedAlbum(null, 0, albumPath, null, 0), null,
+                    "Dieses Piwigo-Album wurde nicht gefunden: " + albumPath);
+        }
+        PiwigoGateway.Album album = resolved.get();
+        LinkedAlbum linkedAlbum = new LinkedAlbum(null, album.id(), album.name(), album.url(), 0);
+        try {
+            PiwigoGateway.ImagePage fetched = piwigo.randomImages(album.id(), previewSize);
+            return new Gallery(linkedAlbum, fetched, null);
+        } catch (PiwigoException exception) {
+            return new Gallery(linkedAlbum, null, "Die Fotos sind momentan nicht erreichbar.");
+        }
+    }
+
+    private static String fullPath(PiwigoGateway.Album album, Map<Long, PiwigoGateway.Album> byId) {
+        List<String> parts = new java.util.ArrayList<>();
+        PiwigoGateway.Album current = album;
+        while (current != null) {
+            parts.add(current.name());
+            current = current.parentId() == null ? null : byId.get(current.parentId());
+        }
+        java.util.Collections.reverse(parts);
+        return String.join("/", parts);
+    }
+
+    private static String normalizePath(String path) {
+        return path.trim().replaceAll("^/+|/+$", "");
+    }
 
     @Transactional
     public void attach(UUID entityId, long albumId) {
@@ -108,35 +161,51 @@ public class PiwigoGalleryService {
     @Transactional
     public List<Gallery> galleries(ArchiveEntity entity, int previewSize) {
         if (!configuration.piwigo().enabled()) return List.of();
-        return links.findByEntityOrderBySortOrderAscCreatedAtAsc(entity).stream().map(link -> {
-            List<PiwigoCuratedImage> storedSelection = curatedImages.findByAlbumLinkOrderBySortOrderAsc(link);
-            storedSelection.stream().filter(stored -> stored.getAlbumName() == null || stored.getAlbumName().isBlank())
-                    .forEach(stored -> {
-                        try {
-                            stored.refresh(piwigo.image(link.getAlbumId(), stored.getImageId()));
-                        } catch (PiwigoException ignored) {
-                            // The stored image remains usable; the main album name is the presentation fallback.
-                        }
-                    });
-            List<PiwigoGateway.Image> selected = storedSelection.stream().map(PiwigoCuratedImage::image).toList();
-            try {
-                int requested = Math.min(100, previewSize + selected.size());
-                PiwigoGateway.ImagePage fetched = selected.size() < previewSize
-                        ? piwigo.randomImages(link.getAlbumId(), requested)
-                        : piwigo.images(link.getAlbumId(), 0, previewSize);
-                LinkedHashMap<Long, PiwigoGateway.Image> combined = new LinkedHashMap<>();
-                selected.forEach(image -> combined.put(image.id(), image));
-                fetched.images().forEach(image -> combined.putIfAbsent(image.id(), image));
-                List<PiwigoGateway.Image> preview = combined.values().stream().limit(previewSize).toList();
-                return new Gallery(LinkedAlbum.from(link, selected.size()),
-                        new PiwigoGateway.ImagePage(preview, 0, previewSize, fetched.totalCount(), fetched.pageCount()), null);
-            } catch (PiwigoException exception) {
-                if (!selected.isEmpty()) return new Gallery(LinkedAlbum.from(link, selected.size()),
-                        new PiwigoGateway.ImagePage(selected.stream().limit(previewSize).toList(), 0, previewSize,
-                                selected.size(), 1), null);
-                return new Gallery(LinkedAlbum.from(link, 0), null, "Die Fotos sind momentan nicht erreichbar.");
-            }
-        }).toList();
+        List<GalleryFetchContext> contexts = links.findByEntityOrderBySortOrderAscCreatedAtAsc(entity).stream()
+                .map(link -> {
+                    List<PiwigoCuratedImage> storedSelection = curatedImages.findByAlbumLinkOrderBySortOrderAsc(link);
+                    storedSelection.stream().filter(stored -> stored.getAlbumName() == null || stored.getAlbumName().isBlank())
+                            .forEach(stored -> {
+                                try {
+                                    stored.refresh(piwigo.image(link.getAlbumId(), stored.getImageId()));
+                                } catch (PiwigoException ignored) {
+                                    // The stored image remains usable; the main album name is the presentation fallback.
+                                }
+                            });
+                    List<PiwigoGateway.Image> selected = storedSelection.stream().map(PiwigoCuratedImage::image).toList();
+                    return new GalleryFetchContext(link, selected);
+                }).toList();
+        if (contexts.isEmpty()) return List.of();
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            List<CompletableFuture<Gallery>> futures = contexts.stream()
+                    .map(context -> CompletableFuture.supplyAsync(() -> fetchGallery(context, previewSize), executor))
+                    .toList();
+            return futures.stream().map(CompletableFuture::join).toList();
+        }
+    }
+
+    private record GalleryFetchContext(PiwigoAlbumLink link, List<PiwigoGateway.Image> selected) {}
+
+    private Gallery fetchGallery(GalleryFetchContext context, int previewSize) {
+        PiwigoAlbumLink link = context.link();
+        List<PiwigoGateway.Image> selected = context.selected();
+        try {
+            int requested = Math.min(100, previewSize + selected.size());
+            PiwigoGateway.ImagePage fetched = selected.size() < previewSize
+                    ? piwigo.randomImages(link.getAlbumId(), requested)
+                    : piwigo.images(link.getAlbumId(), 0, previewSize);
+            LinkedHashMap<Long, PiwigoGateway.Image> combined = new LinkedHashMap<>();
+            selected.forEach(image -> combined.put(image.id(), image));
+            fetched.images().forEach(image -> combined.putIfAbsent(image.id(), image));
+            List<PiwigoGateway.Image> preview = combined.values().stream().limit(previewSize).toList();
+            return new Gallery(LinkedAlbum.from(link, selected.size()),
+                    new PiwigoGateway.ImagePage(preview, 0, previewSize, fetched.totalCount(), fetched.pageCount()), null);
+        } catch (PiwigoException exception) {
+            if (!selected.isEmpty()) return new Gallery(LinkedAlbum.from(link, selected.size()),
+                    new PiwigoGateway.ImagePage(selected.stream().limit(previewSize).toList(), 0, previewSize,
+                            selected.size(), 1), null);
+            return new Gallery(LinkedAlbum.from(link, 0), null, "Die Fotos sind momentan nicht erreichbar.");
+        }
     }
 
     @Transactional(readOnly = true)
