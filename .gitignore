@@ -2,7 +2,7 @@ target/
 .idea/
 *.iml
 .env
-media/
+/media/
 docs/wiki-audit.json
 *.log
 
