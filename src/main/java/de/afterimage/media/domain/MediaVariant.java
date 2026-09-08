@@ -12,6 +12,7 @@ public enum MediaVariant {
     LARGE,
     PORTRAIT,
     LOCATION,
-    PROP
+    PROP,
+    TRACK
 }
 

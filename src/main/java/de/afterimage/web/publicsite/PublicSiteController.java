@@ -211,7 +211,9 @@ public class PublicSiteController {
         List<YoutubeVideo> youtubeVideos = youtubeVideos(properties);
         List<FilmingLocation> filmingLocations = filmingLocations(project, relations);
         var photoGalleries = piwigoGalleries.galleries(project, 12);
+        var tracks = media.tracks(project);
 
+        model.addAttribute("tracks", tracks);
         model.addAttribute("textSections", textSections);
         model.addAttribute("properties", technicalProperties);
         model.addAttribute("credits", credits(project, relations));

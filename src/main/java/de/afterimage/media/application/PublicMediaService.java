@@ -1,5 +1,6 @@
 package de.afterimage.media.application;
 
+import de.afterimage.catalog.domain.ArchiveEntity;
 import de.afterimage.catalog.domain.Visibility;
 import de.afterimage.media.domain.MediaVariant;
 import de.afterimage.media.domain.MediaType;
@@ -8,6 +9,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -41,6 +43,18 @@ public class PublicMediaService {
                 .filter(asset -> asset.getStorageKey() != null)
                 .map(asset -> new PublicMediaMetadata(asset.getId(), asset.getType(), asset.getWidth(),
                         asset.getHeight(), asset.getAltText(), asset.getCaption()));
+    }
+
+    @Transactional(readOnly = true)
+    public List<PublicMediaMetadata> tracks(ArchiveEntity entity) {
+        if (!entity.isPubliclyVisible()) return List.of();
+        return assets.findByEntityIdAndTypeAndMediaVariantAndVisibilityOrderBySortOrderAsc(
+                        entity.getId(), MediaType.AUDIO, MediaVariant.TRACK, Visibility.PUBLIC)
+                .stream()
+                .map(asset -> new PublicMediaMetadata(asset.getId(), asset.getType(), asset.getWidth(),
+                        asset.getHeight(), asset.getAltText(), asset.getCaption()))
+                .limit(5)
+                .toList();
     }
 
     public record PublicMedia(Resource resource, String mimeType) {}

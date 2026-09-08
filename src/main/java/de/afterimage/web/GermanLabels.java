@@ -31,6 +31,7 @@ public class GermanLabels {
             Map.entry("RAW", "Rohmaterial"), Map.entry("FINAL", "Final"),
             Map.entry("THUMBNAIL", "Vorschaubild"), Map.entry("LARGE", "Groß"),
             Map.entry("PORTRAIT", "Porträt"), Map.entry("LOCATION", "Ort"), Map.entry("PROP", "Requisite"),
+            Map.entry("TRACK", "Musiktitel"),
             Map.entry("FEATURES", "Mit Band"), Map.entry("FEATURES_PERSON", "Mitwirkende Person"),
             Map.entry("PRODUCED_BY", "Produziert von"), Map.entry("DIRECTED_BY", "Regie von"),
             Map.entry("SHOT_BY", "Kamera von"), Map.entry("EDITED_BY", "Schnitt von"),

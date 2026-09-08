@@ -12,6 +12,30 @@
             </div>
             <h1 th:text="${project.displayTitle ?: project.title}">Projekt</h1>
             <p th:if="${project.subtitle != null}" th:text="${project.subtitle}">Künstler</p>
+            <div class="track-player" th:if="${!tracks.isEmpty()}"
+                 th:attr="data-src=@{/media/{id}(id=${tracks[0].id})},data-title=${tracks[0].caption ?: 'Titel 1'}">
+                <audio class="track-player-audio" preload="none"></audio>
+                <div class="track-player-row">
+                    <button type="button" class="track-player-toggle" aria-label="Abspielen" aria-pressed="false">
+                        <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                        <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+                    </button>
+                    <div class="track-player-info">
+                        <span class="track-player-title" th:text="${tracks[0].caption ?: 'Titel 1'}">Songtitel</span>
+                        <span class="track-player-time"><span class="track-player-elapsed">0:00</span> / <span class="track-player-duration">–:--</span></span>
+                    </div>
+                    <div class="track-player-bar" role="slider" aria-label="Fortschritt" tabindex="0" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <div class="track-player-progress"></div>
+                    </div>
+                </div>
+                <ul class="track-player-list" th:if="${tracks.size() > 1}">
+                    <li th:each="track, stat : ${tracks}">
+                        <button type="button" class="track-player-item" th:classappend="${stat.first} ? ' is-active' : ''"
+                                th:attr="data-src=@{/media/{id}(id=${track.id})},data-title=${track.caption ?: ('Titel ' + stat.count)}"
+                                th:text="${track.caption ?: ('Titel ' + stat.count)}">Songtitel</button>
+                    </li>
+                </ul>
+            </div>
             <div class="project-actions">
                 <a class="project-wiki-link" th:if="${project.wikiUrl != null && !project.wikiUrl.isBlank()}"
                    th:href="${project.wikiUrl}" target="_blank" rel="noopener">
@@ -339,5 +363,6 @@
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
 <script type="module" src="/js/piwigo-gallery.js" th:if="${!photoGalleries.isEmpty()}"></script>
+<script src="/js/track-player.js" defer th:if="${!tracks.isEmpty()}"></script>
 </body>
 </html>

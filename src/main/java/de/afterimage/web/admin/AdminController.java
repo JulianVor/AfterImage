@@ -323,8 +323,12 @@ public class AdminController {
     String upload(@PathVariable UUID id, @RequestParam MultipartFile file,
                   @RequestParam MediaVariant variant, @RequestParam String altText,
                   RedirectAttributes redirect) throws IOException {
-        media.upload(id, file, variant, altText);
-        redirect.addFlashAttribute("message", "Medium wurde privat hochgeladen.");
+        try {
+            media.upload(id, file, variant, altText);
+            redirect.addFlashAttribute("message", "Medium wurde privat hochgeladen.");
+        } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("error", exception.getMessage());
+        }
         return "redirect:/admin/entities/" + id;
     }
 
@@ -332,9 +336,15 @@ public class AdminController {
     String updateMedia(@PathVariable UUID entityId, @PathVariable UUID mediaId,
                        @RequestParam MediaVariant variant, @RequestParam Visibility visibility,
                        @RequestParam(required = false) String altText,
+                       @RequestParam(required = false) String caption,
                        @RequestParam(defaultValue = "0") int sortOrder,
-                       @RequestParam(defaultValue = "false") boolean hero) {
-        media.update(entityId, mediaId, variant, visibility, altText, sortOrder, hero);
+                       @RequestParam(defaultValue = "false") boolean hero,
+                       RedirectAttributes redirect) {
+        try {
+            media.update(entityId, mediaId, variant, visibility, altText, caption, sortOrder, hero);
+        } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("error", exception.getMessage());
+        }
         return "redirect:/admin/entities/" + entityId;
     }
 

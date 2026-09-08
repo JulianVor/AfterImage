@@ -30,6 +30,8 @@ public class AdminMediaService {
         this.entities = entities;
     }
 
+    private static final int MAX_TRACKS_PER_ENTITY = 5;
+
     @Transactional
     public MediaAsset upload(UUID entityId, MultipartFile file, MediaVariant variant, String altText) throws IOException {
         if (file.isEmpty()) {
@@ -37,6 +39,15 @@ public class AdminMediaService {
         }
         String contentType = file.getContentType() == null ? "application/octet-stream" : file.getContentType();
         MediaType type = mediaType(contentType);
+        if (variant == MediaVariant.TRACK) {
+            if (type != MediaType.AUDIO) {
+                throw new IllegalArgumentException("Für einen Musiktitel wird eine Audiodatei erwartet.");
+            }
+            if (mediaAssets.countByEntityIdAndTypeAndMediaVariant(entityId, MediaType.AUDIO, MediaVariant.TRACK)
+                    >= MAX_TRACKS_PER_ENTITY) {
+                throw new IllegalArgumentException("Es sind bereits " + MAX_TRACKS_PER_ENTITY + " Musiktitel hinterlegt.");
+            }
+        }
         MediaAsset asset = new MediaAsset(entities.findById(entityId).orElseThrow(), type, variant);
         asset.setOriginalFilename(file.getOriginalFilename());
         asset.setStorageKey(storage.store(file));
@@ -53,16 +64,22 @@ public class AdminMediaService {
 
     @Transactional
     public void update(UUID entityId, UUID mediaId, MediaVariant variant, Visibility visibility,
-                       String altText, int sortOrder, boolean hero) {
+                       String altText, String caption, int sortOrder, boolean hero) {
         var entity = entities.findById(entityId).orElseThrow();
         var asset = mediaAssets.findById(mediaId).orElseThrow();
         if (asset.getEntity() == null || !asset.getEntity().getId().equals(entityId)) {
             throw new IllegalArgumentException("Das Medium gehört nicht zu diesem Eintrag");
         }
+        if (variant == MediaVariant.TRACK && asset.getMediaVariant() != MediaVariant.TRACK
+                && mediaAssets.countByEntityIdAndTypeAndMediaVariant(entityId, MediaType.AUDIO, MediaVariant.TRACK)
+                        >= MAX_TRACKS_PER_ENTITY) {
+            throw new IllegalArgumentException("Es sind bereits " + MAX_TRACKS_PER_ENTITY + " Musiktitel hinterlegt.");
+        }
         asset.setMediaVariant(variant);
         asset.setVisibility(variant == MediaVariant.ORIGINAL || variant == MediaVariant.RAW
                 ? Visibility.PRIVATE : visibility);
         asset.setAltText(altText == null || altText.isBlank() ? null : altText.trim());
+        asset.setCaption(caption == null || caption.isBlank() ? null : caption.trim());
         asset.setSortOrder(sortOrder);
         if (hero) {
             entity.setHeroMediaId(asset.getId());

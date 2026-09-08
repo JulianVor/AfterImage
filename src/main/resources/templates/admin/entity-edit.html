@@ -82,6 +82,7 @@
                         <label>Variante <select name="variant"><option th:each="variant : ${mediaVariants}" th:value="${variant}" th:text="${labels.of(variant)}" th:selected="${variant == asset.mediaVariant}"></option></select></label>
                         <label>Sichtbarkeit <select name="visibility"><option th:each="value : ${visibilities}" th:value="${value}" th:text="${labels.of(value)}" th:selected="${value == asset.visibility}"></option></select></label>
                         <label>Alternativtext <input name="altText" th:value="${asset.altText}"></label>
+                        <label>Titel (für Musiktitel) <input name="caption" th:value="${asset.caption}"></label>
                         <label>Sortierung <input type="number" name="sortOrder" th:value="${asset.sortOrder}"></label>
                         <label><span>Titelbild</span><input type="checkbox" name="hero" value="true" th:checked="${entity.heroMediaId == asset.id}"></label>
                         <button type="submit">Medium aktualisieren</button>
