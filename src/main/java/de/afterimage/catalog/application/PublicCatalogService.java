@@ -193,8 +193,53 @@ public class PublicCatalogService {
     }
 
     /**
-     * Every public place that has coordinates, with how many public works/events were shot, recorded,
-     * held or planned there - for the "all places" map next to the band network's "all bands" graph.
+     * Concerts a person played at - derived transitively through their band memberships, since a
+     * concert links to a band (PERFORMED_AT / FEATURES), not directly to its individual members.
+     */
+    public List<ConcertAppearance> personConcerts(ArchiveEntity person) {
+        if (person.getEntityType() != EntityType.PERSON) {
+            return List.of();
+        }
+        Map<UUID, ArchiveEntity> bands = publicRelations(person.getSlug()).stream()
+                .filter(relation -> (relation.getType() == RelationshipType.MEMBER_OF
+                        || relation.getType() == RelationshipType.FORMER_MEMBER_OF)
+                        && relation.getSourceEntity().getId().equals(person.getId())
+                        && relation.getTargetEntity().getEntityType() == EntityType.BAND)
+                .collect(Collectors.toMap(relation -> relation.getTargetEntity().getId(),
+                        Relationship::getTargetEntity, (a, b) -> a));
+        if (bands.isEmpty()) {
+            return List.of();
+        }
+        Map<UUID, ConcertAppearance> appearances = new LinkedHashMap<>();
+        for (Relationship relation : relationships.findPublicGraph(Visibility.PUBLIC)) {
+            ArchiveEntity source = relation.getSourceEntity();
+            ArchiveEntity target = relation.getTargetEntity();
+            if (relation.getType() == RelationshipType.PERFORMED_AT && bands.containsKey(source.getId())
+                    && target.getEntityType() == EntityType.EVENT && target.isPubliclyVisible()) {
+                appearances.putIfAbsent(target.getId(),
+                        new ConcertAppearance(target, bands.get(source.getId()), heroImage(target)));
+            } else if (relation.getType() == RelationshipType.FEATURES && bands.containsKey(target.getId())
+                    && source.getEntityType() == EntityType.EVENT && source.isPubliclyVisible()) {
+                appearances.putIfAbsent(source.getId(),
+                        new ConcertAppearance(source, bands.get(target.getId()), heroImage(source)));
+            }
+        }
+        return appearances.values().stream()
+                .sorted(Comparator.comparing((ConcertAppearance appearance) -> appearance.concert().getStartDate(),
+                        Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .toList();
+    }
+
+    public record ConcertAppearance(ArchiveEntity concert, ArchiveEntity band, PublicMediaService.PublicMediaMetadata image) {}
+
+    private PublicMediaService.PublicMediaMetadata heroImage(ArchiveEntity entity) {
+        return entity.getHeroMediaId() == null ? null : media.metadata(entity.getHeroMediaId()).orElse(null);
+    }
+
+    /**
+     * Every public place that has coordinates, with how many public concerts and projects were shot,
+     * recorded, held or planned there - for the "all places" map next to the band network's "all bands"
+     * graph.
      */
     public List<PlaceMarker> places() {
         List<ArchiveEntity> places = entities.findByVisibilityOrderBySortOrderAscTitleAsc(Visibility.PUBLIC).stream()
@@ -206,22 +251,31 @@ public class PublicCatalogService {
             return List.of();
         }
         Set<UUID> placeIds = places.stream().map(ArchiveEntity::getId).collect(Collectors.toSet());
-        Map<UUID, Integer> workCounts = new LinkedHashMap<>();
+        Map<UUID, Integer> concertCounts = new LinkedHashMap<>();
+        Map<UUID, Integer> projectCounts = new LinkedHashMap<>();
         for (Relationship relation : relationships.findPublicGraph(Visibility.PUBLIC)) {
+            ArchiveEntity source = relation.getSourceEntity();
             ArchiveEntity target = relation.getTargetEntity();
-            if (PLACE_APPEARANCE_TYPES.contains(relation.getType()) && placeIds.contains(target.getId())
-                    && relation.getSourceEntity().isPubliclyVisible()) {
-                workCounts.merge(target.getId(), 1, Integer::sum);
+            if (!PLACE_APPEARANCE_TYPES.contains(relation.getType()) || !placeIds.contains(target.getId())
+                    || !source.isPubliclyVisible()) {
+                continue;
+            }
+            if (source.getEntityType() == EntityType.EVENT) {
+                concertCounts.merge(target.getId(), 1, Integer::sum);
+            } else if (source.getEntityType() == EntityType.PROJECT) {
+                projectCounts.merge(target.getId(), 1, Integer::sum);
             }
         }
         return places.stream()
+                .filter(place -> concertCounts.containsKey(place.getId()) || projectCounts.containsKey(place.getId()))
                 .map(place -> new PlaceMarker(place.getSlug(), place.getTitle(),
                         place.getLatitude().doubleValue(), place.getLongitude().doubleValue(),
-                        workCounts.getOrDefault(place.getId(), 0)))
+                        concertCounts.getOrDefault(place.getId(), 0),
+                        projectCounts.getOrDefault(place.getId(), 0)))
                 .toList();
     }
 
-    public record PlaceMarker(String slug, String title, double lat, double lng, int workCount) {}
+    public record PlaceMarker(String slug, String title, double lat, double lng, int concertCount, int projectCount) {}
 
     /**
      * Public bands that are connected to at least one other band - either directly curated (RELATED_TO

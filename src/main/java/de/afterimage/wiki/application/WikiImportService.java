@@ -401,6 +401,7 @@ public class WikiImportService {
     private Map<String, RelationMapping> relationMappings(WikiPage page) {
         Map<String, RelationMapping> map = new LinkedHashMap<>();
         map.put("Featured band", relation(RelationshipType.FEATURES, EntityType.BAND, false, 92));
+        map.put("Photographed band", relation(RelationshipType.FEATURES, EntityType.BAND, false, 92));
         map.put("Related band", relation(RelationshipType.RELATED_TO, EntityType.BAND, false, 45));
         map.put("Member", relation(RelationshipType.MEMBER_OF, EntityType.PERSON, true, 88));
         map.put("Current member", relation(RelationshipType.MEMBER_OF, EntityType.PERSON, true, 92));

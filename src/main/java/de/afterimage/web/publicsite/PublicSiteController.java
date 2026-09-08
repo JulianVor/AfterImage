@@ -32,8 +32,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 @Controller
 public class PublicSiteController {
@@ -77,7 +81,11 @@ public class PublicSiteController {
             "filming location", "shooting location", "recording location", "source venue",
             "location", "concert location", "final concert location", "planned location",
             "related event", "source event", "festival", "prequel", "sequel", "album",
-            "zugehöriges album", "interpret", "portrayed band", "production");
+            "zugehöriges album", "interpret", "portrayed band", "production",
+            "photographed band",
+            // Not actually relation-backed - additional lineup bands deliberately don't get their own
+            // entity/page, so they're shown in their own dedicated spot instead of this generic list.
+            "additional lineup");
 
     public PublicSiteController(PublicCatalogService catalog, PublicTrailService trails, PublicMediaService media,
                                 WikiContentRenderer wikiContentRenderer, EntityTimelineService timelineService,
@@ -194,14 +202,20 @@ public class PublicSiteController {
         Map<String, List<String>> technicalProperties = technicalProperties(properties);
         List<Relationship> relations = catalog.publicRelations(project.getSlug());
         List<RelatedBandCard> relatedBands = relatedBands(project, relations);
+        List<RelatedBandCard> photographedBands = photographedBands(project, relations);
         List<RelatedProjectCard> musicVideos = musicVideos(project, relations);
         List<WikiContentRenderer.Chapter> textSections = configuration.wiki().contentEnabled()
                 ? wikiContentRenderer.chapters(catalog.contentSections(project))
                 : List.of();
         List<MemberCard> members = members(project, relations);
         List<PersonRoleGroup> personRoles = personRoles(project, relations);
+        List<PublicCatalogService.ConcertAppearance> personConcerts = catalog.personConcerts(project);
         List<PlaceAppearance> placeAppearances = placeAppearances(project, relations);
         Optional<String> ownMapUrl = ownMapEmbedUrl(project);
+        Optional<ArchiveEntity> venue = heldAtPlace(project, relations);
+        Optional<String> venueMapUrl = venue.filter(place -> place.getLatitude() != null && place.getLongitude() != null)
+                .map(PublicSiteController::mapEmbedUrl);
+        List<String> additionalLineup = properties.getOrDefault("Additional lineup", List.of());
         List<Relationship> leftoverRelations = relations.stream()
                 .filter(relation -> !isRelatedBandRelation(project, relation)
                         && !isBandMusicVideoRelation(project, relation)
@@ -210,7 +224,10 @@ public class PublicSiteController {
         var timeline = timelineService.build(project, properties, relations);
         List<YoutubeVideo> youtubeVideos = youtubeVideos(properties);
         List<FilmingLocation> filmingLocations = filmingLocations(project, relations);
-        var photoGalleries = piwigoGalleries.galleries(project, 12);
+        var photoGalleries = Stream.concat(
+                piwigoGalleries.galleries(project, 12).stream(),
+                pathGalleries(properties.getOrDefault("Piwigo path", List.of())).stream()
+        ).toList();
         var tracks = media.tracks(project);
 
         model.addAttribute("tracks", tracks);
@@ -219,10 +236,15 @@ public class PublicSiteController {
         model.addAttribute("credits", credits(project, relations));
         model.addAttribute("members", members);
         model.addAttribute("personRoles", personRoles);
+        model.addAttribute("personConcerts", personConcerts);
         model.addAttribute("placeAppearances", placeAppearances);
         model.addAttribute("ownMapUrl", ownMapUrl);
+        model.addAttribute("venue", venue);
+        model.addAttribute("venueMapUrl", venueMapUrl);
+        model.addAttribute("additionalLineup", additionalLineup);
         model.addAttribute("relations", leftoverRelations);
         model.addAttribute("relatedBands", relatedBands);
+        model.addAttribute("photographedBands", photographedBands);
         model.addAttribute("musicVideos", musicVideos);
         model.addAttribute("timeline", timeline);
         model.addAttribute("youtubeVideos", youtubeVideos);
@@ -238,13 +260,17 @@ public class PublicSiteController {
         if (!youtubeVideos.isEmpty()) navItems.add(new NavItem("video", "Video"));
         if (!members.isEmpty()) navItems.add(new NavItem("mitglieder", "Mitglieder"));
         if (!personRoles.isEmpty()) navItems.add(new NavItem("rollen", "Rollen"));
+        if (!personConcerts.isEmpty()) navItems.add(new NavItem("konzerte", "Konzerte"));
         if (!photoGalleries.isEmpty()) navItems.add(new NavItem("fotos", "Fotos"));
         if (!timeline.isEmpty()) navItems.add(new NavItem("chronik", "Chronik"));
         if (!musicVideos.isEmpty()) navItems.add(new NavItem("musikvideos", "Musikvideos"));
         if (!textSections.isEmpty()) navItems.add(new NavItem("wiki-texte", "Hintergründe"));
+        if (!photographedBands.isEmpty()) navItems.add(new NavItem("fotografierte-bands", "Fotografierte Bands"));
         if (!relatedBands.isEmpty()) navItems.add(new NavItem("bands", "Verwandte Bands"));
         if (!filmingLocations.isEmpty()) navItems.add(new NavItem("drehorte", "Drehorte"));
-        if (ownMapUrl.isPresent() || !placeAppearances.isEmpty()) navItems.add(new NavItem("karte", "Auf der Karte"));
+        if (ownMapUrl.isPresent() || venueMapUrl.isPresent() || !placeAppearances.isEmpty()) {
+            navItems.add(new NavItem("karte", "Auf der Karte"));
+        }
         if (!technicalProperties.isEmpty() || !leftoverRelations.isEmpty()) {
             navItems.add(new NavItem("archivzustand", "Technik"));
         }
@@ -347,6 +373,38 @@ public class PublicSiteController {
                 .toList();
     }
 
+    private static final int PATH_GALLERY_PHOTO_COUNT = 5;
+
+    /**
+     * Concert pages list one Piwigo album path per photographed band (e.g. "Mute-Tales/27.12.2025
+     * Abschiedskonzert"); each becomes its own random-5 preview. Fetched concurrently since every path
+     * is an independent Piwigo round-trip.
+     */
+    private List<PiwigoGalleryService.Gallery> pathGalleries(List<String> paths) {
+        if (paths.isEmpty()) {
+            return List.of();
+        }
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            List<CompletableFuture<PiwigoGalleryService.Gallery>> futures = paths.stream()
+                    .map(path -> CompletableFuture.supplyAsync(
+                            () -> piwigoGalleries.galleryForPath(path, PATH_GALLERY_PHOTO_COUNT), executor))
+                    .toList();
+            return futures.stream().map(CompletableFuture::join).toList();
+        }
+    }
+
+    private static Optional<ArchiveEntity> heldAtPlace(ArchiveEntity entity, List<Relationship> relations) {
+        if (entity.getEntityType() != EntityType.EVENT) {
+            return Optional.empty();
+        }
+        return relations.stream()
+                .filter(relation -> relation.getType() == RelationshipType.HELD_AT
+                        && relation.getSourceEntity().getId().equals(entity.getId())
+                        && relation.getTargetEntity().isPubliclyVisible())
+                .map(Relationship::getTargetEntity)
+                .findFirst();
+    }
+
     private static Optional<String> ownMapEmbedUrl(ArchiveEntity entity) {
         if (entity.getEntityType() != EntityType.PLACE
                 || entity.getLatitude() == null || entity.getLongitude() == null) {
@@ -401,6 +459,24 @@ public class PublicSiteController {
                 .filter(relation -> isRelatedBandRelation(project, relation))
                 .map(relation -> relation.getSourceEntity().getId().equals(project.getId())
                         ? relation.getTargetEntity() : relation.getSourceEntity())
+                .forEach(band -> uniqueBands.putIfAbsent(band.getId(), band));
+        return uniqueBands.values().stream()
+                .map(band -> new RelatedBandCard(band, band.getHeroMediaId() == null
+                        ? null : media.metadata(band.getHeroMediaId()).orElse(null)))
+                .toList();
+    }
+
+    private List<RelatedBandCard> photographedBands(ArchiveEntity entity, List<Relationship> relations) {
+        if (entity.getEntityType() != EntityType.EVENT) {
+            return List.of();
+        }
+        Map<UUID, ArchiveEntity> uniqueBands = new LinkedHashMap<>();
+        relations.stream()
+                .filter(relation -> relation.getType() == RelationshipType.FEATURES
+                        && relation.getSourceEntity().getId().equals(entity.getId())
+                        && relation.getTargetEntity().getEntityType() == EntityType.BAND
+                        && relation.getTargetEntity().isPubliclyVisible())
+                .map(Relationship::getTargetEntity)
                 .forEach(band -> uniqueBands.putIfAbsent(band.getId(), band));
         return uniqueBands.values().stream()
                 .map(band -> new RelatedBandCard(band, band.getHeroMediaId() == null

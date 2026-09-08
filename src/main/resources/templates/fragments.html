@@ -17,13 +17,22 @@
     <a class="wordmark" href="/" th:text="${site.title}">FotosVorJu</a>
     <nav aria-label="Hauptnavigation">
         <a href="/show" th:classappend="${active == 'show'} ? 'is-active'"><em>01</em><span>Auswahl</span></a>
-        <a href="/explore" th:classappend="${active == 'explore'} ? 'is-active'"><em>02</em><span>Entdecken</span></a>
+        <div class="nav-item nav-item--has-submenu" th:classappend="${active == 'explore' || active == 'explore-map'} ? 'is-active'">
+            <button type="button" class="nav-toggle" aria-haspopup="true" aria-expanded="false">
+                <em>02</em><span>Entdecken</span>
+            </button>
+            <div class="nav-submenu">
+                <a href="/explore" th:classappend="${active == 'explore'} ? 'is-active'">Netzwerk</a>
+                <a href="/explore/orte" th:classappend="${active == 'explore-map'} ? 'is-active'">Orte</a>
+            </div>
+        </div>
         <a href="/chronicle" th:classappend="${active == 'chronicle'} ? 'is-active'"><em>03</em><span>Chronik</span></a>
         <a href="/trails" th:classappend="${active == 'trails'} ? 'is-active'"><em>04</em><span>Geschichten</span></a>
         <a href="/about" th:classappend="${active == 'about'} ? 'is-active'"><em>05</em><span>Über</span></a>
         <a href="/archive" th:classappend="${active == 'archive'} ? 'is-active'"><em>06</em><span>Archiv</span></a>
     </nav>
     <a class="search-link" href="/search" aria-label="Archiv durchsuchen">Suche</a>
+    <script src="/js/nav-submenu.js" defer></script>
 </header>
 <footer class="site-footer" th:fragment="footer">
     <p th:text="${site.owner}">Julian Vornfeld</p>

@@ -64,6 +64,17 @@ button, input, textarea, select { font: inherit; }
 .site-header nav a.is-active, .site-header nav a:hover { color: var(--paper); }
 .site-header nav a.is-active em { color: var(--ember-bright); }
 .site-header nav a.is-active::after { display: block; width: 100%; height: 2px; margin-top: .35rem; content: ""; background: var(--ember); }
+.nav-item { position: relative; }
+.nav-toggle { display: flex; align-items: baseline; gap: .4rem; margin: 0; padding: .45rem 0; border: 0; background: none; color: var(--paper-muted); font: inherit; cursor: pointer; }
+.nav-toggle em { font-family: var(--mono); font-size: .66rem; font-style: normal; color: rgba(26, 21, 16, .3); }
+.nav-item.is-active .nav-toggle, .nav-toggle:hover { color: var(--paper); }
+.nav-item.is-active .nav-toggle em { color: var(--ember-bright); }
+.nav-item.is-active .nav-toggle::after { display: block; width: 100%; height: 2px; margin-top: .35rem; content: ""; background: var(--ember); }
+.nav-submenu { position: absolute; top: 100%; left: 0; z-index: 20; display: none; flex-direction: column; min-width: 9rem; margin-top: .6rem; padding: .4rem 0; border: 1px solid var(--line); background: var(--ink); box-shadow: 0 16px 34px rgba(26, 21, 16, .1); }
+.nav-item.is-open .nav-submenu { display: flex; }
+.nav-submenu a { padding: .55rem 1.1rem; color: var(--paper-muted); font: .68rem var(--mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+.nav-submenu a:hover { color: var(--paper); background: rgba(26, 21, 16, .03); }
+.nav-submenu a.is-active { color: var(--ember-bright); }
 .search-link { justify-self: end; color: var(--paper-muted); }
 
 .eyebrow {
@@ -245,6 +256,8 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
 .location-maps article > div { display: flex; align-items: baseline; justify-content: space-between; gap: 1.5rem; padding: 1.3rem; border-top: 1px solid var(--line); }
 .location-maps h3 { margin: 0; font: 400 1.7rem var(--serif); }
 .location-maps a { color: var(--ember-bright); font: .61rem var(--mono); letter-spacing: .07em; text-transform: uppercase; text-align: right; }
+.lineup-note { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem .9rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); color: var(--paper); font: 400 1.05rem var(--serif); }
+.lineup-note .eyebrow { margin: 0; }
 .narrative-sections { max-width: 940px; }
 .narrative-heading { display: flex; align-items: end; justify-content: space-between; gap: 3rem; padding-bottom: 2rem; border-bottom: 1px solid var(--line); }
 .narrative-heading h2 { max-width: 42rem; margin: .55rem 0 0; font: 400 clamp(2.8rem, 6vw, 5.8rem)/.94 var(--serif); letter-spacing: -.025em; }
@@ -432,6 +445,8 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
 .connections-intro-meta span::before { width: 3px; height: 3px; border-radius: 50%; background: var(--ember); content: ""; }
 .connections-intro-meta a { border-bottom: 1px solid var(--ember); color: var(--paper); white-space: nowrap; }
 .connections-workspace { min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) clamp(290px, 22vw, 370px); border-top: 1px solid var(--line); }
+.connections-intro-meta .legend-project::before { background: #2f6f9e; }
+.connections-intro-meta .legend-both::before { background: #7a4a8f; }
 .places-map-workspace { min-height: 0; border-top: 1px solid var(--line); }
 .places-map-wrap { position: relative; width: 100%; height: 100%; }
 #places-map { width: 100%; height: 100%; background: var(--ink-soft); }
@@ -734,6 +749,9 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
     .site-header nav { position: fixed; z-index: 12; bottom: 0; left: 0; right: 0; justify-content: space-around; gap: .5rem; padding: .75rem .5rem; border-top: 1px solid var(--line); background: rgba(246,242,234,.96); backdrop-filter: blur(12px); }
     .site-header nav a em { display: none; }
     .site-header nav a.is-active::after { display: none; }
+    .nav-toggle em { display: none; }
+    .nav-item.is-active .nav-toggle::after { display: none; }
+    .nav-submenu { top: auto; bottom: 100%; left: 50%; transform: translateX(-50%); margin-top: 0; margin-bottom: .6rem; }
     .search-link { font-size: 0; }
     .search-link::after { content: "⌕"; font-size: 1rem; }
     .show-intro { min-height: calc(100svh - 5rem); grid-template-columns: 1fr; padding-top: 4rem; }

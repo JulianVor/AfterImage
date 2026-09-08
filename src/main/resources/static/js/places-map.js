@@ -19,17 +19,25 @@ if (mapEl && window.L) {
             maxZoom: 18
         }).addTo(map);
 
-        const maxWorkCount = Math.max(1, ...places.map(place => place.workCount));
+        const total = place => place.concertCount + place.projectCount;
+        const maxTotal = Math.max(1, ...places.map(total));
+        const markerColor = place => place.concertCount > 0 && place.projectCount > 0 ? '#7a4a8f'
+            : place.projectCount > 0 ? '#2f6f9e'
+            : '#c8431c';
         places.forEach(place => {
-            const radius = 6 + (place.workCount / maxWorkCount) * 10;
+            const radius = 6 + (total(place) / maxTotal) * 10;
+            const color = markerColor(place);
             const marker = L.circleMarker([place.lat, place.lng], {
                 radius,
                 weight: 1.5,
-                color: '#c8431c',
-                fillColor: '#c8431c',
+                color,
+                fillColor: color,
                 fillOpacity: 0.75
             }).addTo(map);
-            const count = place.workCount === 1 ? '1 Werk' : `${place.workCount} Werke`;
+            const parts = [];
+            if (place.concertCount > 0) parts.push(place.concertCount === 1 ? '1 Konzert' : `${place.concertCount} Konzerte`);
+            if (place.projectCount > 0) parts.push(place.projectCount === 1 ? '1 Projekt' : `${place.projectCount} Projekte`);
+            const count = parts.length > 0 ? parts.join(', ') : 'Kein dokumentiertes Werk';
             marker.bindPopup(`<strong>${place.title}</strong><span>${count}</span><a href="/explore?focus=${encodeURIComponent('entity:' + place.slug)}">Bei Entdecken öffnen →</a>`);
         });
 

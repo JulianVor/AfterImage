@@ -2,7 +2,7 @@
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('ENTDECKEN')}"></head>
 <body class="explore-page">
-<header th:replace="~{fragments :: nav('explore')}"></header>
+<header th:replace="~{fragments :: nav('explore-map')}"></header>
 <main class="connections">
     <header class="connections-heading">
         <div>
@@ -11,6 +11,9 @@
             <p>Alle dokumentierten Drehorte, Bühnen und Schauplätze auf einer Karte – <em>ein Ort nach dem anderen.</em></p>
         </div>
         <div class="connections-intro-meta" aria-label="So funktioniert diese Ansicht">
+            <span>Konzerte</span>
+            <span class="legend-project">Projekte</span>
+            <span class="legend-both">Beides</span>
             <a href="/explore">← Als Netzwerk ansehen</a>
         </div>
     </header>

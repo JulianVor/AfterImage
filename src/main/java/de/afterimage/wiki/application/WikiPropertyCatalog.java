@@ -35,6 +35,6 @@ public final class WikiPropertyCatalog {
             "Latitude", "Longitude", "Location type", "Project name", "Project type", "Related city",
             "Related district", "Related location", "Related project", "Related production", "Related concert",
             "Featured in video", "Creator", "Artist", "Photographer", "Source video", "Release status",
-            "Release type", "Number of videos"
+            "Release type", "Number of videos", "Photographed band", "Additional lineup", "Piwigo path"
     );
 }

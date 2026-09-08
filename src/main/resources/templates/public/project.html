@@ -7,7 +7,9 @@
     <header class="project-hero">
         <div class="project-hero-copy">
             <div class="project-kicker">
-                <span th:text="${project.entityType.name() == 'PROJECT' && project.projectType != null ? labels.of(project.projectType) : labels.of(project.entityType)}">Musikvideo</span>
+                <span th:text="${project.entityType.name() == 'PROJECT' && project.projectType != null ? labels.of(project.projectType)
+                    : project.entityType.name() == 'EVENT' && project.eventType != null ? labels.of(project.eventType)
+                    : labels.of(project.entityType)}">Musikvideo</span>
                 <span th:if="${project.year != null}" th:text="${project.year}">2024</span>
             </div>
             <h1 th:text="${project.displayTitle ?: project.title}">Projekt</h1>
@@ -127,6 +129,35 @@
                 </span>
             </li>
         </ul>
+    </section>
+
+    <section id="konzerte" class="related-bands" th:if="${!personConcerts.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Konzerte</p><h2>Wo gespielt wurde</h2></div>
+            <p th:text="${personConcerts.size() == 1 ? 'Ein dokumentiertes Konzert.' : personConcerts.size() + ' dokumentierte Konzerte.'}">Konzerte.</p>
+        </header>
+        <div class="related-band-grid">
+            <article th:each="appearance, stat : ${personConcerts}">
+                <a th:href="@{/entry/{slug}(slug=${appearance.concert.slug})}">
+                    <div class="related-band-visual">
+                        <img th:if="${appearance.image != null}" th:src="@{/media/{id}(id=${appearance.image.id})}"
+                             th:alt="${appearance.image.altText ?: appearance.concert.title}"
+                             th:attr="width=${appearance.image.width},height=${appearance.image.height}" loading="lazy">
+                        <div class="related-band-plate" th:unless="${appearance.image != null}"
+                             th:attr="data-index=${#numbers.formatInteger(stat.count, 2)}">
+                            <span>Archivbild</span>
+                        </div>
+                    </div>
+                    <div class="related-band-caption">
+                        <div>
+                            <h3 th:text="${appearance.concert.displayTitle ?: appearance.concert.title}">Konzert</h3>
+                            <small th:text="${appearance.band.displayTitle ?: appearance.band.title}">Band</small>
+                        </div>
+                        <span>Konzert ansehen <span aria-hidden="true">↗</span></span>
+                    </div>
+                </a>
+            </article>
+        </div>
     </section>
 
     <section id="video" class="project-video" th:if="${!youtubeVideos.isEmpty()}">
@@ -261,6 +292,32 @@
         </div>
     </section>
 
+    <section id="fotografierte-bands" class="related-bands" th:if="${!photographedBands.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Konzert</p><h2>Fotografierte Bands</h2></div>
+            <p th:text="${photographedBands.size() == 1 ? 'Eine fotografierte Band.' : photographedBands.size() + ' fotografierte Bands.'}">Fotografierte Bands.</p>
+        </header>
+        <div class="related-band-grid">
+            <article th:each="card, stat : ${photographedBands}">
+                <a th:href="@{/entry/{slug}(slug=${card.band.slug})}">
+                    <div class="related-band-visual">
+                        <img th:if="${card.image != null}" th:src="@{/media/{id}(id=${card.image.id})}"
+                             th:alt="${card.image.altText ?: card.band.title}"
+                             th:attr="width=${card.image.width},height=${card.image.height}" loading="lazy">
+                        <div class="related-band-plate" th:unless="${card.image != null}"
+                             th:attr="data-index=${#numbers.formatInteger(stat.count, 2)}">
+                            <span>Archivbild</span>
+                        </div>
+                    </div>
+                    <div class="related-band-caption">
+                        <h3 th:text="${card.band.displayTitle ?: card.band.title}">Band</h3>
+                        <span>Band ansehen <span aria-hidden="true">↗</span></span>
+                    </div>
+                </a>
+            </article>
+        </div>
+    </section>
+
     <section id="bands" class="related-bands" th:if="${!relatedBands.isEmpty()}">
         <header>
             <div><p class="eyebrow">Im Umfeld</p><h2>Verwandte Bands</h2></div>
@@ -304,7 +361,7 @@
         </div>
     </section>
 
-    <section id="karte" class="project-locations" th:if="${ownMapUrl.isPresent() || !placeAppearances.isEmpty()}">
+    <section id="karte" class="project-locations" th:if="${ownMapUrl.isPresent() || venueMapUrl.isPresent() || !placeAppearances.isEmpty()}">
         <header>
             <div><p class="eyebrow">Ort</p><h2>Auf der Karte</h2></div>
             <p th:if="${!placeAppearances.isEmpty()}"
@@ -319,6 +376,14 @@
                     <a th:href="@{/explore(focus=${'entity:' + project.slug})}">Verbindungen dieses Ortes entdecken →</a>
                 </div>
             </article>
+            <article th:if="${venueMapUrl.isPresent()}">
+                <iframe th:src="${venueMapUrl.get()}" th:title="${'Karte: ' + (venue.get().displayTitle ?: venue.get().title)}"
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div>
+                    <h3 th:text="${venue.get().displayTitle ?: venue.get().title}">Veranstaltungsort</h3>
+                    <a th:href="@{/entry/{slug}(slug=${venue.get().slug})}">Ort im Archiv öffnen →</a>
+                </div>
+            </article>
         </div>
         <ul class="relation-list" th:if="${!placeAppearances.isEmpty()}">
             <li th:each="appearance : ${placeAppearances}">
@@ -326,6 +391,10 @@
                 <a th:href="@{/entry/{slug}(slug=${appearance.work.slug})}" th:text="${appearance.work.displayTitle ?: appearance.work.title}">Werk</a>
             </li>
         </ul>
+        <p class="lineup-note" th:if="${!additionalLineup.isEmpty()}">
+            <span class="eyebrow">Weiteres Line-up</span>
+            <span th:text="${#strings.listJoin(additionalLineup, ', ')}">Weitere Bands</span>
+        </p>
     </section>
 
     <details id="archivzustand" class="archive-state" th:if="${!properties.isEmpty() || !relations.isEmpty()}">
