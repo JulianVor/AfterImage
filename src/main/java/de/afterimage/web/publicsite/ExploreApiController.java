@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/explore")
 public class ExploreApiController {
@@ -24,6 +26,11 @@ public class ExploreApiController {
     @GetMapping("/bands")
     PublicCatalogService.BandNetwork bands() {
         return catalog.bandNetwork();
+    }
+
+    @GetMapping("/places")
+    List<PublicCatalogService.PlaceMarker> places() {
+        return catalog.places();
     }
 }
 

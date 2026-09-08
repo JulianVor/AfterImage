@@ -84,7 +84,8 @@ public class GermanLabels {
             Map.entry("MISSING_WIKI_LINK", "Wiki-Link fehlt"), Map.entry("GENERIC_RELATIONSHIP", "Unspezifische Beziehung"),
             Map.entry("MISSING_RELEASE_DATE", "Veröffentlichungsdatum fehlt"),
             Map.entry("LOCATION_WITHOUT_DATE", "Drehort ohne Drehdatum"),
-            Map.entry("SPARSE_TIMELINE", "Chronik ist zu dünn")
+            Map.entry("SPARSE_TIMELINE", "Chronik ist zu dünn"),
+            Map.entry("PLACE_MISSING_COORDINATES", "Orte ohne Lat/Long")
     );
 
     public String of(Object value) {

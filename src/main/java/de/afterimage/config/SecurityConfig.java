@@ -20,7 +20,7 @@ public class SecurityConfig {
         return http
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/admin/login", "/css/**", "/js/**", "/webjars/**", "/favicon.svg",
-                                "/actuator/health", "/error", "/", "/show", "/work/**", "/entry/**", "/chronicle", "/explore", "/api/explore/**",
+                                "/actuator/health", "/error", "/", "/show", "/work/**", "/entry/**", "/chronicle", "/explore", "/explore/**", "/api/explore/**",
                                 "/about", "/archive", "/search", "/connect", "/trails", "/trails/**",
                                 "/media/**", "/api/media/piwigo/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")

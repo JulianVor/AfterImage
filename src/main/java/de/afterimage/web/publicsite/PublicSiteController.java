@@ -483,6 +483,11 @@ public class PublicSiteController {
         return "public/explore";
     }
 
+    @GetMapping("/explore/orte")
+    String exploreMap() {
+        return "public/explore-map";
+    }
+
     @GetMapping("/about")
     String about() {
         return "public/about";

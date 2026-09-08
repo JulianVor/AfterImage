@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('ENTDECKEN')}"></head>
+<body class="explore-page">
+<header th:replace="~{fragments :: nav('explore')}"></header>
+<main class="connections">
+    <header class="connections-heading">
+        <div>
+            <p class="eyebrow">Entdecken</p>
+            <h1>Orte</h1>
+            <p>Alle dokumentierten Drehorte, Bühnen und Schauplätze auf einer Karte – <em>ein Ort nach dem anderen.</em></p>
+        </div>
+        <div class="connections-intro-meta" aria-label="So funktioniert diese Ansicht">
+            <a href="/explore">← Als Netzwerk ansehen</a>
+        </div>
+    </header>
+
+    <section class="places-map-workspace">
+        <div class="places-map-wrap">
+            <div id="places-map" role="img" aria-label="Karte mit allen dokumentierten Orten des Archivs"></div>
+            <p class="places-map-empty" hidden>Noch keine Orte mit Koordinaten im Archiv.</p>
+        </div>
+    </section>
+</main>
+<link rel="stylesheet" href="/webjars/leaflet/1.9.4/dist/leaflet.css">
+<script src="/webjars/leaflet/1.9.4/dist/leaflet.js"></script>
+<script type="module" src="/js/places-map.js"></script>
+</body>
+</html>

@@ -20,6 +20,7 @@
     <properties>
         <java.version>21</java.version>
         <d3.version>7.9.0</d3.version>
+        <leaflet.version>1.9.4</leaflet.version>
     </properties>
 
     <dependencies>
@@ -72,6 +73,17 @@
             <groupId>org.webjars.npm</groupId>
             <artifactId>d3</artifactId>
             <version>${d3.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars.npm</groupId>
+            <artifactId>leaflet</artifactId>
+            <version>${leaflet.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>*</groupId>

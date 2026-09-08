@@ -135,6 +135,12 @@ public class ArchiveHealthService {
                         "Ein Drehort ist dokumentiert, aber der zugehörige Dreh besitzt kein Datum.",
                         "Ergänze im Wiki Shooting date oder Filming date."));
             }
+            if (entity.getEntityType() == EntityType.PLACE
+                    && (entity.getLatitude() == null || entity.getLongitude() == null)) {
+                findings.add(finding(Severity.MEDIUM, "PLACE_MISSING_COORDINATES", entity,
+                        "Für diesen Ort sind keine Koordinaten hinterlegt - er erscheint deshalb weder auf der Orte-Karte noch mit eigener Kartenvorschau.",
+                        "Ergänze Breiten- und Längengrad im Eintrag."));
+            }
             if (entity.getEntityType() == EntityType.BAND && datedMoments(entity, graph, names) == 1) {
                 findings.add(finding(Severity.LOW, "SPARSE_TIMELINE", entity,
                         "Die Bandchronik enthält bisher nur einen einzigen datierten Moment.",

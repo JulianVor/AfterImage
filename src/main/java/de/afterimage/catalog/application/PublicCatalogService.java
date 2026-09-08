@@ -43,6 +43,10 @@ public class PublicCatalogService {
             RelationshipType.FEATURES_PERSON, RelationshipType.PARTICIPATED_IN,
             RelationshipType.FOUNDED_BY, RelationshipType.ORGANIZED_BY);
 
+    private static final Set<RelationshipType> PLACE_APPEARANCE_TYPES = EnumSet.of(
+            RelationshipType.SHOT_AT, RelationshipType.RECORDED_AT, RelationshipType.HELD_AT,
+            RelationshipType.RECORDED_AT_EVENT, RelationshipType.PLANNED_FOR);
+
     private final ArchiveEntityRepository entities;
     private final RelationshipRepository relationships;
     private final EntityPropertyRepository properties;
@@ -187,6 +191,37 @@ public class PublicCatalogService {
         return entities.findFirstByVisibilityOrderByFeaturedDescSortOrderAscYearDesc(Visibility.PUBLIC)
                 .filter(ArchiveEntity::isPubliclyVisible);
     }
+
+    /**
+     * Every public place that has coordinates, with how many public works/events were shot, recorded,
+     * held or planned there - for the "all places" map next to the band network's "all bands" graph.
+     */
+    public List<PlaceMarker> places() {
+        List<ArchiveEntity> places = entities.findByVisibilityOrderBySortOrderAscTitleAsc(Visibility.PUBLIC).stream()
+                .filter(ArchiveEntity::isPubliclyVisible)
+                .filter(entity -> entity.getEntityType() == EntityType.PLACE)
+                .filter(entity -> entity.getLatitude() != null && entity.getLongitude() != null)
+                .toList();
+        if (places.isEmpty()) {
+            return List.of();
+        }
+        Set<UUID> placeIds = places.stream().map(ArchiveEntity::getId).collect(Collectors.toSet());
+        Map<UUID, Integer> workCounts = new LinkedHashMap<>();
+        for (Relationship relation : relationships.findPublicGraph(Visibility.PUBLIC)) {
+            ArchiveEntity target = relation.getTargetEntity();
+            if (PLACE_APPEARANCE_TYPES.contains(relation.getType()) && placeIds.contains(target.getId())
+                    && relation.getSourceEntity().isPubliclyVisible()) {
+                workCounts.merge(target.getId(), 1, Integer::sum);
+            }
+        }
+        return places.stream()
+                .map(place -> new PlaceMarker(place.getSlug(), place.getTitle(),
+                        place.getLatitude().doubleValue(), place.getLongitude().doubleValue(),
+                        workCounts.getOrDefault(place.getId(), 0)))
+                .toList();
+    }
+
+    public record PlaceMarker(String slug, String title, double lat, double lng, int workCount) {}
 
     /**
      * Public bands that are connected to at least one other band - either directly curated (RELATED_TO
