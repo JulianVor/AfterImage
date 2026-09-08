@@ -85,13 +85,22 @@
         <a href="/admin/homepage">Kuratierung öffnen</a>
     </section>
 
-    <section class="memory-invite">
+    <section class="memory-invite band-network" aria-labelledby="band-network-title">
         <p class="eyebrow">Das Archiv entdecken</p>
-        <h2>Bands, Personen und Orte<br>sind miteinander verknüpft.</h2>
-        <p>Jeder Eintrag ist über dokumentierte Beziehungen mit anderen verbunden – Mitgliedschaften, Drehorte, Auftritte.</p>
-        <a href="/explore">Verbindungen entdecken →</a>
+        <h2 id="band-network-title">Alle Bands<br>und wie sie verbunden sind.</h2>
+        <p>Jede Band ist über gemeinsame Mitglieder oder dokumentierte Beziehungen mit anderen verknüpft.</p>
+        <a href="/explore">Verbindungen frei erkunden →</a>
+        <div class="band-network-canvas-wrap">
+            <svg id="band-network-canvas" viewBox="0 0 1400 760" preserveAspectRatio="xMidYMid meet"
+                 role="img" aria-labelledby="band-network-title" aria-describedby="band-network-desc">
+                <desc id="band-network-desc">Alle Bands im Archiv, verbunden über gemeinsame Mitglieder und dokumentierte Beziehungen.</desc>
+            </svg>
+            <p class="band-network-empty" hidden>Noch keine verknüpften Bands im Archiv.</p>
+        </div>
     </section>
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
+<script src="/webjars/d3/7.9.0/dist/d3.min.js"></script>
+<script type="module" src="/js/band-network.js"></script>
 </body>
 </html>

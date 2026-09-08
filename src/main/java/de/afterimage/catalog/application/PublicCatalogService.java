@@ -188,6 +188,77 @@ public class PublicCatalogService {
                 .filter(ArchiveEntity::isPubliclyVisible);
     }
 
+    /**
+     * Public bands that are connected to at least one other band - either directly curated (RELATED_TO
+     * between two bands) or derived from a shared member (two bands are linked when the same person has
+     * been a MEMBER_OF/FORMER_MEMBER_OF both). Unlike graph(), this isn't centered on a single focus
+     * entity. Bands with no connections at all are left out entirely, rather than shown as isolated dots.
+     */
+    public BandNetwork bandNetwork() {
+        List<ArchiveEntity> bands = entities.findByVisibilityOrderBySortOrderAscTitleAsc(Visibility.PUBLIC).stream()
+                .filter(ArchiveEntity::isPubliclyVisible)
+                .filter(entity -> entity.getEntityType() == EntityType.BAND)
+                .toList();
+        Set<UUID> bandIds = bands.stream().map(ArchiveEntity::getId).collect(Collectors.toSet());
+
+        Map<UUID, Set<UUID>> bandsByPerson = new LinkedHashMap<>();
+        Map<String, Integer> edgeWeights = new LinkedHashMap<>();
+        Map<UUID, ArchiveEntity> byId = bands.stream().collect(Collectors.toMap(ArchiveEntity::getId, entity -> entity));
+
+        for (Relationship relation : relationships.findPublicGraph(Visibility.PUBLIC)) {
+            ArchiveEntity source = relation.getSourceEntity();
+            ArchiveEntity target = relation.getTargetEntity();
+            if (!source.isPubliclyVisible() || !target.isPubliclyVisible()) {
+                continue;
+            }
+            RelationshipType type = relation.getType();
+            if ((type == RelationshipType.MEMBER_OF || type == RelationshipType.FORMER_MEMBER_OF)
+                    && source.getEntityType() == EntityType.PERSON && bandIds.contains(target.getId())) {
+                bandsByPerson.computeIfAbsent(source.getId(), ignored -> new HashSet<>()).add(target.getId());
+            } else if (type == RelationshipType.RELATED_TO
+                    && bandIds.contains(source.getId()) && bandIds.contains(target.getId())) {
+                addBandEdge(edgeWeights, source.getId(), target.getId());
+            }
+        }
+        for (Set<UUID> sharedBands : bandsByPerson.values()) {
+            List<UUID> list = List.copyOf(sharedBands);
+            for (int i = 0; i < list.size(); i++) {
+                for (int j = i + 1; j < list.size(); j++) {
+                    addBandEdge(edgeWeights, list.get(i), list.get(j));
+                }
+            }
+        }
+
+        Set<UUID> connectedIds = new HashSet<>();
+        edgeWeights.keySet().forEach(key -> {
+            String[] ids = key.split("\\|");
+            connectedIds.add(UUID.fromString(ids[0]));
+            connectedIds.add(UUID.fromString(ids[1]));
+        });
+
+        List<Node> nodes = bands.stream()
+                .filter(entity -> connectedIds.contains(entity.getId()))
+                .map(entity -> Node.from(entity, heroImageUrl(entity)))
+                .toList();
+        List<Link> links = edgeWeights.entrySet().stream()
+                .map(entry -> {
+                    String[] ids = entry.getKey().split("\\|");
+                    ArchiveEntity a = byId.get(UUID.fromString(ids[0]));
+                    ArchiveEntity b = byId.get(UUID.fromString(ids[1]));
+                    return new Link(a.getSlug(), a.getTitle(), b.getSlug(), b.getTitle(),
+                            "BAND_NETWORK", null, entry.getValue());
+                })
+                .toList();
+        return new BandNetwork(nodes, links);
+    }
+
+    private static void addBandEdge(Map<String, Integer> edgeWeights, UUID a, UUID b) {
+        String key = a.compareTo(b) < 0 ? a + "|" + b : b + "|" + a;
+        edgeWeights.merge(key, 1, Integer::sum);
+    }
+
+    public record BandNetwork(List<Node> nodes, List<Link> links) {}
+
     public ExploreGraph graph(String requestedFocus) {
         Optional<ArchiveEntity> focus = initialFocus(requestedFocus);
         if (focus.isEmpty()) {

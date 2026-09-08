@@ -20,5 +20,10 @@ public class ExploreApiController {
     PublicCatalogService.ExploreGraph neighborhood(@RequestParam(required = false) String focus) {
         return catalog.graph(focus);
     }
+
+    @GetMapping("/bands")
+    PublicCatalogService.BandNetwork bands() {
+        return catalog.bandNetwork();
+    }
 }
 
