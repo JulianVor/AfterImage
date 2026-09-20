@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${experience.title})}"></head>
+<body class="regie-page">
+<header th:replace="~{fragments :: nav('regie')}"></header>
+<main class="regie-console">
+    <header class="regie-topbar">
+        <div><p class="eyebrow">Live-Regie</p><h1 th:text="${experience.title}">Titel</h1></div>
+        <p th:text="${experience.tagline}">Untertitel</p>
+    </header>
+
+    <audio class="regie-audio" th:attr="data-src=${experience.audioUrl}" preload="none"></audio>
+    <div class="regie-desk">
+        <section class="regie-workspace" aria-label="Programmbild und Kameravorschau">
+            <div class="regie-program">
+                <div class="regie-program-stage"><video class="regie-program-video" muted playsinline preload="none"></video></div><div class="regie-tally" aria-hidden="true"></div>
+                <span class="regie-program-label"><i aria-hidden="true"></i> Programm</span>
+                <strong class="regie-program-name" aria-live="polite">Kamera wird vorbereitet</strong><span class="regie-cut-age">Bereit</span>
+                <button type="button" class="regie-play-overlay"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><strong>Regie übernehmen</strong><span>Wähle während des Songs live deine Perspektive</span></button>
+            </div>
+            <div class="regie-switcher-heading"><span>Kameravorschau</span><span>Klick oder Taste 1–9</span></div>
+            <div class="regie-camera-groups">
+                <section class="regie-camera-group" th:each="group : ${experience.groups}">
+                    <h2 th:text="${group.name}">Kameragruppe</h2>
+                    <div class="regie-camera-grid">
+                        <button type="button" class="regie-camera" th:each="camera : ${group.cameras}" th:attr="data-camera=${camera.id},data-label=${camera.label}" aria-pressed="false">
+                            <span class="regie-preview-stage">
+                                <video th:each="look : ${camera.looks}" class="regie-video" muted playsinline preload="none" th:classappend="${look.id == 'normal'} ? ' is-preview-active'" th:attr="data-camera=${camera.id},data-look=${look.id},data-look-label=${look.label},data-src=${look.videoUrl}"></video>
+                                <span class="regie-preview-loading">Lädt …</span>
+                            </span>
+                            <span class="regie-camera-copy"><strong th:text="${camera.label}">Kamera</strong><kbd></kbd></span>
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </section>
+        <aside class="regie-sidebar">
+            <section><p class="regie-panel-label">Auf Sendung</p><h2 class="regie-live-camera">–</h2><p class="regie-live-look">Rohbild</p></section>
+            <section class="regie-look-panel"><p class="regie-panel-label">Bildlook</p><div class="regie-look-buttons" role="group" aria-label="Bildlook"><button type="button" class="regie-look is-active" data-look="normal" aria-pressed="true">Rohbild</button><button type="button" class="regie-look" data-look="effect" aria-pressed="false">Effekte</button></div><p class="regie-look-note" aria-live="polite"></p></section>
+            <section class="regie-task-panel"><p class="regie-panel-label">Deine Regie</p><p class="regie-task">Schneide frei zwischen den synchronen Kameras. Jeder Wechsel landet in deiner Schnittspur.</p><dl class="regie-stats"><div><dt>Schnitte</dt><dd class="regie-cut-count">0</dd></div><div><dt>Kameras</dt><dd class="regie-camera-count">0</dd></div></dl></section>
+            <section class="regie-keyboard-help"><p class="regie-panel-label">Steuerung</p><p><kbd>1–9</kbd> Kamera <kbd>Leertaste</kbd> Pause</p></section>
+        </aside>
+    </div>
+    <div class="regie-transport">
+        <button type="button" class="regie-toggle" aria-label="Abspielen" aria-pressed="false"><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true" hidden><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button>
+        <span class="regie-time regie-elapsed">0:00</span>
+        <div class="regie-timeline"><div class="regie-bar" role="slider" tabindex="0" aria-label="Fortschritt" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="regie-progress"></div></div><div class="regie-cut-track" aria-label="Eigene Schnittentscheidungen"></div></div>
+        <span class="regie-time regie-duration">–:--</span>
+    </div>
+    <dialog class="regie-result"><button type="button" class="regie-result-close" aria-label="Auswertung schließen">×</button><p class="eyebrow">Dein Schnitt</p><h2>Die Regie ist im Kasten.</h2><div class="regie-result-stats"><p><span>Schnitte</span><strong data-result-cuts>0</strong></p><p><span>Lieblingskamera</span><strong data-result-favorite>–</strong></p><p><span>Längste Einstellung</span><strong data-result-longest>–</strong></p></div><div class="regie-result-actions"><button type="button" class="regie-replay">Meine Regie ansehen</button><button type="button" class="regie-restart">Neu schneiden</button></div></dialog>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+<link rel="stylesheet" href="/css/regie.css"><script type="module" src="/js/regie.js"></script>
+</body>
+</html>

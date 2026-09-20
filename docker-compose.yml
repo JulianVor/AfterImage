@@ -42,6 +42,7 @@ services:
       - "8080:8080"
     volumes:
       - afterimage-media:/app/media
+      - ./videos:/app/media/regie:ro
 volumes:
   afterimage-postgres:
   afterimage-media:

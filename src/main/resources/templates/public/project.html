@@ -51,6 +51,9 @@
                 <a class="project-explore-link" th:href="@{/explore(focus=${'entity:' + project.slug})}">
                     <span>Verbindungen entdecken</span><span aria-hidden="true">↘</span>
                 </a>
+                <a class="project-explore-link" th:if="${regieSlug != null}" th:href="@{/regie/{slug}(slug=${regieSlug})}">
+                    <span>Selbst Regie führen</span><span aria-hidden="true">↗</span>
+                </a>
             </div>
         </div>
         <div class="project-hero-media">

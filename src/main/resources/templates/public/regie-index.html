@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('REGIE')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('regie')}"></header>
+<main class="regie-index">
+    <header class="regie-index-heading">
+        <p class="eyebrow">Gefunden</p>
+        <h1>Führ selbst Regie.</h1>
+        <p>Zwei Redestruction-Videos, jede Kamera einzeln - wechsle live zwischen den Perspektiven, während der Song läuft.</p>
+    </header>
+    <ul class="regie-index-list">
+        <li th:each="experience : ${experiences}">
+            <a th:href="@{/regie/{slug}(slug=${experience.slug})}">
+                <span th:text="${experience.title}">Titel</span>
+                <span aria-hidden="true">→</span>
+            </a>
+        </li>
+    </ul>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+<link rel="stylesheet" href="/css/regie.css">
+</body>
+</html>

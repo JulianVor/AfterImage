@@ -45,6 +45,9 @@ public class PublicSiteController {
     private static final Pattern YOUTUBE_URL = Pattern.compile(
             "(?:youtube(?:-nocookie)?\\.com/(?:watch\\?(?:[^#]*&)?v=|embed/|shorts/)|youtu\\.be/)([A-Za-z0-9_-]{11})",
             Pattern.CASE_INSENSITIVE);
+    private static final Map<String, String> REGIE_LINKS = Map.of(
+            "again-musikvideo", "again",
+            "lessons-unlearned-livevideo", "lessons-unlearned");
     private final PublicCatalogService catalog;
     private final PublicTrailService trails;
     private final PublicMediaService media;
@@ -240,6 +243,7 @@ public class PublicSiteController {
         model.addAttribute("placeAppearances", placeAppearances);
         model.addAttribute("ownMapUrl", ownMapUrl);
         model.addAttribute("venue", venue);
+        model.addAttribute("regieSlug", REGIE_LINKS.get(project.getSlug()));
         model.addAttribute("venueMapUrl", venueMapUrl);
         model.addAttribute("additionalLineup", additionalLineup);
         model.addAttribute("relations", leftoverRelations);

@@ -22,7 +22,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/login", "/css/**", "/js/**", "/webjars/**", "/favicon.svg",
                                 "/actuator/health", "/error", "/", "/show", "/work/**", "/entry/**", "/chronicle", "/explore", "/explore/**", "/api/explore/**",
                                 "/about", "/archive", "/search", "/connect", "/trails", "/trails/**",
-                                "/media/**", "/api/media/piwigo/**").permitAll()
+                                "/media/**", "/api/media/piwigo/**", "/regie/**", "/regie-media/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().denyAll())
                 .formLogin(form -> form
