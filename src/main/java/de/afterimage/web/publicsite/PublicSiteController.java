@@ -22,6 +22,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
@@ -35,6 +37,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -45,6 +48,8 @@ public class PublicSiteController {
     private static final Pattern YOUTUBE_URL = Pattern.compile(
             "(?:youtube(?:-nocookie)?\\.com/(?:watch\\?(?:[^#]*&)?v=|embed/|shorts/)|youtu\\.be/)([A-Za-z0-9_-]{11})",
             Pattern.CASE_INSENSITIVE);
+    private static final int MIN_CONNECTIONS_FOR_DIAGRAM = 2;
+    private static final Pattern TRAILING_ISO_DATE = Pattern.compile("\\s*[–-]\\s*\\d{4}-\\d{2}-\\d{2}$");
     private static final Map<String, String> REGIE_LINKS = Map.of(
             "again-musikvideo", "again",
             "lessons-unlearned-livevideo", "lessons-unlearned");
@@ -205,7 +210,13 @@ public class PublicSiteController {
         Map<String, List<String>> technicalProperties = technicalProperties(properties);
         List<Relationship> relations = catalog.publicRelations(project.getSlug());
         List<RelatedBandCard> relatedBands = relatedBands(project, relations);
-        List<RelatedBandCard> photographedBands = photographedBands(project, relations);
+        boolean showcase = project.getEntityType() == EntityType.PROJECT || project.getEntityType() == EntityType.EVENT;
+        List<RelatedBandCard> involvedBands = showcase ? involvedBands(project, relations) : List.of();
+        List<ArchiveEntity> connectedPlaces = showcase
+                ? neighbors(project, relations, EntityType.PLACE::equals) : List.of();
+        boolean placesMapped = connectedPlaces.stream()
+                .anyMatch(place -> place.getLatitude() != null && place.getLongitude() != null);
+        List<ConnectedEvent> connectedEvents = showcase ? connectedEvents(project, relations) : List.of();
         List<RelatedProjectCard> musicVideos = musicVideos(project, relations);
         List<WikiContentRenderer.Chapter> textSections = configuration.wiki().contentEnabled()
                 ? wikiContentRenderer.chapters(catalog.contentSections(project))
@@ -216,8 +227,9 @@ public class PublicSiteController {
         List<PlaceAppearance> placeAppearances = placeAppearances(project, relations);
         Optional<String> ownMapUrl = ownMapEmbedUrl(project);
         Optional<ArchiveEntity> venue = heldAtPlace(project, relations);
-        Optional<String> venueMapUrl = venue.filter(place -> place.getLatitude() != null && place.getLongitude() != null)
-                .map(PublicSiteController::mapEmbedUrl);
+        Optional<String> venueMapUrl = placesMapped ? Optional.<String>empty()
+                : venue.filter(place -> place.getLatitude() != null && place.getLongitude() != null)
+                        .map(PublicSiteController::mapEmbedUrl);
         List<String> additionalLineup = properties.getOrDefault("Additional lineup", List.of());
         List<Relationship> leftoverRelations = relations.stream()
                 .filter(relation -> !isRelatedBandRelation(project, relation)
@@ -226,7 +238,7 @@ public class PublicSiteController {
                 .toList();
         var timeline = timelineService.build(project, properties, relations);
         List<YoutubeVideo> youtubeVideos = youtubeVideos(properties);
-        List<FilmingLocation> filmingLocations = filmingLocations(project, relations);
+        List<FilmingLocation> filmingLocations = placesMapped ? List.of() : filmingLocations(project, relations);
         var photoGalleries = Stream.concat(
                 piwigoGalleries.galleries(project, 12).stream(),
                 pathGalleries(properties.getOrDefault("Piwigo path", List.of())).stream()
@@ -248,7 +260,10 @@ public class PublicSiteController {
         model.addAttribute("additionalLineup", additionalLineup);
         model.addAttribute("relations", leftoverRelations);
         model.addAttribute("relatedBands", relatedBands);
-        model.addAttribute("photographedBands", photographedBands);
+        model.addAttribute("involvedBands", involvedBands);
+        model.addAttribute("connectedPlaces", connectedPlaces);
+        model.addAttribute("placesMapped", placesMapped);
+        model.addAttribute("connectedEvents", connectedEvents);
         model.addAttribute("musicVideos", musicVideos);
         model.addAttribute("timeline", timeline);
         model.addAttribute("youtubeVideos", youtubeVideos);
@@ -261,6 +276,9 @@ public class PublicSiteController {
         if (project.getShortDescription() != null || project.getDescription() != null) {
             navItems.add(new NavItem("ueberblick", "Überblick"));
         }
+        if (!involvedBands.isEmpty()) navItems.add(new NavItem("beteiligte-bands", "Bands"));
+        if (!connectedPlaces.isEmpty()) navItems.add(new NavItem("orte", "Orte"));
+        if (!connectedEvents.isEmpty()) navItems.add(new NavItem("veranstaltungen", "Konzerte"));
         if (!youtubeVideos.isEmpty()) navItems.add(new NavItem("video", "Video"));
         if (!members.isEmpty()) navItems.add(new NavItem("mitglieder", "Mitglieder"));
         if (!personRoles.isEmpty()) navItems.add(new NavItem("rollen", "Rollen"));
@@ -269,12 +287,19 @@ public class PublicSiteController {
         if (!timeline.isEmpty()) navItems.add(new NavItem("chronik", "Chronik"));
         if (!musicVideos.isEmpty()) navItems.add(new NavItem("musikvideos", "Musikvideos"));
         if (!textSections.isEmpty()) navItems.add(new NavItem("wiki-texte", "Hintergründe"));
-        if (!photographedBands.isEmpty()) navItems.add(new NavItem("fotografierte-bands", "Fotografierte Bands"));
         if (!relatedBands.isEmpty()) navItems.add(new NavItem("bands", "Verwandte Bands"));
         if (!filmingLocations.isEmpty()) navItems.add(new NavItem("drehorte", "Drehorte"));
         if (ownMapUrl.isPresent() || venueMapUrl.isPresent() || !placeAppearances.isEmpty()) {
             navItems.add(new NavItem("karte", "Auf der Karte"));
         }
+        List<String> restSlugs = showcase ? restConnectionSlugs(project, relations) : List.of();
+        int connectionCount = showcase
+                ? restSlugs.size()
+                : Math.max(0, catalog.graph("entity:" + project.getSlug()).nodes().size() - 1);
+        boolean showConnections = connectionCount >= (showcase ? 1 : MIN_CONNECTIONS_FOR_DIAGRAM);
+        model.addAttribute("showConnections", showConnections);
+        model.addAttribute("connectionSlugs", String.join(",", restSlugs));
+        if (showConnections) navItems.add(new NavItem("zusammenhang", "Verbindungen"));
         if (!technicalProperties.isEmpty() || !leftoverRelations.isEmpty()) {
             navItems.add(new NavItem("archivzustand", "Technik"));
         }
@@ -470,21 +495,58 @@ public class PublicSiteController {
                 .toList();
     }
 
-    private List<RelatedBandCard> photographedBands(ArchiveEntity entity, List<Relationship> relations) {
-        if (entity.getEntityType() != EntityType.EVENT) {
-            return List.of();
+    private static List<ArchiveEntity> neighbors(ArchiveEntity focus, List<Relationship> relations,
+                                                 Predicate<EntityType> typeFilter) {
+        Map<UUID, ArchiveEntity> unique = new LinkedHashMap<>();
+        for (Relationship relation : relations) {
+            ArchiveEntity neighbor = relation.getSourceEntity().getId().equals(focus.getId())
+                    ? relation.getTargetEntity() : relation.getSourceEntity();
+            if (!neighbor.getId().equals(focus.getId()) && neighbor.isPubliclyVisible()
+                    && typeFilter.test(neighbor.getEntityType())) {
+                unique.putIfAbsent(neighbor.getId(), neighbor);
+            }
         }
-        Map<UUID, ArchiveEntity> uniqueBands = new LinkedHashMap<>();
-        relations.stream()
-                .filter(relation -> relation.getType() == RelationshipType.FEATURES
-                        && relation.getSourceEntity().getId().equals(entity.getId())
-                        && relation.getTargetEntity().getEntityType() == EntityType.BAND
-                        && relation.getTargetEntity().isPubliclyVisible())
-                .map(Relationship::getTargetEntity)
-                .forEach(band -> uniqueBands.putIfAbsent(band.getId(), band));
-        return uniqueBands.values().stream()
+        return List.copyOf(unique.values());
+    }
+
+    private List<RelatedBandCard> involvedBands(ArchiveEntity entity, List<Relationship> relations) {
+        return neighbors(entity, relations, EntityType.BAND::equals).stream()
                 .map(band -> new RelatedBandCard(band, band.getHeroMediaId() == null
                         ? null : media.metadata(band.getHeroMediaId()).orElse(null)))
+                .toList();
+    }
+
+    private static List<ConnectedEvent> connectedEvents(ArchiveEntity entity, List<Relationship> relations) {
+        DateTimeFormatter format = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.GERMAN);
+        return neighbors(entity, relations, EntityType.EVENT::equals).stream()
+                .sorted(Comparator.comparing(ArchiveEntity::getStartDate, Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(ArchiveEntity::getYear, Comparator.nullsLast(Comparator.reverseOrder())))
+                .map(event -> {
+                    String title = event.getDisplayTitle() != null ? event.getDisplayTitle() : event.getTitle();
+                    String dateLabel = event.getStartDate() != null ? format.format(event.getStartDate())
+                            : event.getYear() != null ? event.getYear().toString() : "";
+                    if (event.getStartDate() != null) {
+                        title = TRAILING_ISO_DATE.matcher(title).replaceFirst("");
+                    }
+                    return new ConnectedEvent(event, title, dateLabel);
+                })
+                .toList();
+    }
+
+    // Bands, places and events get their own presentation; credited people are already listed in the
+    // colophon, so what remains for the connection graph is mostly related projects.
+    private static List<String> restConnectionSlugs(ArchiveEntity entity, List<Relationship> relations) {
+        Set<UUID> credited = new java.util.HashSet<>();
+        for (Relationship relation : relations) {
+            if (isCredited(entity, relation)) {
+                credited.add(relation.getSourceEntity().getId().equals(entity.getId())
+                        ? relation.getTargetEntity().getId() : relation.getSourceEntity().getId());
+            }
+        }
+        return neighbors(entity, relations, type -> type != EntityType.BAND && type != EntityType.PLACE
+                && type != EntityType.EVENT).stream()
+                .filter(neighbor -> neighbor.getEntityType() != EntityType.PERSON || !credited.contains(neighbor.getId()))
+                .map(ArchiveEntity::getSlug)
                 .toList();
     }
 
@@ -554,6 +616,8 @@ public class PublicSiteController {
     public record FilmingLocation(String title, String slug, String embedUrl) {}
 
     public record RelatedBandCard(ArchiveEntity band, PublicMediaService.PublicMediaMetadata image) {}
+
+    public record ConnectedEvent(ArchiveEntity event, String title, String dateLabel) {}
 
     public record RelatedProjectCard(ArchiveEntity project, PublicMediaService.PublicMediaMetadata image) {}
 

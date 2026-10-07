@@ -841,3 +841,65 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
     html { scroll-behavior: auto; }
     *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
 }
+
+.project-connections, .project-places, .project-events { max-width: 1180px; margin: clamp(5rem, 9vw, 9rem) auto 0; padding: 0 var(--gutter); scroll-margin-top: 4rem; }
+.project-connections > header, .project-places > header, .project-events > header { display: flex; align-items: end; justify-content: space-between; gap: 2rem; padding-bottom: 1.8rem; border-bottom: 1px solid var(--line); }
+.project-connections h2, .project-places h2, .project-events h2, #beteiligte-bands > header h2 { margin: .55rem 0 0; font: 400 clamp(1.7rem, 3vw, 2.7rem)/1.15 var(--serif); letter-spacing: -.01em; }
+.project-connections > header > a { border-bottom: 1px solid var(--paper-muted); font: .72rem var(--mono); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.project-places > header > p, .project-events > header > p { margin: 0; color: var(--paper-muted); font: .72rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.connections-canvas { display: block; width: 100%; height: auto; margin-top: 1.5rem; }
+.connection-edge { fill: none; stroke: var(--line-strong); transition: stroke .2s ease; }
+.connection-link { cursor: pointer; }
+.connection-label { paint-order: stroke; stroke: var(--ink); stroke-width: 6px; stroke-linejoin: round; }
+.connection-title { fill: var(--paper); font: 400 15px var(--sans); transition: fill .2s ease; }
+.connection-role { fill: var(--paper-muted); font: 500 10px var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.connection-marker { transition: transform .2s ease; transform-box: fill-box; transform-origin: center; }
+.connection-marker--band { fill: var(--ember); }
+.connection-marker--person { fill: var(--ink); stroke: var(--paper); stroke-width: 1.5; }
+.connection-marker--project { fill: var(--paper); }
+.connection-marker--event { fill: var(--ink); stroke: var(--ember-bright); stroke-width: 2; }
+.connection-marker--place { fill: var(--paper-muted); }
+.connection-link:hover .connection-edge, .connection-link:focus-visible .connection-edge { stroke: var(--ember); }
+.connection-link:hover .connection-title, .connection-link:focus-visible .connection-title { fill: var(--ember-bright); }
+.connection-link:hover .connection-marker, .connection-link:focus-visible .connection-marker { transform: scale(1.35); }
+.connection-focus-plate { fill: var(--ink); stroke: var(--ember); stroke-width: 1.5; }
+.connection-focus text { fill: var(--paper); font: 400 20px var(--serif); }
+
+.connections-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 2rem 2.5rem; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--line); }
+.connections-group h3 { display: flex; align-items: center; gap: .6rem; margin: 0 0 .8rem; color: var(--paper-muted); font: 500 .62rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.connections-group h3::before { content: ""; width: .6rem; height: .6rem; background: var(--paper); }
+.connections-group--band h3::before { border-radius: 50%; background: var(--ember); }
+.connections-group--person h3::before { border-radius: 50%; border: 1.5px solid var(--paper); background: var(--ink); }
+.connections-group--event h3::before { transform: rotate(45deg) scale(.85); border: 2px solid var(--ember-bright); background: var(--ink); }
+.connections-group--place h3::before { background: var(--paper-muted); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.connections-group ul { list-style: none; margin: 0; padding: 0; }
+.connections-group li { padding: .5rem 0; border-bottom: 1px solid var(--line); }
+.connections-group li a, .connections-group li > span { font: 400 1.15rem/1.25 var(--serif); }
+.connections-group li small { display: block; margin-top: .15rem; color: var(--paper-muted); font: 500 .58rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+
+@media (max-width: 760px) {
+    .project-connections > header { display: block; }
+    .project-connections > header > a { display: inline-block; margin-top: 1rem; }
+    .connections-canvas { display: none; }
+    .connections-legend { margin-top: 0; padding-top: 1.5rem; border-top: 0; }
+}
+.connections-note { margin: .8rem 0 0; color: var(--paper-muted); font: 500 .62rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.connections-more summary { padding: .7rem 0; color: var(--paper-muted); font: 500 .62rem var(--mono); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+.connections-more summary:hover { color: var(--ember-bright); }
+
+.project-places-map { height: clamp(18rem, 42vh, 28rem); margin-top: 1.5rem; background: var(--ink-soft); }
+.project-places-map .leaflet-tile-pane { filter: grayscale(1) contrast(1.05); }
+.project-places-list { display: flex; flex-wrap: wrap; gap: .6rem 1.6rem; margin: 1.2rem 0 0; padding: 0; list-style: none; }
+.project-places-list a { border-bottom: 1px solid var(--line-strong); font: 400 1.15rem var(--serif); }
+.project-places-list a:hover { border-bottom-color: var(--ember); }
+.event-list { margin: 0; padding: 0; list-style: none; }
+.event-list li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; gap: 1.5rem; padding: .75rem 0; border-bottom: 1px solid var(--line); }
+.event-list a { font: 400 1.15rem/1.3 var(--serif); }
+.event-list a:hover { color: var(--ember-bright); }
+.event-list span { color: var(--paper-muted); font: 500 .66rem var(--mono); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.connections-legend--alone { margin-top: 1.5rem; padding-top: 0; border-top: 0; }
+@media (max-width: 760px) {
+    .project-places > header, .project-events > header { display: block; }
+    .project-places > header > p, .project-events > header > p { margin-top: .8rem; }
+    .event-list li { grid-template-columns: 1fr; gap: .2rem; }
+}

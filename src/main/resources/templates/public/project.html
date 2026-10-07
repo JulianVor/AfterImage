@@ -89,6 +89,59 @@
         <p th:text="${project.description}"></p>
     </section>
 
+    <section id="beteiligte-bands" class="related-bands" th:if="${!involvedBands.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Beteiligt</p><h2>Bands</h2></div>
+            <p th:text="${involvedBands.size() == 1 ? 'Eine beteiligte Band.' : involvedBands.size() + ' beteiligte Bands.'}">Beteiligte Bands.</p>
+        </header>
+        <div class="related-band-grid">
+            <article th:each="card, stat : ${involvedBands}">
+                <a th:href="@{/entry/{slug}(slug=${card.band.slug})}">
+                    <div class="related-band-visual">
+                        <img th:if="${card.image != null}" th:src="@{/media/{id}(id=${card.image.id})}"
+                             th:alt="${card.image.altText ?: card.band.title}"
+                             th:attr="width=${card.image.width},height=${card.image.height}" loading="lazy">
+                        <div class="related-band-plate" th:unless="${card.image != null}"
+                             th:attr="data-index=${#numbers.formatInteger(stat.count, 2)}">
+                            <span>Archivbild</span>
+                        </div>
+                    </div>
+                    <div class="related-band-caption">
+                        <h3 th:text="${card.band.displayTitle ?: card.band.title}">Band</h3>
+                        <span>Band ansehen <span aria-hidden="true">↗</span></span>
+                    </div>
+                </a>
+            </article>
+        </div>
+    </section>
+
+    <section id="orte" class="project-places" th:if="${!connectedPlaces.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Schauplätze</p><h2 th:text="${connectedPlaces.size() == 1 ? 'Ort' : 'Orte'}">Orte</h2></div>
+            <p th:if="${connectedPlaces.size() > 1}" th:text="${connectedPlaces.size() + ' verknüpfte Orte.'}">Verknüpfte Orte.</p>
+        </header>
+        <div class="project-places-map" th:if="${placesMapped}" role="img" aria-label="Karte der verknüpften Orte"></div>
+        <ul class="project-places-list">
+            <li th:each="place : ${connectedPlaces}"
+                th:attr="data-lat=${place.latitude},data-lon=${place.longitude},data-title=${place.displayTitle ?: place.title},data-url=@{/entry/{slug}(slug=${place.slug})}">
+                <a th:href="@{/entry/{slug}(slug=${place.slug})}" th:text="${place.displayTitle ?: place.title}">Ort</a>
+            </li>
+        </ul>
+    </section>
+
+    <section id="veranstaltungen" class="project-events" th:if="${!connectedEvents.isEmpty()}">
+        <header>
+            <div><p class="eyebrow">Konzerte</p><h2>Veranstaltungen</h2></div>
+            <p th:if="${connectedEvents.size() > 1}" th:text="${connectedEvents.size() + ' verknüpfte Veranstaltungen.'}">Verknüpfte Veranstaltungen.</p>
+        </header>
+        <ul class="event-list">
+            <li th:each="item : ${connectedEvents}">
+                <a th:href="@{/entry/{slug}(slug=${item.event.slug})}" th:text="${item.title}">Konzert</a>
+                <span th:if="${!item.dateLabel.isEmpty()}" th:text="${item.dateLabel}">1. Januar 2025</span>
+            </li>
+        </ul>
+    </section>
+
     <section id="mitglieder" class="related-bands" th:if="${!members.isEmpty()}">
         <header>
             <div><p class="eyebrow">Besetzung</p><h2>Mitglieder</h2></div>
@@ -295,32 +348,6 @@
         </div>
     </section>
 
-    <section id="fotografierte-bands" class="related-bands" th:if="${!photographedBands.isEmpty()}">
-        <header>
-            <div><p class="eyebrow">Konzert</p><h2>Fotografierte Bands</h2></div>
-            <p th:text="${photographedBands.size() == 1 ? 'Eine fotografierte Band.' : photographedBands.size() + ' fotografierte Bands.'}">Fotografierte Bands.</p>
-        </header>
-        <div class="related-band-grid">
-            <article th:each="card, stat : ${photographedBands}">
-                <a th:href="@{/entry/{slug}(slug=${card.band.slug})}">
-                    <div class="related-band-visual">
-                        <img th:if="${card.image != null}" th:src="@{/media/{id}(id=${card.image.id})}"
-                             th:alt="${card.image.altText ?: card.band.title}"
-                             th:attr="width=${card.image.width},height=${card.image.height}" loading="lazy">
-                        <div class="related-band-plate" th:unless="${card.image != null}"
-                             th:attr="data-index=${#numbers.formatInteger(stat.count, 2)}">
-                            <span>Archivbild</span>
-                        </div>
-                    </div>
-                    <div class="related-band-caption">
-                        <h3 th:text="${card.band.displayTitle ?: card.band.title}">Band</h3>
-                        <span>Band ansehen <span aria-hidden="true">↗</span></span>
-                    </div>
-                </a>
-            </article>
-        </div>
-    </section>
-
     <section id="bands" class="related-bands" th:if="${!relatedBands.isEmpty()}">
         <header>
             <div><p class="eyebrow">Im Umfeld</p><h2>Verwandte Bands</h2></div>
@@ -400,6 +427,19 @@
         </p>
     </section>
 
+    <section id="zusammenhang" class="project-connections" aria-labelledby="connections-title"
+             th:if="${showConnections}" th:attr="data-slug=${project.slug},data-include=${connectionSlugs}" hidden>
+        <header>
+            <div>
+                <p class="eyebrow">Zusammenhang</p>
+                <h2 id="connections-title" th:text="${connectionSlugs.isEmpty() ? 'Verbindungen' : 'Weitere Verbindungen'}">Verbindungen</h2>
+            </div>
+            <a th:href="@{/explore(focus=${'entity:' + project.slug})}">Im Netzwerk erkunden <span aria-hidden="true">↘</span></a>
+        </header>
+        <svg class="connections-canvas" role="img" th:attr="aria-label=${'Verbindungen von ' + (project.displayTitle ?: project.title)}"></svg>
+        <div class="connections-legend"></div>
+    </section>
+
     <details id="archivzustand" class="archive-state" th:if="${!properties.isEmpty() || !relations.isEmpty()}">
         <summary><span>Kamera, Software und weitere technische Angaben</span><strong>Technik &amp; Archivdaten öffnen</strong></summary>
         <div class="archive-state-content">
@@ -436,5 +476,9 @@
 <footer th:replace="~{fragments :: footer}"></footer>
 <script type="module" src="/js/piwigo-gallery.js" th:if="${!photoGalleries.isEmpty()}"></script>
 <script src="/js/track-player.js" defer th:if="${!tracks.isEmpty()}"></script>
+<script type="module" src="/js/project-connections.js" th:if="${showConnections}"></script>
+<link rel="stylesheet" href="/webjars/leaflet/1.9.4/dist/leaflet.css" th:if="${placesMapped}">
+<script src="/webjars/leaflet/1.9.4/dist/leaflet.js" th:if="${placesMapped}"></script>
+<script type="module" src="/js/project-places.js" th:if="${placesMapped}"></script>
 </body>
 </html>
