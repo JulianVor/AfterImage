@@ -15,27 +15,13 @@
 
     <section class="slideshow" aria-roledescription="Karussell" aria-label="Konzertfotografie">
         <div class="slideshow-stage" aria-live="off">
-        <img class="slide" src="/img/home/konzert-01.jpg" width="1068" height="1600" alt="Sänger mit Cap und Sonnenbrille, Schwarzweiß" decoding="async">
-        <img class="slide" src="/img/home/konzert-04.jpg" width="1600" height="1068" alt="Blaue Bühne, Publikum von hinten" decoding="async">
-        <img class="slide" src="/img/home/konzert-05.jpg" width="1600" height="1066" alt="Gitarrist mit langen Haaren im roten Licht" decoding="async">
-        <img class="slide" src="/img/home/konzert-02.jpg" width="1068" height="1600" alt="Gitarrist im grünen und roten Bühnenlicht" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-09.jpg" width="1600" height="1066" alt="Zwei Gitarristen im Gegenlicht" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-08.jpg" width="1600" height="1066" alt="Schlagzeuger mit fliegenden Haaren" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-12.jpg" width="1600" height="1066" alt="Bärtiger Gitarrist mit Les Paul" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-07.jpg" width="1066" height="1600" alt="Sänger im blauen Licht" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-10.jpg" width="1600" height="1066" alt="Zwei Musiker im Gegenlicht vor Backsteinwand" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-06.jpg" width="1600" height="1066" alt="Langhaariger Gitarrist in violettem Licht, Band im Hintergrund" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-03.jpg" width="1068" height="1600" alt="Sänger mit gelber Mütze beugt sich zum Mikrofon" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-14.jpg" width="1600" height="1066" alt="Headbanging bei einem Open-Air-Auftritt" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-13.jpg" width="1600" height="1066" alt="Sänger am Mikrofon im Rauch" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-17.jpg" width="1066" height="1600" alt="Bassist in türkisfarbenem Licht" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-11.jpg" width="1600" height="1066" alt="Sänger und Band in einem blau beleuchteten Club" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-16.jpg" width="1600" height="1066" alt="Silhouette mit Gitarre in rotem und blauem Nebel" loading="lazy" decoding="async">
-        <img class="slide" src="/img/home/konzert-15.jpg" width="1600" height="1066" alt="Gitarrist vor Festivalpublikum" loading="lazy" decoding="async">
+        <img class="slide" th:each="photo, stat : ${homePhotos}" th:src="@{/img/home/{file}(file=${photo.file})}"
+             th:attr="width=${photo.width},height=${photo.height},loading=${stat.index >= 2 ? 'lazy' : null}"
+             th:alt="${photo.alt}" decoding="async">
         </div>
         <div class="slideshow-controls">
             <button type="button" class="slideshow-prev" aria-label="Vorheriges Foto">←</button>
-            <p class="slideshow-count" aria-live="polite"><span class="slideshow-current">01</span> / <span class="slideshow-total">17</span></p>
+            <p class="slideshow-count" aria-live="polite"><span class="slideshow-current">01</span> / <span class="slideshow-total" th:text="${#lists.size(homePhotos)}">17</span></p>
             <button type="button" class="slideshow-next" aria-label="Nächstes Foto">→</button>
             <button type="button" class="slideshow-toggle" aria-pressed="true">Pause</button>
         </div>

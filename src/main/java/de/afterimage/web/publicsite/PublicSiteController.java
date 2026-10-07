@@ -132,6 +132,7 @@ public class PublicSiteController {
         model.addAttribute("highlights", highlights);
         model.addAttribute("fallbackHighlights", fallback);
         model.addAttribute("stats", catalog.stats());
+        model.addAttribute("homePhotos", HomePhotos.shuffled());
         return "public/show";
     }
 
