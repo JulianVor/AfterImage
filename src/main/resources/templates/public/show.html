@@ -11,15 +11,6 @@
             <p class="intro-lead">Konzerte, Livevideos und Musikvideos, sortiert nach Band, Projekt und Jahr.</p>
         </div>
         <a class="thread-link" href="/explore">Verbindungen entdecken <span aria-hidden="true">↘</span></a>
-        <dl class="stat-strip" th:if="${stats.total > 0}">
-            <div><dt th:text="${stats.total}">0</dt><dd>Archivierte Einträge</dd></div>
-            <div><dt th:text="${stats.bands}">0</dt><dd>Bands</dd></div>
-            <div><dt th:text="${stats.projects}">0</dt><dd>Produktionen</dd></div>
-            <div th:if="${stats.earliestYear != null}">
-                <dt th:text="${stats.earliestYear == stats.latestYear ? stats.earliestYear : stats.earliestYear + '–' + stats.latestYear}">0</dt>
-                <dd>Zeitspanne</dd>
-            </div>
-        </dl>
     </section>
 
     <section class="slideshow" aria-roledescription="Karussell" aria-label="Konzertfotografie">
@@ -48,6 +39,15 @@
             <button type="button" class="slideshow-next" aria-label="Nächstes Foto">→</button>
             <button type="button" class="slideshow-toggle" aria-pressed="true">Pause</button>
         </div>
+        <dl class="stat-strip" th:if="${stats.total > 0}">
+            <div><dt th:text="${stats.total}">0</dt><dd>Archivierte Einträge</dd></div>
+            <div><dt th:text="${stats.bands}">0</dt><dd>Bands</dd></div>
+            <div><dt th:text="${stats.projects}">0</dt><dd>Produktionen</dd></div>
+            <div th:if="${stats.earliestYear != null}">
+                <dt th:text="${stats.earliestYear == stats.latestYear ? stats.earliestYear : stats.earliestYear + '–' + stats.latestYear}">0</dt>
+                <dd>Zeitspanne</dd>
+            </div>
+        </dl>
     </section>
 
     <section class="project-reel" aria-label="Ausgewählte Highlights" th:if="${!highlights.isEmpty()}">

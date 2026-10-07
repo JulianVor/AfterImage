@@ -111,7 +111,7 @@ button, input, textarea, select { font: inherit; }
 .slideshow-toggle { margin-left: auto; }
 @media (prefers-reduced-motion: reduce) { .slideshow .slide { transition: none; } }
 
-.stat-strip { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 0; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.stat-strip { display: flex; flex-wrap: wrap; gap: 0; margin: clamp(1.5rem, 3vw, 2.5rem) 0 0; padding: 0; border-top: 1px solid var(--line); }
 .stat-strip > div { flex: 1 1 9rem; padding: 1.2rem 1.6rem 0 0; }
 .stat-strip > div + div { padding-left: 1.6rem; border-left: 1px solid var(--line); }
 .stat-strip dt { margin: 0; font: 400 clamp(1.7rem, 2.8vw, 2.4rem) var(--serif); color: var(--paper); font-variant-numeric: tabular-nums; }
