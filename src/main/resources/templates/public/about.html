@@ -11,10 +11,52 @@
              alt="Julian Vornfeld mit einer Mittelformatkamera in einem warm beleuchteten Gang">
         <div>
             <p class="lead">Ich fotografiere und filme Bands – bei Konzerten, auf der Bühne und für Musikvideos.</p>
+            <p>Ich komme aus Hamburg-Harburg und arbeite hauptberuflich als Softwareentwickler. Fotografie und Film habe ich mir selbst beigebracht: durch Ausprobieren, Tutorials und viele Projekte mit Bands.</p>
+            <p>Angefangen hat es mit Landschaften, Architektur und Natur. 2018 fragte mich der Sänger von <a href="/entry/mute-tales">Mute Tales</a>, ob ich ein Konzert der Band fotografieren möchte. Daraus wurden sieben Jahre Konzertfotografie in der Hamburger und norddeutschen Szene, und bald auch Musikvideos und Livevideos, unter anderem für <a href="/entry/redestruction">Redestruction</a>, <a href="/entry/potrock">Potrock</a>, <a href="/entry/vioxis">Vioxis</a> und <a href="/entry/acid-head">Acid Head</a>. Das <a href="/entry/grumbrechtstrassen-open-air">Grumbrechtstraßen Open Air</a> habe ich gegründet und organisiert.</p>
+            <p>Mich interessieren auch die Orte dahinter: Kneipen, Kioske, alte Gebäude und Industrieanlagen, oft in Harburg und Heimfeld, wo ich zu Hause bin.</p>
             <p th:text="${site.title + ' ist das Archiv dieser Arbeiten. Jede Band, jedes Projekt und jeder Ort ist mit den Menschen verknüpft, die daran beteiligt waren.'}">FotosVorJu ist das Archiv dieser Arbeiten.</p>
-            <p>Die Startseite zeigt eine Auswahl. Unter „Entdecken" lässt sich nachverfolgen, wer mit wem gespielt hat und wo etwas entstanden ist. Das MediaWiki bleibt das ausführliche Produktionsarchiv.</p>
+            <div class="about-links">
+                <a class="project-wiki-link" href="https://wiki.fotosvorju.de/wiki/Julian_Vornfeld" target="_blank" rel="noopener">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a2 2 0 0 1 2 2v15a2 2 0 0 0-2-2H6.5A2.5 2.5 0 0 0 4 20.5v-15Z"/>
+                        <path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H13v17a2 2 0 0 1 2-2h2.5a2.5 2.5 0 0 1 2.5 2.5v-15Z"/>
+                    </svg>
+                    <span>Ausführlicher Artikel im Wiki</span>
+                    <span aria-hidden="true">↗</span>
+                </a>
+                <a class="project-explore-link" href="/explore">
+                    <span>Verbindungen entdecken</span>
+                    <span aria-hidden="true">↘</span>
+                </a>
+            </div>
         </div>
     </div>
+
+    <section class="about-stations" aria-labelledby="about-stations-title">
+        <h2 id="about-stations-title">Stationen</h2>
+        <ol>
+            <li>
+                <time>2006</time>
+                <p>Zum elften Geburtstag bekomme ich meine erste eigene Digitalkamera. Ich fotografiere Natur, Landschaft, Architektur und Makros.</p>
+            </li>
+            <li>
+                <time datetime="2018-10-06">6. Oktober 2018</time>
+                <p>Mein erstes Konzert: <a href="/entry/stellwerk-hamburg-2018-10-06">Mute Tales im Stellwerk Hamburg</a>.</p>
+            </li>
+            <li>
+                <time datetime="2019-08-15">15. August 2019</time>
+                <p>Mein erstes Musikvideo erscheint: <a href="/entry/the-second-circle-musikvideo">The Second Circle</a> von Mute Tales.</p>
+            </li>
+            <li>
+                <time>2021</time>
+                <p>Ich nehme ganze Auftritte als Livevideos mit mehreren Kameras auf, zuerst für Potrock, dann <a href="/entry/lessons-unlearned-livevideo">Lessons Unlearned</a> von Redestruction.</p>
+            </li>
+            <li>
+                <time datetime="2025-12-27">27. Dezember 2025</time>
+                <p>Ich beende die regelmäßige Konzertfotografie – beim <a href="/entry/redestruction-abschiedskonzert-2025-12-27">Abschiedskonzert von Redestruction</a>, im Stellwerk Hamburg, wo es 2018 angefangen hat.</p>
+            </li>
+        </ol>
+    </section>
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
 </body>
