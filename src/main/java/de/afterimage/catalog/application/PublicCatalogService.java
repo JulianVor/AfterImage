@@ -110,6 +110,7 @@ public class PublicCatalogService {
         Map<EntityType, Long> counts = visible.stream()
                 .collect(Collectors.groupingBy(ArchiveEntity::getEntityType, Collectors.counting()));
         IntSummaryStatistics years = visible.stream()
+                .filter(entity -> entity.getEntityType() == EntityType.PROJECT || entity.getEntityType() == EntityType.EVENT)
                 .map(ArchiveEntity::getYear)
                 .filter(Objects::nonNull)
                 .mapToInt(Integer::intValue)

@@ -19,7 +19,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/admin/login", "/css/**", "/js/**", "/webjars/**", "/favicon.svg",
+                        .requestMatchers("/admin/login", "/css/**", "/js/**", "/img/**", "/webjars/**", "/favicon.svg",
                                 "/actuator/health", "/error", "/", "/show", "/work/**", "/entry/**", "/chronicle", "/explore", "/explore/**", "/api/explore/**",
                                 "/about", "/archive", "/search", "/connect", "/trails", "/trails/**",
                                 "/media/**", "/api/media/piwigo/**", "/regie/**", "/regie-media/**").permitAll()
