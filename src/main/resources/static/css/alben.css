@@ -106,18 +106,18 @@ html.album-theme {
 .album-spine-number { font: 500 .85em var(--mono); letter-spacing: .14em; opacity: .75; }
 .album-spine-title { letter-spacing: var(--album-title-tracking, .02em); text-transform: var(--album-title-transform, none); }
 
-/* The turn runs in one go on a single easing curve (fastest at the spine, no stall). The lift toward the viewer is
-   a separate, gentle bump that runs in parallel through the individual translate/rotate properties, so the thickness
-   shows mid-turn without the motion ever pausing. */
+/* The turn runs in one go on a single, nearly even easing curve, so it never stalls at the spine. In parallel the
+   sleeve sinks slightly and tips its top edge toward the viewer (individual translate/rotate properties), so the
+   thickness shows from above while it turns, in addition to the spine itself. */
 @keyframes flip-turn-back { from { transform: rotateY(0deg); } to { transform: rotateY(180deg); } }
 @keyframes flip-turn-front { from { transform: rotateY(180deg); } to { transform: rotateY(0deg); } }
 @keyframes flip-lift {
     0% { translate: 0 0 0; rotate: 1 0 0 0deg; }
-    50% { translate: 0 0 calc(var(--depth) * 2.2); rotate: 1 0 0 -6deg; }
+    50% { translate: 0 calc(var(--depth) * 1.5) calc(var(--depth) * 2.4); rotate: 1 0 0 -15deg; }
     100% { translate: 0 0 0; rotate: 1 0 0 0deg; }
 }
-.album-sleeve.flip-to-back .album-sleeve-inner { animation: flip-turn-back .95s cubic-bezier(.5, .05, .25, 1) forwards, flip-lift .95s cubic-bezier(.37, 0, .63, 1) forwards; }
-.album-sleeve.flip-to-front .album-sleeve-inner { animation: flip-turn-front .95s cubic-bezier(.5, .05, .25, 1) forwards, flip-lift .95s cubic-bezier(.37, 0, .63, 1) forwards; }
+.album-sleeve.flip-to-back .album-sleeve-inner { animation: flip-turn-back 1.5s cubic-bezier(.42, .04, .58, .96) forwards, flip-lift 1.5s cubic-bezier(.37, 0, .63, 1) forwards; }
+.album-sleeve.flip-to-front .album-sleeve-inner { animation: flip-turn-front 1.5s cubic-bezier(.42, .04, .58, .96) forwards, flip-lift 1.5s cubic-bezier(.37, 0, .63, 1) forwards; }
 @media (prefers-reduced-motion: reduce) {
     .album-sleeve.flip-to-back .album-sleeve-inner, .album-sleeve.flip-to-front .album-sleeve-inner { animation: none; }
 }
