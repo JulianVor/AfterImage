@@ -318,8 +318,8 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
 .project-hero-copy > p { margin: 2rem 0 0; color: var(--ember-bright); letter-spacing: .1em; text-transform: uppercase; }
 .project-actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 2rem; }
 .project-wiki-link { align-self: auto; margin-top: 0; }
-.project-explore-link { display: inline-flex; align-items: center; gap: .65rem; padding: .7rem .85rem; border: 1px solid var(--line); color: var(--paper-muted); font: .65rem var(--mono); letter-spacing: .09em; text-transform: uppercase; transition: border-color .2s ease, color .2s ease, background .2s ease; }
-.project-explore-link:hover, .project-explore-link:focus-visible { border-color: var(--ember); background: rgba(200, 67, 28, .08); color: var(--ember-bright); }
+.project-explore-link, .project-youtube-link { display: inline-flex; align-items: center; gap: .65rem; padding: .7rem .85rem; border: 1px solid var(--line); color: var(--paper-muted); font: .65rem var(--mono); letter-spacing: .09em; text-transform: uppercase; transition: border-color .2s ease, color .2s ease, background .2s ease; }
+.project-explore-link:hover, .project-explore-link:focus-visible, .project-youtube-link:hover, .project-youtube-link:focus-visible { border-color: var(--ember); background: rgba(200, 67, 28, .08); color: var(--ember-bright); }
 .track-player { width: min(100%, 30rem); margin: 1.6rem 0 0; padding: .9rem 1.1rem; border: 1px solid var(--line); }
 .track-player-row { display: flex; align-items: center; gap: 1rem; }
 .track-player-toggle { flex: 0 0 auto; display: grid; place-items: center; width: 2.3rem; height: 2.3rem; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--paper); cursor: pointer; transition: border-color .2s ease, color .2s ease; }
@@ -1002,4 +1002,6 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
 
 /* Keep Leaflet's internal layers (z-index up to 1000) from painting over the sticky header and its menus. */
 .leaflet-container { isolation: isolate; z-index: 0; }
+
+.project-youtube-link svg { width: 1.35rem; height: 1.35rem; fill: #e62117; }
 
