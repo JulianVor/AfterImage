@@ -8,12 +8,13 @@
         <div class="intro-text">
             <p class="eyebrow" th:text="${site.owner + ' · Fotografie und Film'}">Julian Vornfeld · Fotografie und Film</p>
             <h1 id="show-title">Meine Fotos und Videos von Bands.</h1>
-            <p class="intro-lead">Ich fotografiere Konzerte und drehe Musik- und Livevideos für Bands.</p>
+            <p class="intro-lead">Ich fotografiere Konzerte, mache Bandfotos und drehe Musik- und Livevideos.</p>
         </div>
         <ul class="intro-does" aria-label="Was ich mache">
             <li><a href="#fotografie">Konzertfotografie <span aria-hidden="true">↓</span></a></li>
             <li th:if="${musicVideoTotal > 0}"><a href="#musikvideos">Musikvideos <span aria-hidden="true">↓</span></a></li>
             <li th:if="${liveVideoTotal > 0}"><a href="#livevideos">Livevideos <span aria-hidden="true">↓</span></a></li>
+            <li th:if="${!workBands.isEmpty()}"><a href="#bands">Bandfotos <span aria-hidden="true">↓</span></a></li>
         </ul>
     </section>
 
@@ -75,9 +76,9 @@
 
     <section id="bands" class="home-section" aria-labelledby="bands-title" th:if="${!workBands.isEmpty()}">
         <header class="home-head">
-            <div><p class="eyebrow">Zusammenarbeit</p><h2 id="bands-title">Mit wem ich arbeite</h2></div>
+            <div><p class="eyebrow">Porträts</p><h2 id="bands-title">Fotoshootings mit Bands</h2></div>
         </header>
-        <ul class="home-grid home-grid--five">
+        <ul class="home-grid home-grid--three">
             <li th:each="item : ${workBands}">
                 <a th:href="${item.href}">
                     <span class="home-thumb home-thumb--band">
@@ -86,6 +87,13 @@
                     </span>
                     <span class="home-title" th:text="${item.title}">Band</span>
                     <span class="home-sub" th:text="${item.subtitle}">12 Arbeiten</span>
+                </a>
+            </li>
+            <li>
+                <a href="/explore">
+                    <span class="home-thumb home-thumb--band home-thumb--more"><span class="home-thumb-plate">Weitere Bands →</span></span>
+                    <span class="home-title">Alle Bands im Netzwerk</span>
+                    <span class="home-sub" th:text="${stats.bands + ' Bands im Archiv'}">0 Bands im Archiv</span>
                 </a>
             </li>
         </ul>
