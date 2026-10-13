@@ -1,5 +1,6 @@
 package de.afterimage.web.publicsite;
 
+import de.afterimage.albums.AlbumCatalog;
 import de.afterimage.catalog.application.PublicCatalogService;
 import de.afterimage.catalog.application.PublicTrailService;
 import de.afterimage.catalog.domain.ArchiveEntity;
@@ -49,6 +50,11 @@ public class PublicSiteController {
             "(?:youtube(?:-nocookie)?\\.com/(?:watch\\?(?:[^#]*&)?v=|embed/|shorts/)|youtu\\.be/)([A-Za-z0-9_-]{11})",
             Pattern.CASE_INSENSITIVE);
     private static final int MIN_CONNECTIONS_FOR_DIAGRAM = 2;
+    private static final int HOME_MUSIC_VIDEOS = 6;
+    private static final int HOME_LIVE_VIDEOS = 3;
+    private static final int HOME_BANDS = 5;
+    private static final Pattern VIDEO_TITLE_SUFFIX = Pattern.compile(
+            "\\s*\\([^)]*(?:Musik|Live)video\\)\\s*$", Pattern.CASE_INSENSITIVE);
     private static final Pattern TRAILING_ISO_DATE = Pattern.compile("\\s*[–-]\\s*\\d{4}-\\d{2}-\\d{2}$");
     private static final Map<String, String> REGIE_LINKS = Map.of(
             "again-musikvideo", "again",
@@ -62,6 +68,7 @@ public class PublicSiteController {
     private final GlobalChronicleService chronicleService;
     private final PiwigoGalleryService piwigoGalleries;
     private final GermanLabels labels;
+    private final AlbumCatalog albumCatalog;
 
     private static final Set<RelationshipType> CREDIT_ROLE_TYPES = EnumSet.of(
             RelationshipType.DIRECTED_BY, RelationshipType.SHOT_BY, RelationshipType.EDITED_BY,
@@ -98,7 +105,7 @@ public class PublicSiteController {
     public PublicSiteController(PublicCatalogService catalog, PublicTrailService trails, PublicMediaService media,
                                 WikiContentRenderer wikiContentRenderer, EntityTimelineService timelineService,
                                 GlobalChronicleService chronicleService, PiwigoGalleryService piwigoGalleries,
-                                GermanLabels labels, AfterimageProperties configuration) {
+                                GermanLabels labels, AfterimageProperties configuration, AlbumCatalog albumCatalog) {
         this.catalog = catalog;
         this.trails = trails;
         this.media = media;
@@ -108,80 +115,50 @@ public class PublicSiteController {
         this.chronicleService = chronicleService;
         this.piwigoGalleries = piwigoGalleries;
         this.labels = labels;
+        this.albumCatalog = albumCatalog;
     }
 
     @GetMapping({"/", "/show"})
     String show(Model model) {
-        List<HomeHighlight> highlights = new ArrayList<>();
-        for (ArchiveEntity entity : catalog.featuredHighlightEntities()) {
-            highlights.add(highlight(entity));
-        }
-        for (Story story : trails.featuredHighlights()) {
-            highlights.add(highlight(story));
-        }
-        highlights.sort(Comparator.comparingInt(HomeHighlight::sortOrder));
-        if (highlights.size() > 12) {
-            highlights = new ArrayList<>(highlights.subList(0, 12));
-        }
-        highlights = withLayoutVariants(highlights);
+        List<ArchiveEntity> videos = catalog.homeVideos();
+        List<HomeCard> musicVideos = videos.stream().filter(video -> !isLiveVideo(video)).map(this::videoCard).toList();
+        List<HomeCard> liveVideos = videos.stream().filter(PublicSiteController::isLiveVideo).map(this::videoCard).toList();
 
-        List<HomeHighlight> fallback = highlights.isEmpty()
-                ? withLayoutVariants(catalog.recentProjects(4).stream().map(this::highlight).toList())
-                : List.of();
-
-        model.addAttribute("highlights", highlights);
-        model.addAttribute("fallbackHighlights", fallback);
+        model.addAttribute("musicVideos", musicVideos.stream().limit(HOME_MUSIC_VIDEOS).toList());
+        model.addAttribute("musicVideoTotal", musicVideos.size());
+        model.addAttribute("liveVideos", liveVideos.stream().limit(HOME_LIVE_VIDEOS).toList());
+        model.addAttribute("liveVideoTotal", liveVideos.size());
+        model.addAttribute("workBands", catalog.homeBands(HOME_BANDS).stream().map(this::bandCard).toList());
+        model.addAttribute("albums", albumCatalog.all());
         model.addAttribute("stats", catalog.stats());
         model.addAttribute("homePhotos", HomePhotos.shuffled());
         return "public/show";
     }
 
-    private HomeHighlight highlight(ArchiveEntity entity) {
-        PublicMediaService.PublicMediaMetadata hero = entity.getHeroMediaId() == null
-                ? null : media.metadata(entity.getHeroMediaId()).orElse(null);
-        boolean isBand = entity.getEntityType() == EntityType.BAND;
-        String kindLabel = isBand ? "Band" : "Projekt";
-        String subtitle = isBand ? "Band" : (entity.getSubtitle() != null ? entity.getSubtitle() : "Freie Arbeit");
-        String meta = isBand
-                ? (entity.getYear() != null ? "Band · seit " + entity.getYear() : "Band")
-                : (entity.getProjectType() == null ? "Projekt" : labels.of(entity.getProjectType()))
-                        + (entity.getYear() != null ? " · " + entity.getYear() : "");
-        List<EntityChip> chips = isBand ? List.of() : chips(entity);
-        return new HomeHighlight(entity.getSortOrder(), kindLabel, "/entry/" + entity.getSlug(),
-                entity.getDisplayTitle() != null ? entity.getDisplayTitle() : entity.getTitle(),
-                subtitle, meta, hero, chips, "");
+    private static boolean isLiveVideo(ArchiveEntity video) {
+        return video.getTitle().toLowerCase(Locale.ROOT).contains("livevideo");
     }
 
-    private HomeHighlight highlight(Story story) {
-        UUID heroId = trails.heroMediaId(story);
-        PublicMediaService.PublicMediaMetadata hero = heroId == null ? null : media.metadata(heroId).orElse(null);
-        String subtitle = story.getTeaser() != null && !story.getTeaser().isBlank()
-                ? story.getTeaser() : labels.of(story.getStoryType());
-        String meta = "Geschichte · " + labels.of(story.getStoryType());
-        return new HomeHighlight(story.getSortOrder(), "Geschichte", "/trails/" + story.getSlug(),
-                story.getTitle(), subtitle, meta, hero, List.of(), "");
+    private HomeCard videoCard(ArchiveEntity video) {
+        String title = video.getDisplayTitle() != null ? video.getDisplayTitle() : video.getTitle();
+        String band = chips(video).stream().map(EntityChip::title).findFirst().orElse(video.getSubtitle());
+        return new HomeCard("/entry/" + video.getSlug(), VIDEO_TITLE_SUFFIX.matcher(title).replaceFirst(""),
+                band, video.getYear(), heroOf(video));
     }
 
-    /**
-     * Picks each card's layout treatment from its hero image's actual orientation rather than
-     * its list position: portrait treatment (4:5) only for genuinely portrait source images, so a
-     * landscape image never gets cropped down to a slice to fit a taller box. Landscape/square
-     * images alternate between the default and the wider "offset" treatment (both 16:9) for rhythm.
-     */
-    private List<HomeHighlight> withLayoutVariants(List<HomeHighlight> items) {
-        List<HomeHighlight> result = new ArrayList<>();
-        int landscapeIndex = 0;
-        for (HomeHighlight item : items) {
-            PublicMediaService.PublicMediaMetadata hero = item.heroMedia();
-            boolean portraitSource = hero != null && hero.width() != null && hero.height() != null
-                    && hero.height() > hero.width();
-            String variant = portraitSource ? "project-card--portrait"
-                    : (landscapeIndex++ % 2 == 1 ? "project-card--offset" : "");
-            result.add(new HomeHighlight(item.sortOrder(), item.kindLabel(), item.href(), item.title(),
-                    item.subtitle(), item.meta(), item.heroMedia(), item.chips(), variant));
-        }
-        return List.copyOf(result);
+    private HomeCard bandCard(PublicCatalogService.RankedBand ranked) {
+        ArchiveEntity band = ranked.band();
+        String works = ranked.works() == 1 ? "1 Arbeit" : ranked.works() + " Arbeiten";
+        return new HomeCard("/entry/" + band.getSlug(),
+                band.getDisplayTitle() != null ? band.getDisplayTitle() : band.getTitle(), works, null, heroOf(band));
     }
+
+    private PublicMediaService.PublicMediaMetadata heroOf(ArchiveEntity entity) {
+        return entity.getHeroMediaId() == null ? null : media.metadata(entity.getHeroMediaId()).orElse(null);
+    }
+
+    public record HomeCard(String href, String title, String subtitle, Integer year,
+                           PublicMediaService.PublicMediaMetadata image) {}
 
     private List<EntityChip> chips(ArchiveEntity project) {
         return catalog.publicRelations(project.getSlug()).stream()
@@ -197,10 +174,6 @@ public class PublicSiteController {
     }
 
     public record EntityChip(String slug, String title) {}
-
-    public record HomeHighlight(int sortOrder, String kindLabel, String href, String title, String subtitle,
-                                String meta, PublicMediaService.PublicMediaMetadata heroMedia,
-                                List<EntityChip> chips, String layoutVariant) {}
 
     @GetMapping({"/work/{slug}", "/entry/{slug}"})
     String project(@PathVariable String slug, Model model) {

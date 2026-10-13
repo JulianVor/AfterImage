@@ -936,3 +936,47 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
 /* Images cannot be dragged or picked as a target, which removes "save image" from the context menu and long-press.
    A hurdle only: the files can still be read from the network traffic. */
 img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; pointer-events: none; }
+
+/* Homepage: one repeating section pattern (small label, title, optional link) over one set of grids. */
+.intro-does { align-self: end; list-style: none; display: grid; gap: .5rem; margin: 0; padding: 0; font: .72rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.intro-does a { display: inline-block; padding: .2rem 0; border-bottom: 1px solid var(--line-strong); }
+.intro-does a:hover { border-bottom-color: var(--ember); }
+
+.home-section { padding: clamp(3rem, 6vw, 5.5rem) var(--gutter); border-top: 1px solid var(--line); border-bottom: 0; scroll-margin-top: 4rem; }
+.home-section > * { max-width: 1280px; margin-left: auto; margin-right: auto; }
+.home-head { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: clamp(1.4rem, 3vw, 2.2rem); }
+.home-head .eyebrow { margin-bottom: .5rem; }
+.home-head h2 { margin: 0; font: 400 clamp(1.5rem, 2.4vw, 2.1rem)/1.15 var(--serif); letter-spacing: -.01em; }
+.home-more { border-bottom: 1px solid var(--paper-muted); font: .72rem var(--mono); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+.home-more:hover { border-bottom-color: var(--ember); }
+
+.home-grid { list-style: none; display: grid; gap: clamp(1.6rem, 3vw, 2.6rem) clamp(1rem, 2vw, 1.8rem); padding: 0; }
+.home-grid--three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.home-grid--five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.home-grid a { display: block; }
+.home-thumb { position: relative; display: block; overflow: hidden; background: var(--ink-soft); }
+.home-thumb--video { aspect-ratio: 16 / 9; }
+.home-thumb--band { aspect-ratio: 4 / 3; }
+.home-thumb--cover { aspect-ratio: 1; box-shadow: 0 18px 36px -20px rgba(0, 0, 0, .7); }
+.home-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
+.home-grid a:hover .home-thumb img { transform: scale(1.04); }
+.home-title { display: block; margin-top: .8rem; font: 400 clamp(1.1rem, 1.5vw, 1.35rem)/1.25 var(--serif); }
+.home-title--small { margin-top: .15rem; font-size: 1rem; }
+.home-sub { display: block; margin-top: .25rem; color: var(--paper-muted); font: 500 .62rem var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+.home-thumb--cover + .home-sub { margin-top: .8rem; }
+
+.home-artwork { --ink: #1a1510; --ink-soft: #231d16; --paper: #f6f2ea; --paper-muted: rgba(246, 242, 234, .58); --line: rgba(246, 242, 234, .16); --line-strong: rgba(246, 242, 234, .34); background: var(--ink); color: var(--paper); border-top: 0; }
+.home-archive-text { margin-top: 0; margin-bottom: 0; color: var(--paper-muted); }
+.home-archive-links { list-style: none; display: flex; flex-wrap: wrap; gap: .6rem 1.8rem; margin-top: clamp(1.5rem, 3vw, 2.5rem); margin-bottom: 0; padding: 0; font: .72rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.home-archive-links a { padding-bottom: .15rem; border-bottom: 1px solid var(--line-strong); }
+.home-archive-links a:hover { border-bottom-color: var(--ember); }
+
+@media (max-width: 1000px) {
+    .home-grid--five { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+    .home-grid--three, .home-grid--five { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .home-head { display: block; }
+    .home-more { display: inline-block; margin-top: .9rem; }
+}
+

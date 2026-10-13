@@ -2,6 +2,7 @@ package de.afterimage.catalog.application;
 
 import de.afterimage.catalog.domain.ArchiveEntity;
 import de.afterimage.catalog.domain.EntityType;
+import de.afterimage.catalog.domain.ProjectType;
 import de.afterimage.catalog.domain.Relationship;
 import de.afterimage.catalog.domain.RelationshipType;
 import de.afterimage.catalog.domain.Visibility;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.HashSet;
 import java.util.IntSummaryStatistics;
@@ -72,6 +74,55 @@ public class PublicCatalogService {
         return entities.findByVisibilityAndFeaturedTrueAndEntityTypeInOrderBySortOrderAscTitleAsc(
                 Visibility.PUBLIC, List.of(EntityType.PROJECT, EntityType.BAND));
     }
+
+    /**
+     * Finished music and live videos that have a hero image, curated (featured) ones first and then newest
+     * first. Unrealised ideas are left out.
+     */
+    public List<ArchiveEntity> homeVideos() {
+        return entities.findByVisibilityOrderBySortOrderAscTitleAsc(Visibility.PUBLIC).stream()
+                .filter(ArchiveEntity::isPubliclyVisible)
+                .filter(entity -> entity.getEntityType() == EntityType.PROJECT
+                        && entity.getProjectType() == ProjectType.MUSIC_VIDEO
+                        && entity.getHeroMediaId() != null
+                        && !entity.getTitle().toLowerCase().contains("unrealisiert"))
+                .sorted(Comparator.comparing(ArchiveEntity::isFeatured).reversed()
+                        .thenComparing(ArchiveEntity::getYear, Comparator.nullsLast(Comparator.reverseOrder()))
+                        .thenComparing(ArchiveEntity::getTitle))
+                .toList();
+    }
+
+    /** Public bands with a hero image, ordered by how many projects and events they appear in. */
+    public List<RankedBand> homeBands(int limit) {
+        Map<UUID, Set<UUID>> worksByBand = new HashMap<>();
+        for (Relationship relation : relationships.findPublicGraph(Visibility.PUBLIC)) {
+            ArchiveEntity source = relation.getSourceEntity();
+            ArchiveEntity target = relation.getTargetEntity();
+            if (!source.isPubliclyVisible() || !target.isPubliclyVisible()) {
+                continue;
+            }
+            if (source.getEntityType() == EntityType.BAND && isWork(target)) {
+                worksByBand.computeIfAbsent(source.getId(), ignored -> new HashSet<>()).add(target.getId());
+            } else if (target.getEntityType() == EntityType.BAND && isWork(source)) {
+                worksByBand.computeIfAbsent(target.getId(), ignored -> new HashSet<>()).add(source.getId());
+            }
+        }
+        return entities.findByVisibilityOrderBySortOrderAscTitleAsc(Visibility.PUBLIC).stream()
+                .filter(ArchiveEntity::isPubliclyVisible)
+                .filter(entity -> entity.getEntityType() == EntityType.BAND && entity.getHeroMediaId() != null)
+                .map(band -> new RankedBand(band, worksByBand.getOrDefault(band.getId(), Set.of()).size()))
+                .filter(ranked -> ranked.works() > 0)
+                .sorted(Comparator.comparingInt(RankedBand::works).reversed()
+                        .thenComparing(ranked -> ranked.band().getTitle()))
+                .limit(limit)
+                .toList();
+    }
+
+    private static boolean isWork(ArchiveEntity entity) {
+        return entity.getEntityType() == EntityType.PROJECT || entity.getEntityType() == EntityType.EVENT;
+    }
+
+    public record RankedBand(ArchiveEntity band, int works) {}
 
     public List<ArchiveEntity> recentProjects(int limit) {
         Set<UUID> involvedIds = involvedEntityIds();
