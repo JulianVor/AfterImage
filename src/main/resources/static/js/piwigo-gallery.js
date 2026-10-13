@@ -20,7 +20,15 @@ if (lightbox) {
         error.hidden = true;
         loading.hidden = false;
         stage.setAttribute('aria-busy', 'true');
-        caption.textContent = title;
+        caption.textContent = '';
+        if (tile.dataset.href && title) {
+            const link = document.createElement('a');
+            link.href = tile.dataset.href;
+            link.textContent = `${title} ansehen →`;
+            caption.append(link);
+        } else {
+            caption.textContent = title;
+        }
 
         if (!lightbox.open) lightbox.showModal();
 

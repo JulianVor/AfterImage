@@ -11,9 +11,14 @@
     </section>
 
     <section class="home-section" aria-label="Fotos">
+        <nav class="filter-chips" aria-label="Nach Band filtern">
+            <a href="/fotos" th:classappend="${activeBand == null} ? 'is-active'" th:attr="aria-current=${activeBand == null ? 'page' : null}" th:text="${'Alle (' + photoTotal + ')'}">Alle</a>
+            <a th:each="count : ${photoBands}" th:href="@{/fotos(band=${count.band.slug})}" th:text="${count.band.name + ' (' + count.photos + ')'}"
+               th:classappend="${activeBand == count.band.slug} ? 'is-active'" th:attr="aria-current=${activeBand == count.band.slug ? 'page' : null}">Band</a>
+        </nav>
         <div class="photo-masonry">
             <button type="button" class="photo-tile photo-tile--natural" th:each="photo : ${photos}"
-                    th:attr="data-full=${'/img/home/' + photo.file},data-alt=${photo.alt}">
+                    th:attr="data-full=${'/img/home/' + photo.file},data-alt=${photo.alt},data-title=${photo.band?.name},data-href=${photo.band != null ? '/entry/' + photo.band.slug : null}">
                 <img th:src="@{/img/home/{file}(file=${photo.file})}" th:alt="${photo.alt}"
                      th:attr="width=${photo.width},height=${photo.height}" loading="lazy" decoding="async">
             </button>

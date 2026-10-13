@@ -144,8 +144,13 @@ public class PublicSiteController {
     }
 
     @GetMapping("/fotos")
-    String photos(Model model) {
-        model.addAttribute("photos", HomePhotos.all());
+    String photos(@RequestParam(required = false) String band, Model model) {
+        List<HomePhotos.BandCount> bands = HomePhotos.bands();
+        String active = bands.stream().map(count -> count.band().slug()).filter(slug -> slug.equals(band)).findFirst().orElse(null);
+        model.addAttribute("photos", active == null ? HomePhotos.all() : HomePhotos.forBand(active));
+        model.addAttribute("photoBands", bands);
+        model.addAttribute("activeBand", active);
+        model.addAttribute("photoTotal", HomePhotos.all().size());
         return "public/fotos";
     }
 
@@ -231,6 +236,7 @@ public class PublicSiteController {
                 piwigoGalleries.galleries(project, 12).stream(),
                 pathGalleries(properties.getOrDefault("Piwigo path", List.of())).stream()
         ).toList();
+        List<HomePhotos.HomePhoto> bandPhotos = HomePhotos.forBand(project.getSlug());
         var tracks = media.tracks(project);
 
         model.addAttribute("tracks", tracks);
@@ -257,6 +263,7 @@ public class PublicSiteController {
         model.addAttribute("youtubeVideos", youtubeVideos);
         model.addAttribute("filmingLocations", filmingLocations);
         model.addAttribute("photoGalleries", photoGalleries);
+        model.addAttribute("bandPhotos", bandPhotos);
         model.addAttribute("heroMedia", project.getHeroMediaId() == null
                 ? Optional.empty() : media.metadata(project.getHeroMediaId()));
 
@@ -271,7 +278,7 @@ public class PublicSiteController {
         if (!members.isEmpty()) navItems.add(new NavItem("mitglieder", "Mitglieder"));
         if (!personRoles.isEmpty()) navItems.add(new NavItem("rollen", "Rollen"));
         if (!personConcerts.isEmpty()) navItems.add(new NavItem("konzerte", "Konzerte"));
-        if (!photoGalleries.isEmpty()) navItems.add(new NavItem("fotos", "Fotos"));
+        if (!photoGalleries.isEmpty() || !bandPhotos.isEmpty()) navItems.add(new NavItem("fotos", "Fotos"));
         if (!timeline.isEmpty()) navItems.add(new NavItem("chronik", "Chronik"));
         if (!musicVideos.isEmpty()) navItems.add(new NavItem("musikvideos", "Musikvideos"));
         if (!textSections.isEmpty()) navItems.add(new NavItem("wiki-texte", "Hintergründe"));

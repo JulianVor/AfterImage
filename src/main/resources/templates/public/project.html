@@ -236,8 +236,22 @@
         </div>
     </section>
 
-    <section id="fotos" class="photo-galleries" th:if="${!photoGalleries.isEmpty()}">
+    <section id="fotos" class="photo-galleries" th:if="${!photoGalleries.isEmpty() or !bandPhotos.isEmpty()}">
         <header><div><p class="eyebrow">Fotografie</p><h2>Fotos</h2></div></header>
+        <article class="photo-gallery" th:if="${!bandPhotos.isEmpty()}">
+            <div class="photo-gallery-heading">
+                <div><h3 th:text="${project.displayTitle ?: project.title}">Band</h3>
+                    <p th:text="${bandPhotos.size() == 1 ? '1 Aufnahme' : bandPhotos.size() + ' Aufnahmen'}">Aufnahmen</p></div>
+                <a th:href="@{/fotos(band=${project.slug})}">Alle Konzertfotos ansehen</a>
+            </div>
+            <div class="photo-grid">
+                <button type="button" class="photo-tile" th:each="photo : ${bandPhotos}"
+                        th:attr="data-full=${'/img/home/' + photo.file},data-alt=${photo.alt},data-title=${photo.band.name}">
+                    <img th:src="@{/img/home/{file}(file=${photo.file})}" th:alt="${photo.alt}" loading="lazy" decoding="async"
+                         th:attr="width=${photo.width},height=${photo.height}">
+                </button>
+            </div>
+        </article>
         <article class="photo-gallery" th:each="gallery : ${photoGalleries}">
             <div class="photo-gallery-heading">
                 <div><h3 th:text="${gallery.album.name}">Album</h3>
@@ -489,7 +503,7 @@
     </a>
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
-<script type="module" src="/js/piwigo-gallery.js" th:if="${!photoGalleries.isEmpty()}"></script>
+<script type="module" src="/js/piwigo-gallery.js" th:if="${!photoGalleries.isEmpty() or !bandPhotos.isEmpty()}"></script>
 <script src="/js/track-player.js" defer th:if="${!tracks.isEmpty()}"></script>
 <script src="/js/embed-consent.js" defer></script>
 <script type="module" src="/js/project-connections.js" th:if="${showConnections}"></script>
