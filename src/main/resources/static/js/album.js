@@ -35,8 +35,9 @@ if (main) {
             const style = sleeve.style;
             style.setProperty('--tilt-y', ((px - 0.5) * 2 * MAX_TILT).toFixed(2) + 'deg');
             style.setProperty('--tilt-x', ((0.5 - py) * 2 * MAX_TILT).toFixed(2) + 'deg');
-            style.setProperty('--glare-x', (px * 100).toFixed(1) + '%');
-            style.setProperty('--glare-y', (py * 100).toFixed(1) + '%');
+            // The pressed side recedes, so the highlight sits on the opposite side, which tilts toward the viewer.
+            style.setProperty('--glare-x', ((1 - px) * 100).toFixed(1) + '%');
+            style.setProperty('--glare-y', ((1 - py) * 100).toFixed(1) + '%');
             style.setProperty('--shadow-x', (-(px - 0.5) * 28).toFixed(1) + 'px');
             style.setProperty('--shadow-y', (30 - (py - 0.5) * 20).toFixed(1) + 'px');
         };
