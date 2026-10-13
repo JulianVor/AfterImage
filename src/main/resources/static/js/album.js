@@ -47,9 +47,9 @@ if (main) {
         // px/py: where the cover is "pressed", 0..1 from the top-left. The depth is 0 at the edge and 1 well inside
         // for the mouse (the cover sinks and tilts more the deeper it goes); the phone passes a fixed value and a
         // glare strength that grows with the tilt, so a phone held still shows no highlight.
-        const setTargetFraction = (px, py, depth = smoothstep(0, 0.5, 2 * Math.min(px, 1 - px, py, 1 - py)), glareStrength = 1) => {
-            target.tiltY = (px - 0.5) * 2 * MAX_TILT;
-            target.tiltX = (0.5 - py) * 2 * MAX_TILT;
+        const setTargetFraction = (px, py, depth = smoothstep(0, 0.5, 2 * Math.min(px, 1 - px, py, 1 - py)), glareStrength = 1, tiltGain = 1) => {
+            target.tiltY = (px - 0.5) * 2 * MAX_TILT * tiltGain;
+            target.tiltX = (0.5 - py) * 2 * MAX_TILT * tiltGain;
             target.depth = depth;
             target.glareStrength = glareStrength;
             // The pressed side recedes, so the highlight sits on the opposite side, which tilts toward the viewer.
@@ -155,7 +155,8 @@ if (main) {
             const toggle = main.querySelector('.album-motion-toggle');
             if (!window.isSecureContext || !('DeviceOrientationEvent' in window)) return;
 
-            const DEVICE_RANGE = 18;
+            const DEVICE_RANGE = 12;
+            const DEVICE_TILT_GAIN = 2.2;
             const FOLLOW_MS = 3500;
             let wantMotion = false;
             let listening = false;
@@ -190,7 +191,7 @@ if (main) {
                 const py = clamp(0.5 + wrap(pitch - base.pitch) / (2 * DEVICE_RANGE));
                 // The highlight appears with the tilt and is gone while the phone rests.
                 const glareStrength = smoothstep(0.04, 0.5, Math.hypot(px - 0.5, py - 0.5) * 2);
-                setTargetFraction(px, py, 0.6, glareStrength);
+                setTargetFraction(px, py, 0.6, glareStrength, DEVICE_TILT_GAIN);
                 if (!hovering) engage();
             };
 
