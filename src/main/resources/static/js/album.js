@@ -148,12 +148,12 @@ if (main) {
             sleeve.addEventListener('pointerleave', release);
         };
 
-        // Phone: the tilt sensor moves the "pressed" point like a mouse would. iOS only releases the sensor after a tap
-        // (a button asks for that); elsewhere no permission is needed, so it starts by itself and the button stays
-        // hidden. Browsers only expose the sensor on HTTPS.
+        // Phone: the tilt sensor moves the "pressed" point like a mouse would. iOS only releases the sensor after a tap,
+        // so it starts off there; elsewhere no permission is needed and it is on by default. The button always shows the
+        // state and switches it; a deliberate "off" is remembered. Browsers only expose the sensor on HTTPS.
         const setupDeviceTilt = () => {
             const toggle = main.querySelector('.album-motion-toggle');
-            if (!window.isSecureContext || !('DeviceOrientationEvent' in window)) return;
+            if (!toggle || !window.isSecureContext || !('DeviceOrientationEvent' in window)) return;
 
             const DEVICE_RANGE = 12;
             const DEVICE_TILT_GAIN = 2.2;
@@ -218,24 +218,26 @@ if (main) {
             });
 
             const needsPermission = typeof DeviceOrientationEvent.requestPermission === 'function';
-            if (!needsPermission) {
-                wantMotion = true;
-                listen();
-                return;
-            }
-            if (!toggle) return;
+            const PREFERENCE_KEY = 'album-motion';
+            const readPreference = () => {
+                try { return window.localStorage.getItem(PREFERENCE_KEY); } catch (error) { return null; }
+            };
+            const writePreference = value => {
+                try { window.localStorage.setItem(PREFERENCE_KEY, value); } catch (error) { /* storage unavailable */ }
+            };
 
-            const setActive = value => {
+            const setActive = (value, { save = true } = {}) => {
                 wantMotion = value;
                 toggle.setAttribute('aria-pressed', String(value));
                 toggle.textContent = value ? 'Handy-Bewegung: an' : 'Handy-Bewegung nutzen';
+                if (save) writePreference(value ? 'on' : 'off');
                 if (value) {
                     received = false;
                     listen();
-                    // No sensor data: switch off and hide the button again.
+                    // No sensor data (device without sensor, access blocked): switch off and hide the button.
                     setTimeout(() => {
                         if (wantMotion && !received) {
-                            setActive(false);
+                            setActive(false, { save: false });
                             toggle.hidden = true;
                         }
                     }, 1500);
@@ -250,13 +252,20 @@ if (main) {
                     setActive(false);
                     return;
                 }
-                try {
-                    if (await DeviceOrientationEvent.requestPermission() !== 'granted') return;
-                } catch (error) {
-                    return;
+                if (needsPermission) {
+                    try {
+                        if (await DeviceOrientationEvent.requestPermission() !== 'granted') return;
+                    } catch (error) {
+                        return;
+                    }
                 }
                 setActive(true);
             });
+
+            // Default: on wherever no confirmation is needed, unless it was switched off on purpose before.
+            if (!needsPermission && readPreference() !== 'off') {
+                setActive(true, { save: false });
+            }
         };
 
         if (canHover) {
