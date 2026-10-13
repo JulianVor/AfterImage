@@ -10,6 +10,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 @Configuration
 @EnableMethodSecurity
@@ -19,7 +20,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/admin/login", "/css/**", "/js/**", "/img/**", "/webjars/**", "/favicon.svg",
+                        .requestMatchers("/admin/login", "/css/**", "/js/**", "/img/**", "/fonts/**", "/webjars/**", "/favicon.svg", "/robots.txt", "/impressum", "/datenschutz",
                                 "/actuator/health", "/error", "/", "/show", "/work/**", "/entry/**", "/chronicle", "/explore", "/explore/**", "/api/explore/**",
                                 "/about", "/archive", "/search", "/connect", "/trails", "/trails/**",
                                 "/media/**", "/api/media/piwigo/**", "/regie/**", "/regie-media/**", "/alben", "/alben/**").permitAll()
@@ -31,6 +32,10 @@ public class SecurityConfig {
                         .defaultSuccessUrl("/admin", true)
                         .permitAll())
                 .logout(logout -> logout.logoutUrl("/admin/logout").logoutSuccessUrl("/"))
+                // Machine-readable reservation of text and data mining (section 44b UrhG) on every response, images included.
+                .headers(headers -> headers
+                        .addHeaderWriter(new StaticHeadersWriter("X-Robots-Tag", "noai, noimageai"))
+                        .addHeaderWriter(new StaticHeadersWriter("TDM-Reservation", "1")))
                 .build();
     }
 

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Impressum')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('')}"></header>
+<main class="legal-page">
+    <p class="eyebrow">Rechtliches</p>
+    <h1>Impressum</h1>
+
+    <section>
+        <h2>Angaben gemäß § 5 DDG</h2>
+        <p>
+            <span th:text="${site.owner}">Julian Vornfeld</span><br>
+            Stader Straße 133<br>
+            21075 Hamburg
+        </p>
+    </section>
+
+    <section>
+        <h2>Kontakt</h2>
+        <p>E-Mail: julian.vornfeld@outlook.de</p>
+    </section>
+
+    <section>
+        <h2>Verantwortlich für den Inhalt</h2>
+        <p>Nach § 18 Abs. 2 MStV: <span th:text="${site.owner}">Julian Vornfeld</span>, Anschrift wie oben.</p>
+    </section>
+
+    <section id="urheberrecht">
+        <h2>Urheberrecht und Nutzung</h2>
+        <p>
+            © <span th:text="${#temporals.createToday().year}">2026</span> <span th:text="${site.owner}">Julian Vornfeld</span>. Alle Rechte vorbehalten.
+        </p>
+        <p>
+            Alle Inhalte dieser Website, insbesondere Fotografien, Videos, Artwork, Texte und die Gestaltung, sind urheberrechtlich geschützt.
+            Eine Nutzung außerhalb der gesetzlichen Schranken, etwa Vervielfältigung, Bearbeitung, Verbreitung oder öffentliche Wiedergabe,
+            ist nur mit meiner vorherigen schriftlichen Zustimmung erlaubt. Anfragen gern per E-Mail.
+        </p>
+        <p>
+            Soweit Inhalte Rechte Dritter berühren, etwa Musik, Namen oder Logos von Bands, liegen diese Rechte bei den jeweiligen Inhabern.
+        </p>
+        <h3>Vorbehalt für Text und Data Mining</h3>
+        <p>
+            Ich behalte mir die Nutzung der Inhalte dieser Website für das Text und Data Mining im Sinne von § 44b UrhG ausdrücklich vor.
+            Das gilt insbesondere für das Training von KI-Systemen. Der Vorbehalt ist zusätzlich maschinenlesbar hinterlegt
+            (robots.txt, Meta-Angaben und HTTP-Header).
+        </p>
+    </section>
+
+    <section>
+        <h2>Externe Links</h2>
+        <p>
+            Diese Website verweist auf externe Seiten, zum Beispiel auf mein Wiki. Auf deren Inhalte habe ich keinen Einfluss,
+            verantwortlich ist jeweils der Anbieter. Wenn mir Rechtsverletzungen bekannt werden, entferne ich den betreffenden Link.
+        </p>
+    </section>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -219,11 +219,12 @@
     <section id="video" class="project-video" th:if="${!youtubeVideos.isEmpty()}">
         <header><p class="eyebrow">Film</p><h2>Video ansehen</h2></header>
         <div class="video-embeds">
-            <iframe th:each="video : ${youtubeVideos}" th:src="${video.embedUrl}"
-                    th:title="${'YouTube-Video zu ' + (project.displayTitle ?: project.title)}"
-                    loading="lazy" referrerpolicy="strict-origin-when-cross-origin"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen></iframe>
+            <div class="embed-consent embed-consent--video" th:each="video : ${youtubeVideos}" data-provider="YouTube"
+                 th:attr="data-src=${video.embedUrl},data-title=${'YouTube-Video zu ' + (project.displayTitle ?: project.title)}"
+                 data-allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" data-referrer="strict-origin-when-cross-origin">
+                <p>Dieses Video wird von YouTube bereitgestellt. Beim Laden werden Daten, darunter deine IP-Adresse, an Google übertragen. <a href="/datenschutz#drittanbieter">Mehr dazu</a></p>
+                <button type="button">Video laden</button>
+            </div>
         </div>
     </section>
 
@@ -381,8 +382,10 @@
         </header>
         <div class="location-maps">
             <article th:each="location : ${filmingLocations}">
-                <iframe th:src="${location.embedUrl}" th:title="${'Karte: ' + location.title}"
-                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div class="embed-consent" data-provider="Google Maps" th:attr="data-src=${location.embedUrl},data-title=${'Karte: ' + location.title}" data-referrer="no-referrer-when-downgrade">
+                    <p>Diese Karte wird von Google Maps bereitgestellt. Beim Laden werden Daten, darunter deine IP-Adresse, an Google übertragen. <a href="/datenschutz#drittanbieter">Mehr dazu</a></p>
+                    <button type="button">Karte laden</button>
+                </div>
                 <div>
                     <h3 th:text="${location.title}">Drehort</h3>
                     <a th:href="@{/explore(focus=${'entity:' + location.slug})}">Verbindungen dieses Ortes entdecken →</a>
@@ -399,16 +402,20 @@
         </header>
         <div class="location-maps">
             <article th:if="${ownMapUrl.isPresent()}">
-                <iframe th:src="${ownMapUrl.get()}" th:title="${'Karte: ' + (project.displayTitle ?: project.title)}"
-                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div class="embed-consent" data-provider="Google Maps" th:attr="data-src=${ownMapUrl.get()},data-title=${'Karte: ' + (project.displayTitle ?: project.title)}" data-referrer="no-referrer-when-downgrade">
+                    <p>Diese Karte wird von Google Maps bereitgestellt. Beim Laden werden Daten, darunter deine IP-Adresse, an Google übertragen. <a href="/datenschutz#drittanbieter">Mehr dazu</a></p>
+                    <button type="button">Karte laden</button>
+                </div>
                 <div>
                     <h3 th:text="${project.displayTitle ?: project.title}">Ort</h3>
                     <a th:href="@{/explore(focus=${'entity:' + project.slug})}">Verbindungen dieses Ortes entdecken →</a>
                 </div>
             </article>
             <article th:if="${venueMapUrl.isPresent()}">
-                <iframe th:src="${venueMapUrl.get()}" th:title="${'Karte: ' + (venue.get().displayTitle ?: venue.get().title)}"
-                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <div class="embed-consent" data-provider="Google Maps" th:attr="data-src=${venueMapUrl.get()},data-title=${'Karte: ' + (venue.get().displayTitle ?: venue.get().title)}" data-referrer="no-referrer-when-downgrade">
+                    <p>Diese Karte wird von Google Maps bereitgestellt. Beim Laden werden Daten, darunter deine IP-Adresse, an Google übertragen. <a href="/datenschutz#drittanbieter">Mehr dazu</a></p>
+                    <button type="button">Karte laden</button>
+                </div>
                 <div>
                     <h3 th:text="${venue.get().displayTitle ?: venue.get().title}">Veranstaltungsort</h3>
                     <a th:href="@{/entry/{slug}(slug=${venue.get().slug})}">Ort im Archiv öffnen →</a>
@@ -476,6 +483,7 @@
 <footer th:replace="~{fragments :: footer}"></footer>
 <script type="module" src="/js/piwigo-gallery.js" th:if="${!photoGalleries.isEmpty()}"></script>
 <script src="/js/track-player.js" defer th:if="${!tracks.isEmpty()}"></script>
+<script src="/js/embed-consent.js" defer></script>
 <script type="module" src="/js/project-connections.js" th:if="${showConnections}"></script>
 <link rel="stylesheet" href="/webjars/leaflet/1.9.4/dist/leaflet.css" th:if="${placesMapped}">
 <script src="/webjars/leaflet/1.9.4/dist/leaflet.js" th:if="${placesMapped}"></script>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Datenschutz')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('')}"></header>
+<main class="legal-page">
+    <p class="eyebrow">Rechtliches</p>
+    <h1>Datenschutzerklärung</h1>
+
+    <section>
+        <h2>Verantwortlich</h2>
+        <p>
+            <span th:text="${site.owner}">Julian Vornfeld</span>,
+            Stader Straße 133, 21075 Hamburg<br>
+            E-Mail: julian.vornfeld@outlook.de
+        </p>
+    </section>
+
+    <section>
+        <h2>Server-Logfiles</h2>
+        <p>
+            Beim Aufruf dieser Website verarbeitet der Server technisch notwendige Daten: deine IP-Adresse, Datum und Uhrzeit, die
+            angeforderte Seite, die Referrer-Adresse sowie Browser und Betriebssystem. Das dient dem sicheren und stabilen Betrieb.
+            Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse am Betrieb der Website).
+            Die Daten werden nach <mark class="legal-todo">Speicherdauer, z. B. 7 Tagen</mark> gelöscht.
+        </p>
+        <p>Die Website wird betrieben bei: <mark class="legal-todo">Hostinganbieter oder eigener Server</mark>.</p>
+    </section>
+
+    <section>
+        <h2>Cookies und Tracking</h2>
+        <p>
+            Für Besucher setzt diese Website keine Cookies und verwendet keine Analyse- oder Tracking-Dienste.
+            Der Admin-Bereich ist nur für mich bestimmt. Dort wird nach der Anmeldung ein Sitzungs-Cookie gesetzt.
+        </p>
+    </section>
+
+    <section>
+        <h2>Schriften</h2>
+        <p>Alle Schriften werden von diesem Server ausgeliefert. Es gibt keine Verbindung zu Google Fonts oder anderen Schriftanbietern.</p>
+    </section>
+
+    <section id="drittanbieter">
+        <h2>Inhalte von Drittanbietern</h2>
+
+        <h3>Karten von OpenStreetMap</h3>
+        <p>
+            Auf Seiten mit Orten und auf der Karte „Orte" werden Kartenkacheln von tile.openstreetmap.org geladen. Betreiber ist die
+            OpenStreetMap Foundation (St John’s Innovation Centre, Cowley Road, Cambridge, CB4 0WS, Vereinigtes Königreich).
+            Dabei wird deine IP-Adresse an den Betreiber übertragen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO
+            (berechtigtes Interesse an der Darstellung von Orten).
+        </p>
+
+        <h3>Google Maps</h3>
+        <p>
+            Auf einzelnen Seiten kann eine Google-Karte eingebunden sein. Sie wird erst geladen, wenn du auf „Karte laden" klickst.
+            Erst dann werden Daten, darunter deine IP-Adresse, an Google übertragen, und Google kann Cookies setzen.
+            Anbieter ist Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Rechtsgrundlage ist deine Einwilligung
+            durch den Klick (Art. 6 Abs. 1 lit. a DSGVO). Du kannst sie widerrufen, indem du die Seite neu lädst.
+        </p>
+
+        <h3>YouTube</h3>
+        <p>
+            Videos von YouTube werden erst nach einem Klick auf „Video laden" eingebunden, über die datensparsame Adresse
+            youtube-nocookie.com. Anbieter ist Google Ireland Limited (Anschrift siehe oben). Mit dem Klick werden Daten, darunter deine
+            IP-Adresse, an YouTube übertragen. Rechtsgrundlage ist deine Einwilligung durch den Klick (Art. 6 Abs. 1 lit. a DSGVO).
+        </p>
+    </section>
+
+    <section>
+        <h2>Deine Rechte</h2>
+        <p>
+            Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch
+            gegen die Verarbeitung. Wende dich dazu an die oben genannte E-Mail-Adresse. Außerdem kannst du dich bei einer
+            Datenschutz-Aufsichtsbehörde beschweren, zum Beispiel beim Hamburgischen Beauftragten für Datenschutz und Informationsfreiheit.
+        </p>
+    </section>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

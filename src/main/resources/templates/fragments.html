@@ -6,10 +6,12 @@
     <meta name="color-scheme" content="light">
     <meta name="description" content="Julian Vornfeld — Film, Fotografie und visuelle Welten.">
     <title th:text="${pageTitle + ' — ' + site.title}">FotosVorJu</title>
+    <meta name="robots" content="index, follow, noai, noimageai">
+    <meta name="tdm-reservation" content="1">
+    <meta name="tdm-policy" content="/impressum#urheberrecht">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,ital@9..144,300..700,0..1&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+    <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/css/fonts.css">
     <link rel="stylesheet" href="/css/site.css">
 </head>
 <body>
@@ -38,7 +40,16 @@
 <footer class="site-footer" th:fragment="footer">
     <p th:text="${site.owner}">Julian Vornfeld</p>
     <p>Film · Fotografie · Visuelle Welten</p>
-    <a href="/admin">Admin</a>
+    <div class="footer-links" role="navigation" aria-label="Rechtliches">
+        <a href="/impressum">Impressum</a>
+        <a href="/datenschutz">Datenschutz</a>
+        <a href="/admin">Admin</a>
+    </div>
+    <p class="footer-legal">
+        © <span th:text="${#temporals.createToday().year}">2026</span> <span th:text="${site.owner}">Julian Vornfeld</span>. Alle Rechte vorbehalten.
+        Fotos, Videos und Artwork dürfen ohne schriftliche Genehmigung nicht verwendet werden, auch nicht zum Training von KI-Systemen
+        (<a href="/impressum#urheberrecht">Nutzungsvorbehalt</a>).
+    </p>
 </footer>
 </body>
 </html>

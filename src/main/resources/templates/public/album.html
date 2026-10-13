@@ -2,7 +2,6 @@
 <html lang="de" xmlns:th="http://www.thymeleaf.org" class="album-theme" th:style="${album.themeStyle}">
 <head th:replace="~{fragments :: head(${album.title})}"></head>
 <body class="album-page" th:classappend="${'album--' + album.fontKey}">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Hanken+Grotesk:wght@300;400&family=Belleza&family=Jost:wght@300;400&family=Barlow:wght@500;600&display=swap">
 <link rel="stylesheet" href="/css/alben.css">
 <header th:replace="~{fragments :: nav('alben')}"></header>
 <main class="album" th:attr="data-prev=${previous != null ? '/alben/' + previous.slug : null},data-next=${next != null ? '/alben/' + next.slug : null}">
