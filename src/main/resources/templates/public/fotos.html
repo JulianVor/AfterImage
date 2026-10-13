@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Fotos')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('fotos')}"></header>
+<main>
+    <section class="page-intro" aria-labelledby="fotos-title">
+        <p class="eyebrow">Fotografie</p>
+        <h1 id="fotos-title">Konzertfotografie</h1>
+        <p class="intro-lead">Eine Auswahl aus der Zeit von 2018 bis 2025. Ein Klick vergrößert das Foto.</p>
+    </section>
+
+    <section class="home-section" aria-label="Fotos">
+        <div class="photo-masonry">
+            <button type="button" class="photo-tile photo-tile--natural" th:each="photo : ${photos}"
+                    th:attr="data-full=${'/img/home/' + photo.file},data-alt=${photo.alt}">
+                <img th:src="@{/img/home/{file}(file=${photo.file})}" th:alt="${photo.alt}"
+                     th:attr="width=${photo.width},height=${photo.height}" loading="lazy" decoding="async">
+            </button>
+        </div>
+        <p class="page-note">Vollständige Galerien zu einzelnen Konzerten stehen bei den Einträgen im <a href="/archive">Archiv</a>.</p>
+    </section>
+
+    <dialog class="photo-lightbox" id="photo-lightbox" aria-label="Fotoansicht">
+        <button type="button" class="photo-lightbox-close" aria-label="Fotoansicht schließen">Schließen ×</button>
+        <div class="photo-lightbox-stage" aria-live="polite" aria-busy="false">
+            <div class="photo-lightbox-loading" role="status">
+                <span aria-hidden="true"></span>
+                <p>Foto wird geladen …</p>
+            </div>
+            <p class="photo-lightbox-error" hidden>Das Foto konnte nicht geladen werden.</p>
+            <img alt="" hidden>
+        </div>
+        <p class="photo-lightbox-caption"></p>
+    </dialog>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+<script type="module" src="/js/piwigo-gallery.js"></script>
+</body>
+</html>

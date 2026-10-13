@@ -135,6 +135,20 @@ public class PublicSiteController {
         return "public/show";
     }
 
+    @GetMapping("/videos")
+    String videos(Model model) {
+        List<ArchiveEntity> videos = catalog.homeVideos();
+        model.addAttribute("musicVideos", videos.stream().filter(video -> !isLiveVideo(video)).map(this::videoCard).toList());
+        model.addAttribute("liveVideos", videos.stream().filter(PublicSiteController::isLiveVideo).map(this::videoCard).toList());
+        return "public/videos";
+    }
+
+    @GetMapping("/fotos")
+    String photos(Model model) {
+        model.addAttribute("photos", HomePhotos.all());
+        return "public/fotos";
+    }
+
     private static boolean isLiveVideo(ArchiveEntity video) {
         return video.getTitle().toLowerCase(Locale.ROOT).contains("livevideo");
     }

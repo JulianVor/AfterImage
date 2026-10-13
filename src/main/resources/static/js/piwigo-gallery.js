@@ -29,7 +29,7 @@ if (lightbox) {
         pendingImage.addEventListener('load', () => {
             if (currentRequest !== requestId) return;
             image.src = pendingImage.src;
-            image.alt = title ? `Foto aus dem Album ${title}` : 'Galeriefoto';
+            image.alt = tile.dataset.alt || (title ? `Foto aus dem Album ${title}` : 'Galeriefoto');
             image.hidden = false;
             loading.hidden = true;
             stage.setAttribute('aria-busy', 'false');

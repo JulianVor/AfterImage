@@ -980,3 +980,17 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
     .home-more { display: inline-block; margin-top: .9rem; }
 }
 
+/* Fotos and Videos pages */
+.page-intro { max-width: 1280px; margin: 0 auto; padding: clamp(2.5rem, 5vw, 4.5rem) var(--gutter) clamp(1.5rem, 3vw, 2.5rem); }
+.page-intro .eyebrow { margin-bottom: .6rem; }
+.page-intro h1 { margin: 0; font: 400 clamp(1.7rem, 3vw, 2.7rem)/1.15 var(--serif); letter-spacing: -.01em; }
+.page-intro .intro-lead { margin-top: 1rem; }
+.page-note { margin: clamp(1.8rem, 4vw, 3rem) auto 0; color: var(--paper-muted); font-size: .9rem; }
+.page-note a { border-bottom: 1px solid var(--line-strong); color: var(--paper); }
+.photo-masonry { columns: 3; column-gap: clamp(.5rem, 1vw, .9rem); }
+.photo-tile--natural { display: block; width: 100%; margin: 0 0 clamp(.5rem, 1vw, .9rem); aspect-ratio: auto; border: 0; background: var(--ink-soft); break-inside: avoid; }
+.photo-tile--natural img { height: auto; }
+@media (max-width: 760px) {
+    .photo-masonry { columns: 2; }
+}
+

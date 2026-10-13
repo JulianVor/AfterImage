@@ -25,7 +25,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/login", "/css/**", "/js/**", "/img/**", "/fonts/**", "/webjars/**", "/favicon.svg", "/robots.txt", "/impressum", "/datenschutz",
                                 "/actuator/health", "/error", "/", "/show", "/work/**", "/entry/**", "/chronicle", "/explore", "/explore/**", "/api/explore/**",
                                 "/about", "/archive", "/search", "/connect", "/trails", "/trails/**",
-                                "/media/**", "/api/media/piwigo/**", "/regie/**", "/regie-media/**", "/alben", "/alben/**").permitAll()
+                                "/media/**", "/api/media/piwigo/**", "/regie/**", "/regie-media/**", "/alben", "/alben/**", "/fotos", "/videos").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().denyAll())
                 .formLogin(form -> form

@@ -29,6 +29,10 @@ final class HomePhotos {
 
     private HomePhotos() {}
 
+    static List<HomePhoto> all() {
+        return PHOTOS;
+    }
+
     static List<HomePhoto> shuffled() {
         List<HomePhoto> photos = new ArrayList<>(PHOTOS);
         Collections.shuffle(photos);

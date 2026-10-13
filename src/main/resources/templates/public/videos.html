@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Videos')}"></head>
+<body>
+<header th:replace="~{fragments :: nav('videos')}"></header>
+<main>
+    <section class="page-intro" aria-labelledby="videos-title">
+        <p class="eyebrow">Film</p>
+        <h1 id="videos-title">Videos</h1>
+        <p class="intro-lead">Musikvideos und Livevideos für Bands, seit 2019.</p>
+    </section>
+
+    <section id="musikvideos" class="home-section" aria-labelledby="musikvideos-title" th:if="${!musicVideos.isEmpty()}">
+        <header class="home-head">
+            <div><p class="eyebrow" th:text="${musicVideos.size() + ' Videos'}">13 Videos</p><h2 id="musikvideos-title">Musikvideos</h2></div>
+        </header>
+        <ul class="home-grid home-grid--three">
+            <li th:each="item : ${musicVideos}">
+                <a th:href="${item.href}">
+                    <span class="home-thumb home-thumb--video">
+                        <img th:if="${item.image != null}" th:src="@{/media/{id}(id=${item.image.id})}" th:alt="${item.image.altText ?: item.title}"
+                             th:attr="width=${item.image.width},height=${item.image.height}" loading="lazy" decoding="async">
+                    </span>
+                    <span class="home-title" th:text="${item.title}">Titel</span>
+                    <span class="home-sub"><span th:if="${item.subtitle != null}" th:text="${item.subtitle}">Band</span><span th:if="${item.subtitle != null and item.year != null}"> · </span><span th:if="${item.year != null}" th:text="${item.year}">2024</span></span>
+                </a>
+            </li>
+        </ul>
+    </section>
+
+    <section id="livevideos" class="home-section" aria-labelledby="livevideos-title" th:if="${!liveVideos.isEmpty()}">
+        <header class="home-head">
+            <div><p class="eyebrow" th:text="${liveVideos.size() + ' Videos'}">3 Videos</p><h2 id="livevideos-title">Livevideos</h2></div>
+        </header>
+        <ul class="home-grid home-grid--three">
+            <li th:each="item : ${liveVideos}">
+                <a th:href="${item.href}">
+                    <span class="home-thumb home-thumb--video">
+                        <img th:if="${item.image != null}" th:src="@{/media/{id}(id=${item.image.id})}" th:alt="${item.image.altText ?: item.title}"
+                             th:attr="width=${item.image.width},height=${item.image.height}" loading="lazy" decoding="async">
+                    </span>
+                    <span class="home-title" th:text="${item.title}">Titel</span>
+                    <span class="home-sub"><span th:if="${item.subtitle != null}" th:text="${item.subtitle}">Band</span><span th:if="${item.subtitle != null and item.year != null}"> · </span><span th:if="${item.year != null}" th:text="${item.year}">2024</span></span>
+                </a>
+            </li>
+        </ul>
+    </section>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>
