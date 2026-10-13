@@ -106,19 +106,24 @@ html.album-theme {
 .album-spine-number { font: 500 .85em var(--mono); letter-spacing: .14em; opacity: .75; }
 .album-spine-title { letter-spacing: var(--album-title-tracking, .02em); text-transform: var(--album-title-transform, none); }
 
-/* The flip lifts the sleeve toward the viewer and tips it slightly, so its thickness shows mid-turn. */
-@keyframes flip-to-back {
-    0% { transform: translateZ(0) rotateX(0) rotateY(0); }
-    50% { transform: translateZ(calc(var(--depth) * 2.6)) rotateX(-8deg) rotateY(90deg); }
-    100% { transform: translateZ(0) rotateX(0) rotateY(180deg); }
+/* The turn runs in one go on a single easing curve (fastest at the spine, no stall). The lift toward the viewer is
+   a separate, gentle bump that runs in parallel through the individual translate/rotate properties, so the thickness
+   shows mid-turn without the motion ever pausing. */
+@keyframes flip-turn-back { from { transform: rotateY(0deg); } to { transform: rotateY(180deg); } }
+@keyframes flip-turn-front { from { transform: rotateY(180deg); } to { transform: rotateY(0deg); } }
+@keyframes flip-lift {
+    0% { translate: 0 0 0; rotate: 1 0 0 0deg; }
+    50% { translate: 0 0 calc(var(--depth) * 2.2); rotate: 1 0 0 -6deg; }
+    100% { translate: 0 0 0; rotate: 1 0 0 0deg; }
 }
-@keyframes flip-to-front {
-    0% { transform: translateZ(0) rotateX(0) rotateY(180deg); }
-    50% { transform: translateZ(calc(var(--depth) * 2.6)) rotateX(-8deg) rotateY(90deg); }
-    100% { transform: translateZ(0) rotateX(0) rotateY(0); }
-}
-.album-sleeve.flip-to-back .album-sleeve-inner { animation: flip-to-back 1.05s cubic-bezier(.45, .05, .25, 1) forwards; }
-.album-sleeve.flip-to-front .album-sleeve-inner { animation: flip-to-front 1.05s cubic-bezier(.45, .05, .25, 1) forwards; }
+.album-sleeve.flip-to-back .album-sleeve-inner { animation: flip-turn-back .95s cubic-bezier(.5, .05, .25, 1) forwards, flip-lift .95s cubic-bezier(.37, 0, .63, 1) forwards; }
+.album-sleeve.flip-to-front .album-sleeve-inner { animation: flip-turn-front .95s cubic-bezier(.5, .05, .25, 1) forwards, flip-lift .95s cubic-bezier(.37, 0, .63, 1) forwards; }
 @media (prefers-reduced-motion: reduce) {
     .album-sleeve.flip-to-back .album-sleeve-inner, .album-sleeve.flip-to-front .album-sleeve-inner { animation: none; }
 }
+
+/* Optional spine artwork (fa-00X-spine.webp, 64 x 1400 px = 4.4 % of the cover width). Thickness follows the
+   artwork's proportions exactly so the image is never stretched; without artwork the CSS spine stays. */
+.album-sleeve.has-spine-image { --depth: 4.4cqw; }
+.album-edge--spine.has-image { padding: 0; background-size: 100% 100%; background-position: center; background-repeat: no-repeat; }
+.album-edge--spine.has-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0) 22%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, .14)); }

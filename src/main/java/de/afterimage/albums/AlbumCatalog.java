@@ -2,6 +2,7 @@ package de.afterimage.albums;
 
 import de.afterimage.albums.Album.Theme;
 import de.afterimage.albums.Album.Track;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public class AlbumCatalog {
 
     private final List<Album> albums = List.of(
             new Album("the-shape-of-absence", "FA-001", "The Shape of Absence", 2026, "cormorant",
-                    new Theme("#131a17", "#e8e0d2", "#c75b43", "#d6cdbf", "#3a3027"),
+                    new Theme("#131a17", "#e8e0d2", "#c75b43", "#e7dfc9", "#3a3027"),
                     List.of(
                             part(1, "Salt on the Gilded Frame", "I — The World That Was"),
                             part(2, "The House Mistook Itself for Forever", "I — The World That Was"),
@@ -83,6 +84,12 @@ public class AlbumCatalog {
 
     public Album find(String slug) {
         return albums.stream().filter(album -> album.slug().equals(slug)).findFirst().orElse(null);
+    }
+
+    /** URL of the optional spine artwork (fa-00X-spine.webp, 64 x 1400 px), or null to fall back to the CSS spine. */
+    public String spineUrl(Album album) {
+        String file = album.number().toLowerCase() + "-spine.webp";
+        return new ClassPathResource("static/img/alben/" + file).exists() ? "/img/alben/" + file : null;
     }
 
     public Album previous(Album album) {

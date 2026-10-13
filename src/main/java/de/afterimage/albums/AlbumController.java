@@ -29,6 +29,7 @@ public class AlbumController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         model.addAttribute("album", album);
+        model.addAttribute("spineUrl", catalog.spineUrl(album));
         model.addAttribute("previous", catalog.previous(album));
         model.addAttribute("next", catalog.next(album));
         return "public/album";
