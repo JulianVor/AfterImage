@@ -127,3 +127,7 @@ html.album-theme {
 .album-sleeve.has-spine-image { --depth: 4.4cqw; }
 .album-edge--spine.has-image { padding: 0; background-size: 100% 100%; background-position: center; background-repeat: no-repeat; }
 .album-edge--spine.has-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0, 0, 0, .2), rgba(0, 0, 0, 0) 22%, rgba(0, 0, 0, 0) 78%, rgba(0, 0, 0, .14)); }
+
+.album-motion-toggle { padding: .4rem .2rem; border: 0; border-bottom: 1px solid var(--line-strong); background: none; color: var(--paper-muted); font: 500 .62rem var(--mono); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+.album-motion-toggle:not([hidden]) { display: inline-block; }
+.album-motion-toggle:hover, .album-motion-toggle:focus-visible, .album-motion-toggle[aria-pressed="true"] { color: var(--ember); border-bottom-color: var(--ember); }
