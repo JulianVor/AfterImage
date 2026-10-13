@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments :: head('ENTDECKEN')}"></head>
+<head th:replace="~{fragments :: head('Netzwerk')}"></head>
 <body class="explore-page">
 <header th:replace="~{fragments :: nav('explore')}"></header>
 <main class="connections" th:attr="data-focus=${graph.focus}">
     <header class="connections-heading">
         <div>
-            <p class="eyebrow">Entdecken</p>
-            <h1>Verbindungen</h1>
-            <p>Werke, Menschen und Orte sind über direkte, dokumentierte Beziehungen verknüpft – <em>eine Verbindung nach der anderen.</em></p>
+            <p class="eyebrow">Archiv</p>
+            <h1>Netzwerk</h1>
+            <p>Werke, Menschen und Orte, verknüpft über dokumentierte Beziehungen – <em>eine Verbindung nach der anderen.</em></p>
         </div>
         <div class="connections-intro-meta" aria-label="So funktioniert diese Ansicht">
             <span>Ein Fokus</span>

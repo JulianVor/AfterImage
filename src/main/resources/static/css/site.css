@@ -420,7 +420,7 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
 .connections { min-height: calc(100vh - 5rem); height: calc(100vh - 5rem); display: grid; grid-template-rows: auto minmax(0, 1fr); }
 .connections-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 3rem; padding: 1.8rem var(--gutter) 1.4rem; }
 .connections-heading .eyebrow { margin-bottom: .8rem; }
-.connections-heading h1 { margin: 0; font: 400 clamp(3rem, 5vw, 5.2rem)/.86 var(--serif); letter-spacing: -.025em; }
+.connections-heading h1 { margin: 0; font: 400 clamp(1.7rem, 3vw, 2.7rem)/1.15 var(--serif); letter-spacing: -.01em; }
 .connections-heading > div:first-child > p:last-child { margin: .9rem 0 0; color: var(--paper-muted); font-size: .82rem; }
 .connections-heading em { color: var(--ember); }
 .connections-intro-meta { display: flex; gap: 1.4rem; padding-bottom: .3rem; color: var(--paper-muted); font: .56rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
@@ -524,13 +524,13 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
 .map-empty > p:last-child { color: var(--paper-muted); }
 
 /* Connection finder */
-.connect-page, .trails-page { min-height: 80vh; padding: clamp(5rem, 10vw, 10rem) var(--gutter); }
-.connect-heading, .trails-heading { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, .65fr); align-items: end; gap: 6vw; }
+.connect-page, .trails-page { max-width: 1280px; margin: 0 auto; min-height: 80vh; padding: clamp(2.5rem, 5vw, 4.5rem) var(--gutter) clamp(4rem, 8vw, 7rem); }
+.connect-heading, .trails-heading { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
 .connect-heading .eyebrow, .trails-heading .eyebrow { grid-column: 1 / -1; }
-.connect-heading h1, .trails-heading h1 { margin: 0; font: 400 clamp(4.3rem, 9vw, 9rem)/.82 var(--serif); letter-spacing: -.04em; }
+.connect-heading h1, .trails-heading h1 { margin: 0; font: 400 clamp(1.7rem, 3vw, 2.7rem)/1.15 var(--serif); letter-spacing: -.01em; }
 .connect-heading h1 em, .trails-heading h1 em { color: var(--ember); font-style: italic; font-weight: 400; }
-.connect-heading > p:last-child, .trails-heading > p:last-child { margin: 0 0 .6rem; color: var(--paper-muted); }
-.connection-form { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto; align-items: end; gap: 1.2rem; margin: clamp(4rem, 8vw, 8rem) 0 0; padding: 1.5rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.connect-heading > p:last-child, .trails-heading > p:last-child { margin: 1rem 0 0; max-width: 38rem; color: var(--paper-muted); }
+.connection-form { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto; align-items: end; gap: 1.2rem; margin: clamp(2rem, 4vw, 3rem) 0 0; padding: 1.5rem 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .connection-form label { display: grid; gap: .6rem; color: var(--paper-muted); font: .58rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .connection-form select { width: 100%; padding: 1rem 2.5rem 1rem 0; border: 0; border-bottom: 1px solid rgba(26,21,16,.3); border-radius: 0; background: var(--ink); color: var(--paper); font: 400 clamp(1.2rem, 2vw, 1.8rem) var(--serif); }
 .connection-form-mark { padding-bottom: 1rem; color: var(--ember); font-size: 1.4rem; }
@@ -554,8 +554,8 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
 .path-relation { min-height: 7rem; display: grid; place-items: center; align-content: center; gap: .4rem; color: var(--ember-bright); }
 .path-relation::before, .path-relation::after { width: 1px; height: 1.2rem; background: var(--line); content: ""; }
 .path-relation em { color: var(--paper-muted); font: normal .58rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
-.connection-state { margin-top: 5rem; padding: 3rem; border: 1px solid var(--line); }
-.connection-state h2 { margin: 0; font: 400 clamp(2.4rem, 5vw, 5rem)/.95 var(--serif); }
+.connection-state { margin-top: clamp(2rem, 4vw, 3rem); padding: clamp(1.4rem, 3vw, 2.2rem); border: 1px solid var(--line); }
+.connection-state h2 { margin: 0; font: 400 clamp(1.5rem, 2.6vw, 2.2rem)/1.15 var(--serif); }
 .connection-state > p:last-child { max-width: 42rem; color: var(--paper-muted); }
 
 /* Curated trails */
@@ -779,7 +779,6 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
     .about-stations li { grid-template-columns: 1fr; gap: .3rem; }
     .explore-page { padding-bottom: 4rem; }
     .connections-heading { padding-top: 2.6rem; }
-    .connections-heading h1 { font-size: clamp(3.2rem, 16vw, 5rem); }
     .connections-intro-meta { display: none; }
     .network-stage { min-height: 480px; }
     .places-map-workspace { min-height: 480px; }
@@ -789,8 +788,8 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
     .thread-relations ol { columns: 1; }
     .thread-focus h2 { font-size: 2.8rem; }
     .thread-card strong { font-size: 1.55rem; }
-    .connect-page, .trails-page { padding-top: 4rem; }
-    .connect-heading, .trails-heading { grid-template-columns: 1fr; gap: 2rem; }
+    .connect-page, .trails-page { padding-top: 2.2rem; }
+    .connect-heading, .trails-heading { grid-template-columns: 1fr; }
     .connection-form { grid-template-columns: 1fr; }
     .connection-form-mark { display: none; }
     .trail-index a { grid-template-columns: 2.5rem 1fr auto; gap: 1rem; }
