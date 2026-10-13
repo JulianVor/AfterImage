@@ -26,9 +26,7 @@ if (main) {
         const clamp = value => Math.min(1, Math.max(0, value));
         let pending = null;
 
-        const apply = () => {
-            const { x, y } = pending;
-            pending = null;
+        const apply = (x, y) => {
             const rect = sleeve.getBoundingClientRect();
             const px = clamp((x - rect.left) / rect.width);
             const py = clamp((y - rect.top) / rect.height);
@@ -42,17 +40,29 @@ if (main) {
             style.setProperty('--shadow-y', (30 - (py - 0.5) * 20).toFixed(1) + 'px');
         };
 
+        // The glare position stays where it was so it fades out in place instead of snapping to the centre.
         const reset = () => {
-            ['--tilt-x', '--tilt-y', '--glare-x', '--glare-y', '--shadow-x', '--shadow-y']
+            ['--tilt-x', '--tilt-y', '--shadow-x', '--shadow-y']
                 .forEach(name => sleeve.style.removeProperty(name));
         };
 
-        sleeve.addEventListener('pointerenter', () => sleeve.classList.add('is-tracking'));
+        sleeve.addEventListener('pointerenter', event => {
+            if (event.pointerType !== 'mouse') return;
+            apply(event.clientX, event.clientY);
+            sleeve.classList.add('is-tracking');
+        });
         sleeve.addEventListener('pointermove', event => {
             if (event.pointerType !== 'mouse') return;
             const schedule = pending === null;
             pending = { x: event.clientX, y: event.clientY };
-            if (schedule) requestAnimationFrame(apply);
+            if (schedule) {
+                requestAnimationFrame(() => {
+                    if (pending === null) return;
+                    const { x, y } = pending;
+                    pending = null;
+                    apply(x, y);
+                });
+            }
         });
         sleeve.addEventListener('pointerleave', () => {
             pending = null;
