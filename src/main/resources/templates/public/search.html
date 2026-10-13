@@ -3,21 +3,34 @@
 <head th:replace="~{fragments :: head('SUCHE')}"></head>
 <body>
 <header th:replace="~{fragments :: nav('search')}"></header>
-<main class="archive-page search-page">
-    <header><p class="eyebrow">Eine Spur finden</p><h1>Suche</h1></header>
-    <form action="/search" method="get" class="search-form" role="search">
-        <label for="q">Projekte, Bands, Menschen, Orte oder Jahre</label>
-        <div><input id="q" name="q" type="search" th:value="${query}" autofocus><button>Suchen</button></div>
-    </form>
-    <ol class="archive-index" th:if="${!query.isBlank()}">
-        <li th:each="entry : ${entries.content}">
-            <span th:text="${entry.year ?: '—'}">2024</span>
-            <a th:if="${entry.entityType.name() == 'PROJECT' || entry.entityType.name() == 'BAND'}" th:href="@{/entry/{slug}(slug=${entry.slug})}"
-               th:text="${entry.title}">Titel</a>
-            <span th:unless="${entry.entityType.name() == 'PROJECT' || entry.entityType.name() == 'BAND'}" th:text="${entry.title}">Titel</span>
-            <small th:text="${labels.of(entry.entityType)}">Typ</small>
-        </li>
-    </ol>
+<main>
+    <section class="page-intro" aria-labelledby="search-title">
+        <p class="eyebrow">Archiv</p>
+        <h1 id="search-title">Suche</h1>
+        <form action="/search" method="get" class="search-form" role="search">
+            <label for="q">Projekte, Bands, Menschen, Orte oder Jahre</label>
+            <div><input id="q" name="q" type="search" th:value="${query}" autofocus><button>Suchen</button></div>
+        </form>
+    </section>
+
+    <section class="list-section" aria-label="Treffer" th:if="${!query.isBlank()}">
+        <p class="list-count" th:text="${entries.totalElements == 1 ? '1 Treffer' : entries.totalElements + ' Treffer'}">0 Treffer</p>
+        <ol class="archive-index" th:if="${!entries.content.isEmpty()}">
+            <li th:each="entry : ${entries.content}">
+                <a th:href="@{/entry/{slug}(slug=${entry.slug})}" th:text="${entry.displayTitle ?: entry.title}">Titel</a>
+                <small><span th:text="${labels.of(entry.entityType)}">Typ</span><span th:if="${entry.year != null}" th:text="${' · ' + entry.year}"> · 2024</span></small>
+            </li>
+        </ol>
+        <p class="page-note" th:if="${entries.content.isEmpty()}">Dazu gibt es keinen veröffentlichten Eintrag. Versuche es mit einem Bandnamen, einem Ort oder einem Jahr.</p>
+
+        <nav class="pager" aria-label="Seiten" th:if="${entries.totalPages > 1}">
+            <a th:if="${entries.hasPrevious()}" th:href="@{/search(q=${query},page=${entries.number - 1})}" rel="prev">← Zurück</a>
+            <span th:unless="${entries.hasPrevious()}"></span>
+            <p th:text="${'Seite ' + (entries.number + 1) + ' von ' + entries.totalPages}">Seite 1 von 5</p>
+            <a th:if="${entries.hasNext()}" th:href="@{/search(q=${query},page=${entries.number + 1})}" rel="next">Weiter →</a>
+            <span th:unless="${entries.hasNext()}"></span>
+        </nav>
+    </section>
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
 </body>

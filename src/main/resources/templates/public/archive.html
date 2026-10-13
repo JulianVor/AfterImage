@@ -3,21 +3,30 @@
 <head th:replace="~{fragments :: head('ARCHIV')}"></head>
 <body>
 <header th:replace="~{fragments :: nav('archive')}"></header>
-<main class="archive-page">
-    <header>
-        <p class="eyebrow">Öffentlicher Index</p>
-        <h1>Archiv</h1>
-        <p>Hier erscheinen nur veröffentlichte Ausschnitte. Die vollständigen Produktionsgeschichten bleiben im Wiki.</p>
-    </header>
-    <ol class="archive-index">
-        <li th:each="entry : ${entries.content}">
-            <span th:text="${entry.year ?: '—'}">2024</span>
-            <a th:if="${entry.entityType.name() == 'PROJECT' || entry.entityType.name() == 'BAND'}" th:href="@{/entry/{slug}(slug=${entry.slug})}"
-               th:text="${entry.displayTitle ?: entry.title}">Titel</a>
-            <span th:unless="${entry.entityType.name() == 'PROJECT' || entry.entityType.name() == 'BAND'}" th:text="${entry.displayTitle ?: entry.title}">Titel</span>
-            <small th:text="${labels.of(entry.entityType)}">Typ</small>
-        </li>
-    </ol>
+<main>
+    <section class="page-intro" aria-labelledby="archive-title">
+        <p class="eyebrow">Archiv</p>
+        <h1 id="archive-title">Alle Einträge</h1>
+        <p class="intro-lead"><span th:text="${entries.totalElements}">0</span> veröffentlichte Einträge, alphabetisch. Die vollständigen Produktionsgeschichten bleiben im Wiki.</p>
+    </section>
+
+    <section class="list-section" aria-label="Einträge">
+        <ol class="archive-index" th:if="${!entries.content.isEmpty()}">
+            <li th:each="entry : ${entries.content}">
+                <a th:href="@{/entry/{slug}(slug=${entry.slug})}" th:text="${entry.displayTitle ?: entry.title}">Titel</a>
+                <small><span th:text="${labels.of(entry.entityType)}">Typ</span><span th:if="${entry.year != null}" th:text="${' · ' + entry.year}"> · 2024</span></small>
+            </li>
+        </ol>
+        <p class="page-note" th:if="${entries.content.isEmpty()}">Noch keine veröffentlichten Einträge.</p>
+
+        <nav class="pager" aria-label="Seiten" th:if="${entries.totalPages > 1}">
+            <a th:if="${entries.hasPrevious()}" th:href="@{/archive(page=${entries.number - 1})}" rel="prev">← Zurück</a>
+            <span th:unless="${entries.hasPrevious()}"></span>
+            <p th:text="${'Seite ' + (entries.number + 1) + ' von ' + entries.totalPages}">Seite 1 von 5</p>
+            <a th:if="${entries.hasNext()}" th:href="@{/archive(page=${entries.number + 1})}" rel="next">Weiter →</a>
+            <span th:unless="${entries.hasNext()}"></span>
+        </nav>
+    </section>
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
 </body>
