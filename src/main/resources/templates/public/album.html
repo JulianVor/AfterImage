@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org" class="album-theme" th:style="${album.themeStyle}">
+<head th:replace="~{fragments :: head(${album.title})}"></head>
+<body class="album-page" th:classappend="${'album--' + album.fontKey}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Hanken+Grotesk:wght@300;400&family=Belleza&family=Jost:wght@300;400&family=Barlow:wght@500;600&display=swap">
+<link rel="stylesheet" href="/css/alben.css">
+<header th:replace="~{fragments :: nav('alben')}"></header>
+<main class="album" th:attr="data-prev=${previous != null ? '/alben/' + previous.slug : null},data-next=${next != null ? '/alben/' + next.slug : null}">
+    <div class="album-stage">
+        <button type="button" class="album-sleeve" aria-pressed="false"
+                th:aria-label="${'Cover von ' + album.title + ' wenden'}">
+            <span class="album-sleeve-inner">
+                <img class="album-face album-face--front" th:src="${album.frontUrl}" width="1400" height="1400"
+                     th:alt="${'Cover von ' + album.title}">
+                <img class="album-face album-face--back" th:src="${album.backUrl}" width="1400" height="1400"
+                     th:alt="${'Rückseite von ' + album.title}">
+            </span>
+        </button>
+        <p class="album-flip-hint"><span aria-hidden="true">↻</span> Cover wenden</p>
+    </div>
+
+    <section class="album-info" aria-labelledby="album-title">
+        <p class="eyebrow" th:text="${album.number + ' · ' + album.year}">FA-001 · 2026</p>
+        <h1 id="album-title" class="album-title" th:text="${album.title}">Titel</h1>
+        <ol class="album-tracks">
+            <th:block th:each="track, stat : ${album.tracks}">
+                <li class="album-part"
+                    th:if="${track.part != null and (stat.first or track.part != album.tracks[stat.index - 1].part)}"
+                    th:text="${track.part}">I — Teil</li>
+                <li>
+                    <span class="album-track-number" th:text="${#numbers.formatInteger(track.number, 2)}">01</span>
+                    <span class="album-track-title" th:text="${track.title}">Titel</span>
+                    <span class="album-track-duration" th:if="${track.duration != null}" th:text="${track.duration}">0:00</span>
+                </li>
+            </th:block>
+        </ol>
+        <p class="album-summary">
+            <span th:text="${album.trackCount()}">10 Titel</span><span th:if="${album.runtime() != null}"> · <span th:text="${album.runtime()}">0:00</span></span>
+        </p>
+        <p class="album-credit">Artwork by Julian Vornfeld</p>
+    </section>
+
+    <nav class="album-pager" aria-label="Weitere Alben">
+        <a class="album-pager-prev" th:if="${previous != null}" th:href="@{/alben/{slug}(slug=${previous.slug})}">
+            <span aria-hidden="true">←</span>
+            <span class="album-pager-number" th:text="${previous.number}">FA-000</span>
+            <span th:text="${previous.title}">Vorheriges</span>
+        </a>
+        <a class="album-pager-all" href="/alben">Alle Alben</a>
+        <a class="album-pager-next" th:if="${next != null}" th:href="@{/alben/{slug}(slug=${next.slug})}">
+            <span th:text="${next.title}">Nächstes</span>
+            <span class="album-pager-number" th:text="${next.number}">FA-002</span>
+            <span aria-hidden="true">→</span>
+        </a>
+    </nav>
+</main>
+<footer th:replace="~{fragments :: footer}"></footer>
+<script type="module" src="/js/album.js"></script>
+</body>
+</html>

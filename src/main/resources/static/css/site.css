@@ -903,3 +903,8 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
     .project-places > header > p, .project-events > header > p { margin-top: .8rem; }
     .event-list li { grid-template-columns: 1fr; gap: .2rem; }
 }
+
+@media (max-width: 760px) {
+    .site-header nav { gap: .2rem; padding-left: .3rem; padding-right: .3rem; }
+    .site-header nav a, .nav-toggle { font-size: clamp(.68rem, 3.4vw, .82rem); }
+}
