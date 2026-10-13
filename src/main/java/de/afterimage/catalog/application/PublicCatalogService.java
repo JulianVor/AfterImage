@@ -202,9 +202,11 @@ public class PublicCatalogService {
         return contentSections.findByEntityOrderByOrdinalAsc(entity);
     }
 
-    public Page<ArchiveEntity> archive(int page) {
-        return entities.findByVisibility(Visibility.PUBLIC,
-                PageRequest.of(Math.max(0, page), 60, org.springframework.data.domain.Sort.by("title")));
+    public Page<ArchiveEntity> archive(int page, EntityType type) {
+        PageRequest request = PageRequest.of(Math.max(0, page), 60, org.springframework.data.domain.Sort.by("title"));
+        return type == null
+                ? entities.findByVisibility(Visibility.PUBLIC, request)
+                : entities.findByVisibilityAndEntityType(Visibility.PUBLIC, type, request);
     }
 
     public Page<ArchiveEntity> search(String query, int page) {

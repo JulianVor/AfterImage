@@ -36,6 +36,8 @@ public interface ArchiveEntityRepository extends JpaRepository<ArchiveEntity, UU
 
     Page<ArchiveEntity> findByVisibility(Visibility visibility, Pageable pageable);
 
+    Page<ArchiveEntity> findByVisibilityAndEntityType(Visibility visibility, EntityType entityType, Pageable pageable);
+
     List<ArchiveEntity> findByVisibilityOrderBySortOrderAscTitleAsc(Visibility visibility);
 
     List<ArchiveEntity> findAllByOrderByTitleAsc();

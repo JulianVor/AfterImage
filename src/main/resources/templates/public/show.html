@@ -77,6 +77,7 @@
     <section id="bands" class="home-section" aria-labelledby="bands-title" th:if="${!workBands.isEmpty()}">
         <header class="home-head">
             <div><p class="eyebrow">Porträts</p><h2 id="bands-title">Fotoshootings mit Bands</h2></div>
+            <a class="home-more" href="/archive?type=band" th:text="${'Alle ' + stats.bands + ' ansehen'}">Alle ansehen</a>
         </header>
         <ul class="home-grid home-grid--three">
             <li th:each="item : ${workBands}">
@@ -87,13 +88,6 @@
                     </span>
                     <span class="home-title" th:text="${item.title}">Band</span>
                     <span class="home-sub" th:text="${item.subtitle}">12 Arbeiten</span>
-                </a>
-            </li>
-            <li>
-                <a href="/explore">
-                    <span class="home-thumb home-thumb--band home-thumb--more"><span class="home-thumb-plate">Weitere Bands →</span></span>
-                    <span class="home-title">Alle Bands im Netzwerk</span>
-                    <span class="home-sub" th:text="${stats.bands + ' Bands im Archiv'}">0 Bands im Archiv</span>
                 </a>
             </li>
         </ul>

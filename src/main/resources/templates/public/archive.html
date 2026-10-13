@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments :: head('Alle Einträge')}"></head>
+<head th:replace="~{fragments :: head(${bandsOnly ? 'Bands' : 'Alle Einträge'})}"></head>
 <body>
 <header th:replace="~{fragments :: nav('archive')}"></header>
 <main>
     <section class="page-intro" aria-labelledby="archive-title">
         <p class="eyebrow">Archiv</p>
-        <h1 id="archive-title">Alle Einträge</h1>
-        <p class="intro-lead"><span th:text="${entries.totalElements}">0</span> veröffentlichte Einträge, alphabetisch. Die vollständigen Produktionsgeschichten bleiben im Wiki.</p>
+        <h1 id="archive-title" th:text="${bandsOnly ? 'Bands' : 'Alle Einträge'}">Alle Einträge</h1>
+        <p class="intro-lead" th:if="${bandsOnly}"><span th:text="${entries.totalElements}">0</span> Bands im Archiv, alphabetisch. <a href="/archive">Alle Einträge ansehen</a></p>
+        <p class="intro-lead" th:unless="${bandsOnly}"><span th:text="${entries.totalElements}">0</span> veröffentlichte Einträge, alphabetisch. Die vollständigen Produktionsgeschichten bleiben im Wiki.</p>
     </section>
 
     <section class="list-section" aria-label="Einträge">
@@ -20,10 +21,10 @@
         <p class="page-note" th:if="${entries.content.isEmpty()}">Noch keine veröffentlichten Einträge.</p>
 
         <nav class="pager" aria-label="Seiten" th:if="${entries.totalPages > 1}">
-            <a th:if="${entries.hasPrevious()}" th:href="@{/archive(page=${entries.number - 1})}" rel="prev">← Zurück</a>
+            <a th:if="${entries.hasPrevious()}" th:href="@{/archive(page=${entries.number - 1},type=${bandsOnly ? 'band' : null})}" rel="prev">← Zurück</a>
             <span th:unless="${entries.hasPrevious()}"></span>
             <p th:text="${'Seite ' + (entries.number + 1) + ' von ' + entries.totalPages}">Seite 1 von 5</p>
-            <a th:if="${entries.hasNext()}" th:href="@{/archive(page=${entries.number + 1})}" rel="next">Weiter →</a>
+            <a th:if="${entries.hasNext()}" th:href="@{/archive(page=${entries.number + 1},type=${bandsOnly ? 'band' : null})}" rel="next">Weiter →</a>
             <span th:unless="${entries.hasNext()}"></span>
         </nav>
     </section>

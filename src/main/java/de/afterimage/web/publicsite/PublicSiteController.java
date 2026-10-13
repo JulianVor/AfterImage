@@ -53,7 +53,7 @@ public class PublicSiteController {
     private static final int MIN_CONNECTIONS_FOR_DIAGRAM = 2;
     private static final int HOME_MUSIC_VIDEOS = 6;
     private static final int HOME_LIVE_VIDEOS = 3;
-    private static final int HOME_BANDS = 5;
+    private static final int HOME_BANDS = 6;
     private static final Pattern VIDEO_TITLE_SUFFIX = Pattern.compile(
             "\\s*\\([^)]*(?:Musik|Live)video\\)\\s*$", Pattern.CASE_INSENSITIVE);
     private static final Pattern TRAILING_ISO_DATE = Pattern.compile("\\s*[–-]\\s*\\d{4}-\\d{2}-\\d{2}$");
@@ -637,8 +637,10 @@ public class PublicSiteController {
     }
 
     @GetMapping("/archive")
-    String archive(@RequestParam(defaultValue = "0") int page, Model model) {
-        model.addAttribute("entries", catalog.archive(page));
+    String archive(@RequestParam(defaultValue = "0") int page, @RequestParam(required = false) String type, Model model) {
+        boolean bands = "band".equalsIgnoreCase(type);
+        model.addAttribute("entries", catalog.archive(page, bands ? EntityType.BAND : null));
+        model.addAttribute("bandsOnly", bands);
         return "public/archive";
     }
 
