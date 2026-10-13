@@ -2,7 +2,7 @@
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('SUCHE')}"></head>
 <body>
-<header th:replace="~{fragments :: nav('')}"></header>
+<header th:replace="~{fragments :: nav('search')}"></header>
 <main class="archive-page search-page">
     <header><p class="eyebrow">Eine Spur finden</p><h1>Suche</h1></header>
     <form action="/search" method="get" class="search-form" role="search">

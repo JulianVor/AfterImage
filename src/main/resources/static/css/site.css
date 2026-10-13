@@ -994,3 +994,12 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
     .photo-masonry { columns: 2; }
 }
 
+/* The archive menu is the last item; on the phone it opens upward and must stay inside the screen. */
+@media (max-width: 760px) {
+    .nav-item--has-submenu .nav-submenu { left: auto; right: 0; transform: none; }
+}
+.site-header .nav-submenu a.is-active::after { display: none; }
+
+/* Keep Leaflet's internal layers (z-index up to 1000) from painting over the sticky header and its menus. */
+.leaflet-container { isolation: isolate; z-index: 0; }
+

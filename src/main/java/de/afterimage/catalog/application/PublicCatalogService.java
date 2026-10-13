@@ -220,6 +220,15 @@ public class PublicCatalogService {
                 return selected;
             }
         }
+        // Without a (valid) request the network starts with the site owner at the centre.
+        String ownerSlug = configuration.site().ownerSlug();
+        if (ownerSlug != null && !ownerSlug.isBlank()) {
+            Optional<ArchiveEntity> owner = entities.findBySlugAndVisibility(ownerSlug, Visibility.PUBLIC)
+                    .filter(ArchiveEntity::isPubliclyVisible);
+            if (owner.isPresent()) {
+                return owner;
+            }
+        }
         List<ArchiveEntity> publicBands = entities.findByVisibilityOrderBySortOrderAscTitleAsc(Visibility.PUBLIC)
                 .stream()
                 .filter(ArchiveEntity::isPubliclyVisible)
