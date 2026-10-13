@@ -7,7 +7,7 @@ public record Album(String slug, String number, String title, int year, String f
 
     public record Track(int number, String title, String duration, String part) {}
 
-    public record Theme(String background, String ink, String accent) {}
+    public record Theme(String background, String ink, String accent, String edge, String spineInk) {}
 
     public String frontUrl() { return "/img/alben/" + number.toLowerCase() + "-front.webp"; }
 
@@ -18,7 +18,8 @@ public record Album(String slug, String number, String title, int year, String f
     public String backThumbUrl() { return "/img/alben/" + number.toLowerCase() + "-back-s.webp"; }
 
     public String themeStyle() {
-        return "--album-bg:" + theme.background() + ";--album-ink:" + theme.ink() + ";--album-accent:" + theme.accent();
+        return "--album-bg:" + theme.background() + ";--album-ink:" + theme.ink() + ";--album-accent:" + theme.accent()
+                + ";--album-edge:" + theme.edge() + ";--album-spine-ink:" + theme.spineInk();
     }
 
     public String trackCount() {

@@ -18,6 +18,13 @@
                         <img th:src="${album.backUrl}" width="1400" height="1400" th:alt="${'Rückseite von ' + album.title}">
                         <span class="album-glare" aria-hidden="true"></span>
                     </span>
+                    <span class="album-edge album-edge--spine" aria-hidden="true">
+                        <span class="album-spine-number" th:text="${album.number}">FA-001</span>
+                        <span class="album-spine-title" th:text="${album.title}">Titel</span>
+                    </span>
+                    <span class="album-edge album-edge--right" aria-hidden="true"></span>
+                    <span class="album-edge album-edge--top" aria-hidden="true"></span>
+                    <span class="album-edge album-edge--bottom" aria-hidden="true"></span>
                 </span>
             </span>
         </button>

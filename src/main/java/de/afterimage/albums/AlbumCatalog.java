@@ -12,7 +12,7 @@ public class AlbumCatalog {
 
     private final List<Album> albums = List.of(
             new Album("the-shape-of-absence", "FA-001", "The Shape of Absence", 2026, "cormorant",
-                    new Theme("#131a17", "#e8e0d2", "#c75b43"),
+                    new Theme("#131a17", "#e8e0d2", "#c75b43", "#d6cdbf", "#3a3027"),
                     List.of(
                             part(1, "Salt on the Gilded Frame", "I — The World That Was"),
                             part(2, "The House Mistook Itself for Forever", "I — The World That Was"),
@@ -25,7 +25,7 @@ public class AlbumCatalog {
                             part(9, "The Roots Have No Allegiance", "III — What Remains"),
                             part(10, "The Last Thing to Disappear", "III — What Remains"))),
             new Album("the-things-we-cannot-see", "FA-002", "the things we cannot see", 2026, "hanken",
-                    new Theme("#0a0c0b", "#cdd3cc", "#8fb09a"),
+                    new Theme("#0a0c0b", "#cdd3cc", "#8fb09a", "#0d0f0e", "#aeb7ae"),
                     untimed(
                             "landing",
                             "thirteen steps, one missing",
@@ -38,7 +38,7 @@ public class AlbumCatalog {
                             "a window holding the whole forest",
                             "keep walking toward the bright part")),
             new Album("wayside", "FA-003", "Wayside", 2026, "belleza",
-                    new Theme("#1f2522", "#e6e9e2", "#9db7c4"),
+                    new Theme("#1f2522", "#e6e9e2", "#9db7c4", "#8c8982", "#22251f"),
                     timed(
                             "Three Steps", "2:48",
                             "Moss on the North Side", "5:12",
@@ -49,7 +49,7 @@ public class AlbumCatalog {
                             "Low Cloud", "4:44",
                             "Path Down", "7:30")),
             new Album("tracery", "FA-004", "Tracery", 2026, "jost",
-                    new Theme("#ebe8df", "#2a2a28", "#77756c"),
+                    new Theme("#ebe8df", "#2a2a28", "#77756c", "#ebe8de", "#2a2a28"),
                     untimed(
                             "Clerestory",
                             "Corbel",
@@ -60,7 +60,7 @@ public class AlbumCatalog {
                             "Open to Weather",
                             "Mullion")),
             new Album("menschen-unerwuenscht", "FA-005", "Menschen unerwünscht", 2026, "barlow",
-                    new Theme("#2a2622", "#efe8d6", "#c0612f"),
+                    new Theme("#2a2622", "#efe8d6", "#c0612f", "#a99a7e", "#2b241a"),
                     untimed(
                             "Sie sind ja selbst schuld",
                             "Hausordnung",

@@ -6,6 +6,10 @@ if (main) {
     sleeve.addEventListener('click', () => {
         const flipped = sleeve.classList.toggle('is-flipped');
         sleeve.setAttribute('aria-pressed', String(flipped));
+        // Restart the lift-and-turn animation for the new direction.
+        sleeve.classList.remove('flip-to-back', 'flip-to-front');
+        void sleeve.offsetWidth;
+        sleeve.classList.add(flipped ? 'flip-to-back' : 'flip-to-front');
     });
 
     document.addEventListener('keydown', event => {
