@@ -9,11 +9,17 @@
     <div class="album-stage">
         <button type="button" class="album-sleeve" aria-pressed="false"
                 th:aria-label="${'Cover von ' + album.title + ' wenden'}">
-            <span class="album-sleeve-inner">
-                <img class="album-face album-face--front" th:src="${album.frontUrl}" width="1400" height="1400"
-                     th:alt="${'Cover von ' + album.title}">
-                <img class="album-face album-face--back" th:src="${album.backUrl}" width="1400" height="1400"
-                     th:alt="${'Rückseite von ' + album.title}">
+            <span class="album-tilt">
+                <span class="album-sleeve-inner">
+                    <span class="album-face album-face--front">
+                        <img th:src="${album.frontUrl}" width="1400" height="1400" th:alt="${'Cover von ' + album.title}">
+                        <span class="album-glare" aria-hidden="true"></span>
+                    </span>
+                    <span class="album-face album-face--back">
+                        <img th:src="${album.backUrl}" width="1400" height="1400" th:alt="${'Rückseite von ' + album.title}">
+                        <span class="album-glare album-glare--back" aria-hidden="true"></span>
+                    </span>
+                </span>
             </span>
         </button>
         <p class="album-flip-hint"><span aria-hidden="true">↻</span> Cover wenden</p>
