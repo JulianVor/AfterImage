@@ -24,7 +24,7 @@ if (main) {
 
     if (canHover && !reducedMotion) {
         const MAX_TILT = 8;
-        const EDGE_TILT = 0.45;
+        const EDGE_TILT = 0.6;
         const clamp = value => Math.min(1, Math.max(0, value));
         const smoothstep = (from, to, value) => {
             const t = clamp((value - from) / (to - from));
@@ -32,7 +32,7 @@ if (main) {
         };
 
         // Time constants in ms: larger = slower, calmer.
-        const TAU = { intensityIn: 580, intensityOut: 480, tilt: 190, glarePosition: 340, glareIn: 700, glareOut: 620 };
+        const TAU = { intensityIn: 150, intensityOut: 170, tilt: 65, glarePosition: 110, glareIn: 210, glareOut: 260 };
 
         const state = { intensity: 0, sink: 0, tiltX: 0, tiltY: 0, gx: 50, gy: 50, glare: 0, shadowX: 0, shadowY: 30 };
         const target = { tiltX: 0, tiltY: 0, depth: 0, gx: 50, gy: 50, shadowX: 0, shadowY: 30 };
@@ -112,8 +112,8 @@ if (main) {
             if (event.pointerType !== 'mouse') return;
             setTarget(event.clientX, event.clientY);
             // Start the highlight outside the cover on its own side so it glides in instead of appearing.
-            state.gx = 50 + (target.gx - 50) * 2.4;
-            state.gy = 50 + (target.gy - 50) * 2.4;
+            state.gx = 50 + (target.gx - 50) * 1.7;
+            state.gy = 50 + (target.gy - 50) * 1.7;
             hovering = true;
             start();
         });
