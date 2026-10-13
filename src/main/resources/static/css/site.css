@@ -1037,3 +1037,10 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
 @media (max-width: 760px) {
     .poster-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem 1rem; }
 }
+
+/* Homepage artwork strip: two blocks (album covers, posters) under one heading. */
+.artwork-block + .artwork-block { margin-top: clamp(2.5rem, 5vw, 4rem); }
+.artwork-sub { margin: 0 0 clamp(1.2rem, 2.5vw, 1.8rem); font: 400 clamp(1.2rem, 1.8vw, 1.5rem)/1.2 var(--serif); }
+.home-grid--posters { align-items: start; }
+.home-grid--posters .poster-tile { margin-bottom: .8rem; }
+.home-grid--posters .home-title { display: block; }

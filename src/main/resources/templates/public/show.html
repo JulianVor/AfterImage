@@ -99,23 +99,54 @@
         </ul>
     </section>
 
-    <section id="artwork" class="home-section home-artwork" aria-labelledby="artwork-title" th:if="${!albums.isEmpty()}">
+    <section id="artwork" class="home-section home-artwork" aria-labelledby="artwork-title" th:if="${!albums.isEmpty() or !posters.isEmpty()}">
         <header class="home-head">
-            <div><p class="eyebrow">Artwork</p><h2 id="artwork-title">Alben, die es nicht gibt</h2></div>
+            <div><p class="eyebrow">Gestaltung</p><h2 id="artwork-title">Artwork</h2></div>
             <a class="home-more" href="/alben">Alle Arbeiten ansehen</a>
         </header>
-        <ul class="home-grid home-grid--five">
-            <li th:each="album : ${albums}">
-                <a th:href="@{/alben/{slug}(slug=${album.slug})}">
-                    <span class="home-thumb home-thumb--cover">
-                        <img th:src="${album.frontThumbUrl}" width="700" height="700" th:alt="${'Cover von ' + album.title}" loading="lazy" decoding="async">
-                    </span>
-                    <span class="home-sub" th:text="${album.number}">FA-001</span>
-                    <span class="home-title home-title--small" th:text="${album.title}">Titel</span>
-                </a>
-            </li>
-        </ul>
+
+        <div class="artwork-block" th:if="${!albums.isEmpty()}">
+            <h3 class="artwork-sub">Alben, die es nicht gibt</h3>
+            <ul class="home-grid home-grid--five">
+                <li th:each="album : ${albums}">
+                    <a th:href="@{/alben/{slug}(slug=${album.slug})}">
+                        <span class="home-thumb home-thumb--cover">
+                            <img th:src="${album.frontThumbUrl}" width="700" height="700" th:alt="${'Cover von ' + album.title}" loading="lazy" decoding="async">
+                        </span>
+                        <span class="home-sub" th:text="${album.number}">FA-001</span>
+                        <span class="home-title home-title--small" th:text="${album.title}">Titel</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="artwork-block" th:if="${!posters.isEmpty()}">
+            <h3 class="artwork-sub">Festivalplakate</h3>
+            <ul class="home-grid home-grid--three home-grid--posters">
+                <li th:each="poster : ${posters}">
+                    <button type="button" class="photo-tile photo-tile--natural poster-tile"
+                            th:attr="data-full=${poster.fullUrl},data-alt=${poster.alt},data-title=${poster.title},data-href=${poster.entryUrl}">
+                        <img th:src="${poster.thumbUrl}" th:alt="${poster.alt}" th:attr="width=${poster.thumbWidth},height=${poster.thumbHeight}" loading="lazy" decoding="async">
+                    </button>
+                    <span class="home-title home-title--small" th:text="${poster.title}">Titel</span>
+                    <span class="home-sub" th:text="${poster.date}">Datum</span>
+                </li>
+            </ul>
+        </div>
     </section>
+
+    <dialog class="photo-lightbox" id="photo-lightbox" aria-label="Plakatansicht" th:if="${!posters.isEmpty()}">
+        <button type="button" class="photo-lightbox-close" aria-label="Ansicht schließen">Schließen ×</button>
+        <div class="photo-lightbox-stage" aria-live="polite" aria-busy="false">
+            <div class="photo-lightbox-loading" role="status">
+                <span aria-hidden="true"></span>
+                <p>Bild wird geladen …</p>
+            </div>
+            <p class="photo-lightbox-error" hidden>Das Bild konnte nicht geladen werden.</p>
+            <img alt="" hidden>
+        </div>
+        <p class="photo-lightbox-caption"></p>
+    </dialog>
 
     <section id="archiv" class="home-section home-archive" aria-labelledby="archiv-title">
         <header class="home-head">
@@ -142,5 +173,6 @@
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
 <script type="module" src="/js/slideshow.js"></script>
+<script type="module" src="/js/piwigo-gallery.js" th:if="${!posters.isEmpty()}"></script>
 </body>
 </html>

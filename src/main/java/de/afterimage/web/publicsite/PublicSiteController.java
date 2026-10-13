@@ -131,6 +131,7 @@ public class PublicSiteController {
         model.addAttribute("liveVideoTotal", liveVideos.size());
         model.addAttribute("workBands", catalog.homeBands(HOME_BANDS).stream().map(this::bandCard).toList());
         model.addAttribute("albums", albumCatalog.all());
+        model.addAttribute("posters", Posters.all());
         model.addAttribute("stats", catalog.stats());
         model.addAttribute("homePhotos", HomePhotos.shuffled());
         return "public/show";
