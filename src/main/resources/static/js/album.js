@@ -39,22 +39,25 @@ if (main) {
         const TAU = { intensityIn: 150, intensityOut: 170, tilt: 65, glarePosition: 110, glareIn: 210, glareOut: 260 };
 
         const state = { intensity: 0, sink: 0, tiltX: 0, tiltY: 0, gx: 50, gy: 50, glare: 0, shadowX: 0, shadowY: 30 };
-        const target = { tiltX: 0, tiltY: 0, depth: 0, gx: 50, gy: 50, shadowX: 0, shadowY: 30 };
+        const target = { tiltX: 0, tiltY: 0, depth: 0, glareStrength: 1, gx: 50, gy: 50, shadowX: 0, shadowY: 30 };
         let hovering = false;
         let frame = null;
         let last = 0;
 
         // px/py: where the cover is "pressed", 0..1 from the top-left. The depth is 0 at the edge and 1 well inside
-        // for the mouse (the cover sinks and tilts more the deeper it goes); the phone passes a fixed value.
-        const setTargetFraction = (px, py, depth = smoothstep(0, 0.5, 2 * Math.min(px, 1 - px, py, 1 - py))) => {
+        // for the mouse (the cover sinks and tilts more the deeper it goes); the phone passes a fixed value and a
+        // glare strength that grows with the tilt, so a phone held still shows no highlight.
+        const setTargetFraction = (px, py, depth = smoothstep(0, 0.5, 2 * Math.min(px, 1 - px, py, 1 - py)), glareStrength = 1) => {
             target.tiltY = (px - 0.5) * 2 * MAX_TILT;
             target.tiltX = (0.5 - py) * 2 * MAX_TILT;
             target.depth = depth;
+            target.glareStrength = glareStrength;
             // The pressed side recedes, so the highlight sits on the opposite side, which tilts toward the viewer.
             target.gx = (1 - px) * 100;
             target.gy = (1 - py) * 100;
             target.shadowX = -(px - 0.5) * 28;
             target.shadowY = 30 - (py - 0.5) * 20;
+            start();
         };
 
         const render = () => {
@@ -75,33 +78,38 @@ if (main) {
             last = now;
             const ease = tau => 1 - Math.exp(-dt / tau);
 
+            // Moves one value toward its goal and returns how far it moved, to know when everything has come to rest.
+            let moved = 0;
+            const approach = (key, goal, factor) => {
+                const delta = (goal - state[key]) * factor;
+                state[key] += delta;
+                moved += Math.abs(delta);
+            };
+
             const wanted = hovering ? 1 : 0;
-            state.intensity += (wanted - state.intensity) * ease(hovering ? TAU.intensityIn : TAU.intensityOut);
-            state.glare += (wanted - state.glare) * ease(hovering ? TAU.glareIn : TAU.glareOut);
+            approach('intensity', wanted, ease(hovering ? TAU.intensityIn : TAU.intensityOut));
+            approach('glare', wanted * target.glareStrength, ease(hovering ? TAU.glareIn : TAU.glareOut));
 
             // While active the target follows the pointer or phone; after leaving it keeps its last value, so the
             // highlight fades out in place while tilt and sink ease back to rest through the intensity.
             const strength = state.intensity;
             const tiltScale = strength * (EDGE_TILT + (1 - EDGE_TILT) * target.depth);
             const tilt = ease(TAU.tilt);
-            state.tiltX += (target.tiltX * tiltScale - state.tiltX) * tilt;
-            state.tiltY += (target.tiltY * tiltScale - state.tiltY) * tilt;
-            state.sink += (strength * target.depth - state.sink) * tilt;
-            state.shadowX += (target.shadowX * strength - state.shadowX) * tilt;
-            state.shadowY += (30 + (target.shadowY - 30) * strength - state.shadowY) * tilt;
+            approach('tiltX', target.tiltX * tiltScale, tilt);
+            approach('tiltY', target.tiltY * tiltScale, tilt);
+            approach('sink', strength * target.depth, tilt);
+            approach('shadowX', target.shadowX * strength, tilt);
+            approach('shadowY', 30 + (target.shadowY - 30) * strength, tilt);
 
             const glarePosition = ease(TAU.glarePosition);
-            state.gx += (target.gx - state.gx) * glarePosition;
-            state.gy += (target.gy - state.gy) * glarePosition;
+            approach('gx', target.gx, glarePosition);
+            approach('gy', target.gy, glarePosition);
 
             render();
 
-            const settled = !hovering && state.intensity < 0.002 && state.glare < 0.002;
-            if (settled) {
-                frame = null;
-            } else {
-                frame = requestAnimationFrame(tick);
-            }
+            // Stop the loop once nothing moves any more (a phone held still); new input restarts it.
+            const settled = dt > 0 && (hovering ? moved < 0.0005 : state.intensity < 0.002 && state.glare < 0.002);
+            frame = settled ? null : requestAnimationFrame(tick);
         };
 
         const start = () => {
@@ -140,15 +148,17 @@ if (main) {
             sleeve.addEventListener('pointerleave', release);
         };
 
-        // Phone: the tilt sensor moves the "pressed" point like a mouse would. iOS asks for permission on a tap, and
-        // browsers only expose the sensor on HTTPS, so the button stays hidden wherever it cannot work.
+        // Phone: the tilt sensor moves the "pressed" point like a mouse would. iOS only releases the sensor after a tap
+        // (a button asks for that); elsewhere no permission is needed, so it starts by itself and the button stays
+        // hidden. Browsers only expose the sensor on HTTPS.
         const setupDeviceTilt = () => {
             const toggle = main.querySelector('.album-motion-toggle');
-            if (!toggle || !window.isSecureContext || !('DeviceOrientationEvent' in window)) return;
+            if (!window.isSecureContext || !('DeviceOrientationEvent' in window)) return;
 
             const DEVICE_RANGE = 18;
             const FOLLOW_MS = 3500;
-            let active = false;
+            let wantMotion = false;
+            let listening = false;
             let received = false;
             let base = null;
             let lastEvent = 0;
@@ -176,46 +186,73 @@ if (main) {
                 const follow = 1 - Math.exp(-dt / FOLLOW_MS);
                 base.roll += wrap(roll - base.roll) * follow;
                 base.pitch += wrap(pitch - base.pitch) * follow;
-                setTargetFraction(
-                    clamp(0.5 + wrap(roll - base.roll) / (2 * DEVICE_RANGE)),
-                    clamp(0.5 + wrap(pitch - base.pitch) / (2 * DEVICE_RANGE)),
-                    0.6);
+                const px = clamp(0.5 + wrap(roll - base.roll) / (2 * DEVICE_RANGE));
+                const py = clamp(0.5 + wrap(pitch - base.pitch) / (2 * DEVICE_RANGE));
+                // The highlight appears with the tilt and is gone while the phone rests.
+                const glareStrength = smoothstep(0.04, 0.5, Math.hypot(px - 0.5, py - 0.5) * 2);
+                setTargetFraction(px, py, 0.6, glareStrength);
+                if (!hovering) engage();
             };
 
+            const listen = () => {
+                if (listening) return;
+                listening = true;
+                base = null;
+                window.addEventListener('deviceorientation', onOrientation);
+            };
+            const unlisten = () => {
+                if (!listening) return;
+                listening = false;
+                window.removeEventListener('deviceorientation', onOrientation);
+                release();
+            };
+
+            // Do not read the sensor while the page is in the background.
+            document.addEventListener('visibilitychange', () => {
+                if (document.hidden) {
+                    unlisten();
+                } else if (wantMotion) {
+                    listen();
+                }
+            });
+
+            const needsPermission = typeof DeviceOrientationEvent.requestPermission === 'function';
+            if (!needsPermission) {
+                wantMotion = true;
+                listen();
+                return;
+            }
+            if (!toggle) return;
+
             const setActive = value => {
-                active = value;
+                wantMotion = value;
                 toggle.setAttribute('aria-pressed', String(value));
                 toggle.textContent = value ? 'Handy-Bewegung: an' : 'Handy-Bewegung nutzen';
                 if (value) {
-                    base = null;
                     received = false;
-                    window.addEventListener('deviceorientation', onOrientation);
-                    engage();
-                    // No sensor data (desktop, tablet without sensors): switch off and hide the button again.
+                    listen();
+                    // No sensor data: switch off and hide the button again.
                     setTimeout(() => {
-                        if (active && !received) {
+                        if (wantMotion && !received) {
                             setActive(false);
                             toggle.hidden = true;
                         }
                     }, 1500);
                 } else {
-                    window.removeEventListener('deviceorientation', onOrientation);
-                    release();
+                    unlisten();
                 }
             };
 
             toggle.hidden = false;
             toggle.addEventListener('click', async () => {
-                if (active) {
+                if (wantMotion) {
                     setActive(false);
                     return;
                 }
-                if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-                    try {
-                        if (await DeviceOrientationEvent.requestPermission() !== 'granted') return;
-                    } catch (error) {
-                        return;
-                    }
+                try {
+                    if (await DeviceOrientationEvent.requestPermission() !== 'granted') return;
+                } catch (error) {
+                    return;
                 }
                 setActive(true);
             });
