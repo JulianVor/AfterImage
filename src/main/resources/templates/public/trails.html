@@ -3,40 +3,37 @@
 <head th:replace="~{fragments :: head('GESCHICHTEN')}"></head>
 <body>
 <header th:replace="~{fragments :: nav('trails')}"></header>
-<main class="trails-page stories-page">
-    <header class="trails-heading stories-heading">
-        <p class="eyebrow">Kuratierte Geschichten</p>
-        <h1>Geschichten aus dem Archiv<br><em>in vier Formen.</em></h1>
-        <p>Pfade, Fotoessays, Dossiers und Chroniken ordnen Bilder, Werke, Menschen und Orte in einen Zusammenhang.</p>
-    </header>
-    <nav class="story-type-key" aria-label="Erzählformen" th:if="${!trails.isEmpty()}">
-        <span th:each="type : ${storyTypes}" th:text="${labels.of(type)}">Pfad</span>
-    </nav>
-    <ol class="story-index" th:if="${!trails.isEmpty()}">
-        <li th:each="trail, state : ${trails}" th:class="${'story-index-item story-index-item--' + #strings.toLowerCase(trail.storyType.name())}">
-            <a th:href="@{/trails/{slug}(slug=${trail.slug})}">
-                <div class="story-index-visual">
-                    <img th:if="${heroMediaByTrail[trail.id] != null}" th:src="@{/media/{id}(id=${heroMediaByTrail[trail.id].id})}"
-                         th:alt="${heroMediaByTrail[trail.id].altText ?: trail.title}"
-                         th:attr="width=${heroMediaByTrail[trail.id].width},height=${heroMediaByTrail[trail.id].height}" loading="lazy">
-                    <span th:unless="${heroMediaByTrail[trail.id] != null}" th:text="${#numbers.formatInteger(state.count, 2)}">01</span>
-                </div>
-                <div class="story-index-copy">
-                    <p><span th:text="${labels.of(trail.storyType)}">Pfad</span> · <span th:text="${trail.steps.size()}">3</span> Bausteine</p>
-                    <h2 th:text="${trail.title}">Geschichtentitel</h2>
-                    <p th:text="${leadDescriptionByTrail[trail.id] ?: 'Eine kuratierte Geschichte aus dem Archiv.'}">Beschreibung</p>
-                </div>
-                <span class="story-index-arrow" aria-hidden="true">↗</span>
-            </a>
-        </li>
-    </ol>
-    <section class="connection-state" th:if="${trails.isEmpty()}">
-        <p class="eyebrow">Noch keine Geschichten</p><h2>Noch wurde keine öffentliche Geschichte kuratiert.</h2>
+<main>
+    <section class="page-intro" aria-labelledby="trails-title">
+        <p class="eyebrow">Archiv</p>
+        <h1 id="trails-title">Geschichten</h1>
+        <p class="intro-lead">Ausgewählte Themen aus dem Archiv, erzählt über Werke, Menschen und Orte.</p>
     </section>
-    <aside class="trail-connect-invite">
-        <span>Möchtest du Anfang und Ende selbst wählen?</span>
-        <a href="/connect">Verbindung zwischen zwei Einträgen finden →</a>
-    </aside>
+
+    <section class="home-section" aria-label="Geschichten">
+        <ul class="home-grid home-grid--two" th:if="${!trails.isEmpty()}">
+            <li th:each="trail, state : ${trails}">
+                <a th:href="@{/trails/{slug}(slug=${trail.slug})}">
+                    <span class="home-thumb home-thumb--story">
+                        <img th:if="${heroMediaByTrail[trail.id] != null}" th:src="@{/media/{id}(id=${heroMediaByTrail[trail.id].id})}"
+                             th:alt="${heroMediaByTrail[trail.id].altText ?: trail.title}"
+                             th:attr="width=${heroMediaByTrail[trail.id].width},height=${heroMediaByTrail[trail.id].height}" loading="lazy" decoding="async">
+                        <span class="home-thumb-plate" th:unless="${heroMediaByTrail[trail.id] != null}" th:text="${labels.of(trail.storyType)}">Dossier</span>
+                    </span>
+                    <span class="home-sub"><span th:text="${labels.of(trail.storyType)}">Dossier</span> · <span th:text="${trail.steps.size()}">3</span> Bausteine</span>
+                    <span class="home-title" th:text="${trail.title}">Geschichtentitel</span>
+                    <span class="home-desc" th:text="${leadDescriptionByTrail[trail.id] ?: 'Eine kuratierte Geschichte aus dem Archiv.'}">Beschreibung</span>
+                </a>
+            </li>
+        </ul>
+
+        <p class="page-note" th:if="${trails.isEmpty()}">Noch wurde keine öffentliche Geschichte kuratiert.</p>
+
+        <aside class="trail-connect-invite">
+            <span>Möchtest du Anfang und Ende selbst wählen?</span>
+            <a href="/connect">Verbindung zwischen zwei Einträgen finden →</a>
+        </aside>
+    </section>
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
 </body>

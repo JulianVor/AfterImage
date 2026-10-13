@@ -1005,3 +1005,14 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
 
 .project-youtube-link svg { width: 1.35rem; height: 1.35rem; fill: #e62117; }
 
+/* Stories index: same compact pattern as Fotos and Videos, with a short description under each card. */
+.home-grid--two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.home-grid--two .home-title { font-size: clamp(1.3rem, 2vw, 1.7rem); }
+.home-thumb-plate { position: absolute; inset: 0; display: grid; place-items: center; color: var(--paper-muted); font: 500 .7rem var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+.home-desc { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; max-width: 40rem; margin-top: .5rem; color: var(--paper-muted); font-size: .95rem; line-height: 1.5; }
+.home-grid--two .home-sub { margin-top: .8rem; }
+.home-section .trail-connect-invite { margin-top: clamp(2rem, 4vw, 3rem); padding: 1.2rem 1.4rem; }
+@media (max-width: 760px) {
+    .home-grid--two { grid-template-columns: minmax(0, 1fr); }
+}
+.home-thumb--story { aspect-ratio: 3 / 2; }
