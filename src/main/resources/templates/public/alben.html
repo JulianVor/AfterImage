@@ -42,7 +42,6 @@
                 <p class="poster-caption">
                     <a th:href="${poster.entryUrl}" th:text="${poster.title}">Titel</a>
                     <span th:text="${poster.date}">Datum</span>
-                    <span th:if="${poster.designedByOwner}" th:text="${'Gestaltung: ' + site.owner}">Gestaltung</span>
                 </p>
             </li>
         </ul>
