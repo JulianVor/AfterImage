@@ -1026,7 +1026,7 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
 /* Posters: tall thumbnails in natural proportion, caption underneath. */
 .artwork-section { margin-top: clamp(3rem, 6vw, 5rem); }
 .artwork-section > h2 { margin: 0 0 clamp(1.5rem, 3vw, 2.2rem); font: 400 clamp(1.4rem, 2.2vw, 1.9rem)/1.15 var(--serif); }
-.poster-grid { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.5rem, 3vw, 3rem); margin: 0; padding: 0; }
+.poster-grid { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(1.5rem, 3vw, 3rem); margin: 0; padding: 0; }
 .poster-grid--entry { grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 18rem)); }
 .poster-tile { aspect-ratio: auto; margin: 0; }
 .poster-caption { display: grid; gap: .15rem; margin: .8rem 0 0; font-size: .95rem; }
@@ -1040,6 +1040,9 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
 /* Homepage artwork strip: two blocks (album covers, posters) under one heading. */
 .artwork-block + .artwork-block { margin-top: clamp(2.5rem, 5vw, 4rem); }
 .artwork-sub { margin: 0 0 clamp(1.2rem, 2.5vw, 1.8rem); font: 400 clamp(1.2rem, 1.8vw, 1.5rem)/1.2 var(--serif); }
-.home-grid--posters { align-items: start; }
+.home-grid--posters { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: start; }
 .home-grid--posters .poster-tile { margin-bottom: .8rem; }
 .home-grid--posters .home-title { display: block; }
+@media (max-width: 900px) {
+    .poster-grid, .home-grid--posters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

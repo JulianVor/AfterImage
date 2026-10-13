@@ -20,6 +20,9 @@ public final class Posters {
             new Poster("goa-2026", "Grumbrechtstraßen Open Air 2026", "10. & 11. Juli 2026", "grumbrechtstrassen-open-air-2026",
                     "Plakat des Grumbrechtstraßen Open Air am 10. und 11. Juli 2026 in Pink und Dunkelgrün mit Waldmotiv", 960,
                     true),
+            new Poster("redestruction-abschied-2025", "Redestruction-Abschiedskonzert", "27. Dezember 2025", "redestruction-abschiedskonzert-2025-12-27",
+                    "Plakat zum Redestruction-Abschiedskonzert am 27. Dezember 2025 im Stellwerk Hamburg, mit The Grey und Begone, vor einem Tunnel mit drei Gestalten im Gegenlicht", 853,
+                    false),
             new Poster("goa-2025", "Grumbrechtstraßen Open Air 2025", "12. Juli 2025", "grumbrechtstrassen-open-air-2025",
                     "Plakat des Grumbrechtstraßen Open Air am 12. Juli 2025 in Orange und Blau vor grünem Wald, mit Redestruction, Swap The Giant, Defcon Supernaut und Digital Moy", 960,
                     true));
