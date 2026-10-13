@@ -932,3 +932,7 @@ video.hero-frame, .hero-frame.project-plate { aspect-ratio: 2 / 1; object-fit: c
 .embed-consent--video { aspect-ratio: 16 / 9; }
 .location-maps .embed-consent { height: clamp(18rem, 35vw, 28rem); }
 .location-maps article > .embed-consent { display: grid; justify-content: start; justify-items: start; align-content: center; }
+
+/* Images cannot be dragged or picked as a target, which removes "save image" from the context menu and long-press.
+   A hurdle only: the files can still be read from the network traffic. */
+img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; pointer-events: none; }
