@@ -1022,3 +1022,17 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
     .list-head p { margin-top: .3rem; }
 }
 .photo-lightbox-caption a { border-bottom: 1px solid var(--ember); }
+
+/* Posters: tall thumbnails in natural proportion, caption underneath. */
+.artwork-section { margin-top: clamp(3rem, 6vw, 5rem); }
+.artwork-section > h2 { margin: 0 0 clamp(1.5rem, 3vw, 2.2rem); font: 400 clamp(1.4rem, 2.2vw, 1.9rem)/1.15 var(--serif); }
+.poster-grid { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.5rem, 3vw, 3rem); margin: 0; padding: 0; }
+.poster-grid--entry { grid-template-columns: repeat(auto-fill, minmax(min(100%, 16rem), 18rem)); }
+.poster-tile { aspect-ratio: auto; margin: 0; }
+.poster-caption { display: grid; gap: .15rem; margin: .8rem 0 0; font-size: .95rem; }
+.poster-caption a { font: 400 1.15rem/1.25 var(--serif); }
+.poster-caption a:hover { color: var(--ember-bright); }
+.poster-caption span { color: var(--paper-muted); font: .62rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+@media (max-width: 760px) {
+    .poster-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem 1rem; }
+}

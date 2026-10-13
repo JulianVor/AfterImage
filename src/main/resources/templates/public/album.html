@@ -55,13 +55,13 @@
         <p class="album-credit">Artwork by Julian Vornfeld</p>
     </section>
 
-    <nav class="album-pager" aria-label="Weitere Alben">
+    <nav class="album-pager" aria-label="Weitere Arbeiten">
         <a class="album-pager-prev" th:if="${previous != null}" th:href="@{/alben/{slug}(slug=${previous.slug})}">
             <span aria-hidden="true">←</span>
             <span class="album-pager-number" th:text="${previous.number}">FA-000</span>
             <span th:text="${previous.title}">Vorheriges</span>
         </a>
-        <a class="album-pager-all" href="/alben">Alle Alben</a>
+        <a class="album-pager-all" href="/alben">Alle Arbeiten</a>
         <a class="album-pager-next" th:if="${next != null}" th:href="@{/alben/{slug}(slug=${next.slug})}">
             <span th:text="${next.title}">Nächstes</span>
             <span class="album-pager-number" th:text="${next.number}">FA-002</span>

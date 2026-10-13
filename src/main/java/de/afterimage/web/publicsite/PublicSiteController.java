@@ -1,6 +1,7 @@
 package de.afterimage.web.publicsite;
 
 import de.afterimage.albums.AlbumCatalog;
+import de.afterimage.albums.Posters;
 import de.afterimage.catalog.application.PublicCatalogService;
 import de.afterimage.catalog.application.PublicTrailService;
 import de.afterimage.catalog.domain.ArchiveEntity;
@@ -264,6 +265,7 @@ public class PublicSiteController {
         model.addAttribute("filmingLocations", filmingLocations);
         model.addAttribute("photoGalleries", photoGalleries);
         model.addAttribute("bandPhotos", bandPhotos);
+        model.addAttribute("posters", Posters.forEntry(project.getSlug()));
         model.addAttribute("heroMedia", project.getHeroMediaId() == null
                 ? Optional.empty() : media.metadata(project.getHeroMediaId()));
 
@@ -279,6 +281,7 @@ public class PublicSiteController {
         if (!personRoles.isEmpty()) navItems.add(new NavItem("rollen", "Rollen"));
         if (!personConcerts.isEmpty()) navItems.add(new NavItem("konzerte", "Konzerte"));
         if (!photoGalleries.isEmpty() || !bandPhotos.isEmpty()) navItems.add(new NavItem("fotos", "Fotos"));
+        if (!Posters.forEntry(project.getSlug()).isEmpty()) navItems.add(new NavItem("plakat", "Plakat"));
         if (!timeline.isEmpty()) navItems.add(new NavItem("chronik", "Chronik"));
         if (!musicVideos.isEmpty()) navItems.add(new NavItem("musikvideos", "Musikvideos"));
         if (!textSections.isEmpty()) navItems.add(new NavItem("wiki-texte", "Hintergründe"));

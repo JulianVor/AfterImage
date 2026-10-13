@@ -19,6 +19,7 @@ public class AlbumController {
     @GetMapping("/alben")
     String index(Model model) {
         model.addAttribute("albums", catalog.all());
+        model.addAttribute("posters", Posters.all());
         return "public/alben";
     }
 

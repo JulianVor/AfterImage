@@ -20,7 +20,7 @@
     <nav aria-label="Hauptnavigation">
         <a href="/fotos" th:classappend="${active == 'fotos'} ? 'is-active'"><em>01</em><span>Fotos</span></a>
         <a href="/videos" th:classappend="${active == 'videos'} ? 'is-active'"><em>02</em><span>Videos</span></a>
-        <a href="/alben" th:classappend="${active == 'alben'} ? 'is-active'"><em>03</em><span>Alben</span></a>
+        <a href="/alben" th:classappend="${active == 'alben'} ? 'is-active'"><em>03</em><span>Artwork</span></a>
         <div class="nav-item nav-item--has-submenu"
              th:classappend="${active == 'archive' || active == 'explore' || active == 'explore-map' || active == 'chronicle' || active == 'trails' || active == 'search'} ? 'is-active'">
             <button type="button" class="nav-toggle" aria-haspopup="true" aria-expanded="false">

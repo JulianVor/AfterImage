@@ -273,6 +273,23 @@
             </div>
         </article>
     </section>
+    <section id="plakat" class="photo-galleries" th:if="${!posters.isEmpty()}">
+        <header><div><p class="eyebrow">Gestaltung</p><h2 th:text="${posters.size() == 1 ? 'Plakat' : 'Plakate'}">Plakat</h2></div></header>
+        <ul class="poster-grid poster-grid--entry">
+            <li th:each="poster : ${posters}">
+                <button type="button" class="photo-tile photo-tile--natural poster-tile"
+                        th:attr="data-full=${poster.fullUrl},data-alt=${poster.alt},data-title=${poster.title}">
+                    <img th:src="${poster.thumbUrl}" th:alt="${poster.alt}" th:attr="width=${poster.thumbWidth},height=${poster.thumbHeight}" loading="lazy" decoding="async">
+                </button>
+                <p class="poster-caption">
+                    <span th:text="${poster.title}">Titel</span>
+                    <span th:text="${poster.date}">Datum</span>
+                    <span th:if="${poster.designedByOwner}" th:text="${'Gestaltung: ' + site.owner}">Gestaltung</span>
+                </p>
+            </li>
+        </ul>
+        <p class="page-note"><a href="/alben#plakate">Alle Plakate ansehen</a></p>
+    </section>
     <dialog class="photo-lightbox" id="photo-lightbox" aria-label="Fotoansicht">
         <button type="button" class="photo-lightbox-close" aria-label="Fotoansicht schließen">Schließen ×</button>
         <div class="photo-lightbox-stage" aria-live="polite" aria-busy="false">
@@ -503,7 +520,7 @@
     </a>
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
-<script type="module" src="/js/piwigo-gallery.js" th:if="${!photoGalleries.isEmpty() or !bandPhotos.isEmpty()}"></script>
+<script type="module" src="/js/piwigo-gallery.js" th:if="${!photoGalleries.isEmpty() or !bandPhotos.isEmpty() or !posters.isEmpty()}"></script>
 <script src="/js/track-player.js" defer th:if="${!tracks.isEmpty()}"></script>
 <script src="/js/embed-consent.js" defer></script>
 <script type="module" src="/js/project-connections.js" th:if="${showConnections}"></script>
