@@ -1,14 +1,14 @@
 <!doctype html>
 <html lang="de" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments :: head('Fotos und Videos von Bands')}"></head>
+<head th:replace="~{fragments :: head('Bilder, Videos und Artwork')}"></head>
 <body>
 <header th:replace="~{fragments :: nav('show')}"></header>
 <main>
     <section class="show-intro" aria-labelledby="show-title">
         <div class="intro-text">
-            <p class="eyebrow" th:text="${site.owner + ' · Fotografie und Film'}">Julian Vornfeld · Fotografie und Film</p>
-            <h1 id="show-title">Meine Fotos und Videos von Bands.</h1>
-            <p class="intro-lead">Ich fotografiere Konzerte, mache Bandfotos und drehe Musik- und Livevideos.</p>
+            <p class="eyebrow" th:text="${site.owner + ' · Fotografie, Film und Gestaltung'}">Julian Vornfeld · Fotografie, Film und Gestaltung</p>
+            <h1 id="show-title">Bilder, Videos und Artwork<br>für Musik und mehr.</h1>
+            <p class="intro-lead">Ich fotografiere, filme und gestalte – von Bandfotos und Musikvideos bis zu Artworks und freien fotografischen Projekten.</p>
         </div>
         <ul class="intro-does" aria-label="Was ich mache">
             <li><a href="#fotografie">Konzertfotografie <span aria-hidden="true">↓</span></a></li>
