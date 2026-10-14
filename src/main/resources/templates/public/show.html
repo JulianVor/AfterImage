@@ -16,6 +16,7 @@
             <li th:if="${liveVideoTotal > 0}"><a href="#livevideos">Livevideos <span aria-hidden="true">↓</span></a></li>
             <li th:if="${!workBands.isEmpty()}"><a href="#bands">Bandfotos <span aria-hidden="true">↓</span></a></li>
             <li th:if="${!albums.isEmpty() or !posters.isEmpty()}"><a href="#artwork">Artwork <span aria-hidden="true">↓</span></a></li>
+            <li th:if="${!analogPhotos.isEmpty()}"><a href="#analog">Analog <span aria-hidden="true">↓</span></a></li>
         </ul>
     </section>
 
@@ -144,7 +145,27 @@
         </div>
     </section>
 
-    <dialog class="photo-lightbox" id="photo-lightbox" aria-label="Plakatansicht" th:if="${!posters.isEmpty()}">
+    <section id="analog" class="home-section" aria-labelledby="analog-title" th:if="${!analogPhotos.isEmpty()}">
+        <header class="home-head">
+            <div><p class="eyebrow">Neben der Bühne</p><h2 id="analog-title">Analog</h2></div>
+            <a class="home-more" href="/fotos#analog" th:text="${'Alle ' + analogPhotos.size() + ' ansehen'}">Alle ansehen</a>
+        </header>
+        <ol class="photo-rows photo-rows--single">
+            <li th:each="photo : ${analogPreview}" th:style="'--ar:' + ${photo.ratio}">
+                <button type="button" class="photo-tile photo-tile--natural" data-group="analog"
+                        th:attr="data-full=${photo.fullUrl},data-alt=${photo.alt},data-title=${photo.caption}">
+                    <img th:src="${photo.thumbUrl}" th:alt="${photo.alt}"
+                         th:attr="width=${photo.width},height=${photo.height}" loading="lazy" decoding="async">
+                </button>
+            </li>
+        </ol>
+        <div hidden>
+            <button type="button" class="photo-tile" data-group="analog" th:each="photo, stat : ${analogPhotos}" th:if="${stat.index >= 4}"
+                    th:attr="data-full=${photo.fullUrl},data-alt=${photo.alt},data-title=${photo.caption}"></button>
+        </div>
+    </section>
+
+    <dialog class="photo-lightbox" id="photo-lightbox" aria-label="Bildansicht" th:if="${!posters.isEmpty() or !analogPhotos.isEmpty()}">
         <button type="button" class="photo-lightbox-close" aria-label="Ansicht schließen">Schließen ×</button>
         <div class="photo-lightbox-stage" aria-live="polite" aria-busy="false">
             <div class="photo-lightbox-loading" role="status">
@@ -182,6 +203,6 @@
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
 <script type="module" src="/js/slideshow.js"></script>
-<script type="module" src="/js/piwigo-gallery.js" th:if="${!posters.isEmpty()}"></script>
+<script type="module" src="/js/piwigo-gallery.js" th:if="${!posters.isEmpty() or !analogPhotos.isEmpty()}"></script>
 </body>
 </html>

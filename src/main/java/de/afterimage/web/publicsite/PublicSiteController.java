@@ -134,6 +134,8 @@ public class PublicSiteController {
         model.addAttribute("posters", Posters.all());
         model.addAttribute("stats", catalog.stats());
         model.addAttribute("homePhotos", HomePhotos.shuffled());
+        model.addAttribute("analogPhotos", AnalogPhotos.all());
+        model.addAttribute("analogPreview", AnalogPhotos.all().stream().limit(4).toList());
         return "public/show";
     }
 
