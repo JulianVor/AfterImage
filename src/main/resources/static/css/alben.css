@@ -134,7 +134,7 @@ html.album-theme {
 
 /* Festival design: one project page under Artwork (GOA 2026). */
 
-.gd-facts { display: grid; grid-template-columns: repeat(3, minmax(0, auto)); justify-content: start; gap: .8rem clamp(1.5rem, 4vw, 3.5rem); margin: 1.6rem 0 0; }
+.gd-facts { display: flex; flex-wrap: wrap; gap: .8rem clamp(1.5rem, 4vw, 3.5rem); margin: 1.6rem 0 0; }
 .gd-facts dt { margin-bottom: .2rem; color: var(--paper-muted); font: .62rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .gd-facts dd { margin: 0; max-width: 24rem; font-size: .95rem; }
 .gd-facts a { border-bottom: 1px solid var(--ember); }
@@ -158,7 +158,6 @@ html.album-theme {
 .gd-links a { padding-bottom: .15rem; border-bottom: 1px solid var(--line-strong); }
 .gd-links a:hover { border-bottom-color: var(--ember); }
 @media (max-width: 760px) {
-    .gd-facts { grid-template-columns: minmax(0, 1fr); }
     .gd-block { grid-template-columns: minmax(0, 1fr); }
     .gd-swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
