@@ -24,7 +24,7 @@ final class HomePhotos {
     private static final Band FAEHRMANN = new Band("fur-den-fahrmann", "Für den Fährmann");
 
     private static final List<HomePhoto> PHOTOS = List.of(
-            new HomePhoto("konzert-01.jpg", 1068, 1600, "Sänger mit Cap und Sonnenbrille, Schwarzweiß", HANGMEN),
+            new HomePhoto("konzert-01.jpg", 1068, 1600, "Sänger mit Cap und Sonnenbrille am Mikrofon, dahinter eine zweite Person mit Gitarre, Schwarzweiß", HANGMEN),
             new HomePhoto("konzert-02.jpg", 1068, 1600, "Gitarrist im grünen und roten Bühnenlicht", HANGMEN),
             new HomePhoto("konzert-03.jpg", 1068, 1600, "Sänger mit gelber Mütze beugt sich zum Mikrofon", FAEHRMANN),
             new HomePhoto("konzert-04.jpg", 1600, 1068, "Blaue Bühne, Publikum von hinten", REDESTRUCTION),
