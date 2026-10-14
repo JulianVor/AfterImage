@@ -284,6 +284,7 @@
                 <p class="poster-caption">
                     <span th:text="${poster.title}">Titel</span>
                     <span th:text="${poster.date}">Datum</span>
+                    <a class="poster-design-link" th:if="${poster.designUrl != null}" th:href="${poster.designUrl}">Erscheinungsbild ansehen →</a>
                 </p>
             </li>
         </ul>

@@ -131,3 +131,45 @@ html.album-theme {
 .album-motion-toggle { padding: .4rem .2rem; border: 0; border-bottom: 1px solid var(--line-strong); background: none; color: var(--paper-muted); font: 500 .62rem var(--mono); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 .album-motion-toggle:not([hidden]) { display: inline-block; }
 .album-motion-toggle:hover, .album-motion-toggle:focus-visible, .album-motion-toggle[aria-pressed="true"] { color: var(--ember); border-bottom-color: var(--ember); }
+
+/* Festival design: one project page under Artwork (GOA 2026). */
+
+.gd-facts { display: grid; grid-template-columns: repeat(3, minmax(0, auto)); justify-content: start; gap: .8rem clamp(1.5rem, 4vw, 3.5rem); margin: 1.6rem 0 0; }
+.gd-facts dt { margin-bottom: .2rem; color: var(--paper-muted); font: .62rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.gd-facts dd { margin: 0; max-width: 24rem; font-size: .95rem; }
+.gd-facts a { border-bottom: 1px solid var(--ember); }
+.gd-section { max-width: 1280px; margin: 0 auto; padding: clamp(2rem, 4vw, 3.5rem) var(--gutter) 0; }
+.gd-section h2 { margin: 0 0 1rem; font: 400 clamp(1.4rem, 2.2vw, 1.9rem)/1.15 var(--serif); }
+.gd-photo { display: block; width: 100%; }
+.gd-text { max-width: 38rem; }
+.gd-text p { margin: 0 0 1rem; color: var(--paper-muted); }
+.gd-text .eyebrow { margin-bottom: .5rem; color: var(--ember); }
+.gd-lead .gd-text p { color: var(--paper); }
+.gd-block { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: center; gap: clamp(1.5rem, 4vw, 4rem); }
+.gd-figures { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(.6rem, 1.5vw, 1rem); }
+.gd-figures--single { grid-template-columns: minmax(0, 1fr); max-width: 26rem; }
+.gd-section h2.gd-colors-title { color: var(--paper-muted); font: .68rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.gd-swatches { list-style: none; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(.5rem, 1.5vw, 1rem); margin: 0; padding: 0; }
+.gd-swatches li { display: flex; align-items: flex-end; min-height: clamp(5rem, 12vw, 9rem); padding: .7rem .8rem; background: var(--swatch); }
+.gd-swatches span { padding: .1rem .35rem; background: rgba(0, 0, 0, .55); color: #fff; font: .62rem var(--mono); letter-spacing: .08em; }
+.gd-end { padding-bottom: clamp(4rem, 8vw, 7rem); }
+.gd-end > p:first-child { max-width: 38rem; margin: 0; font: 400 clamp(1.15rem, 1.8vw, 1.45rem)/1.4 var(--serif); }
+.gd-links { display: flex; flex-wrap: wrap; gap: .6rem 1.8rem; margin: 1.6rem 0 0; font: .68rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.gd-links a { padding-bottom: .15rem; border-bottom: 1px solid var(--line-strong); }
+.gd-links a:hover { border-bottom-color: var(--ember); }
+@media (max-width: 760px) {
+    .gd-facts { grid-template-columns: minmax(0, 1fr); }
+    .gd-block { grid-template-columns: minmax(0, 1fr); }
+    .gd-swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.gd-figures .gd-photo:first-child, .gd-figures .gd-photo:nth-child(6n) { grid-column: auto; grid-row: auto; }
+.gd-stack .gd-text { margin-bottom: clamp(1.2rem, 3vw, 2rem); }
+.gd-stack .gd-figures { gap: clamp(.6rem, 1.5vw, 1.2rem); }
+.gd-block--flip { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+.gd-block--flip .gd-figures { order: 2; }
+.gd-font { margin: 1rem 0 0; color: var(--paper-muted); font: .68rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+@media (max-width: 760px) {
+    .gd-block, .gd-block--flip { grid-template-columns: minmax(0, 1fr); }
+    .gd-block--flip .gd-figures { order: 0; }
+}

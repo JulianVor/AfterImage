@@ -42,9 +42,25 @@
                 <p class="poster-caption">
                     <a th:href="${poster.entryUrl}" th:text="${poster.title}">Titel</a>
                     <span th:text="${poster.date}">Datum</span>
+                    <a class="poster-design-link" th:if="${poster.designUrl != null}" th:href="${poster.designUrl}">Erscheinungsbild ansehen →</a>
                 </p>
             </li>
         </ul>
+    </section>
+
+    <section class="artwork-section" aria-labelledby="gd-card-title">
+        <h2 id="gd-card-title">Gestaltung für Veranstaltungen</h2>
+        <a class="gd-card" href="/artwork/goa-2026">
+            <span class="gd-card-image">
+                <img src="/img/artwork/goa-2026-gesamt-s.webp" width="1400" height="953" loading="lazy" decoding="async"
+                     alt="Festivalmaterial des GOA 2026: Shirts, Plakat, Flyer, Bierdeckel und Bändchen in Weinrot, Gelb, Pink und Petrol">
+            </span>
+            <span class="gd-card-text">
+                <span class="gd-card-title">Grumbrechtstraßen Open Air 2026</span>
+                <span class="gd-card-sub">Das Erscheinungsbild des Festivals: Plakat und Flyer, T-Shirt, Bierdeckel, Festivalbändchen</span>
+                <span class="gd-card-more">Zum Projekt →</span>
+            </span>
+        </a>
     </section>
 
     <dialog class="photo-lightbox" id="photo-lightbox" aria-label="Plakatansicht">

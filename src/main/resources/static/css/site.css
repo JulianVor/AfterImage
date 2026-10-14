@@ -1045,3 +1045,17 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
 @media (max-width: 900px) {
     .poster-grid, .home-grid--posters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+.poster-caption a.poster-design-link { margin-top: .25rem; color: var(--ember-bright); font: .62rem var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+.poster-caption a.poster-design-link:hover { text-decoration: underline; }
+
+/* Project card (Artwork overview and homepage artwork strip). */
+.gd-card { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); align-items: center; gap: clamp(1.2rem, 3vw, 3rem); }
+.gd-card-image { display: block; overflow: hidden; background: var(--ink-soft); }
+.gd-card-image img { display: block; width: 100%; height: auto; transition: transform .6s cubic-bezier(.2, .8, .2, 1); }
+.gd-card:hover .gd-card-image img { transform: scale(1.03); }
+.gd-card-text { display: grid; gap: .4rem; }
+.gd-card-title { font: 400 clamp(1.3rem, 2.2vw, 1.8rem)/1.2 var(--serif); }
+.gd-card-sub { color: var(--paper-muted); font-size: .92rem; }
+.gd-card-more { margin-top: .6rem; color: var(--ember); font: .68rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.gd-card { max-width: 64rem; }
+@media (max-width: 760px) { .gd-card { grid-template-columns: minmax(0, 1fr); } }

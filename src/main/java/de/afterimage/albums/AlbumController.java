@@ -23,6 +23,11 @@ public class AlbumController {
         return "public/alben";
     }
 
+    @GetMapping("/artwork/goa-2026")
+    String goa2026() {
+        return "public/goa-2026";
+    }
+
     @GetMapping("/alben/{slug}")
     String show(@PathVariable String slug, Model model) {
         Album album = catalog.find(slug);
