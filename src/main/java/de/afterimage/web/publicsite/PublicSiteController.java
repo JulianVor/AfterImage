@@ -152,9 +152,8 @@ public class PublicSiteController {
         List<HomePhotos.BandCount> bands = HomePhotos.bands();
         String active = bands.stream().map(count -> count.band().slug()).filter(slug -> slug.equals(band)).findFirst().orElse(null);
         model.addAttribute("photos", active == null ? HomePhotos.all() : HomePhotos.forBand(active));
-        model.addAttribute("photoBands", bands);
         model.addAttribute("activeBand", active);
-        model.addAttribute("photoTotal", HomePhotos.all().size());
+        model.addAttribute("activeBandName", bands.stream().filter(count -> count.band().slug().equals(active)).map(count -> count.band().name()).findFirst().orElse(null));
         model.addAttribute("analogPhotos", AnalogPhotos.all());
         return "public/fotos";
     }

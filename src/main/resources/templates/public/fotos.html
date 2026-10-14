@@ -18,12 +18,10 @@
         <header class="home-head">
             <div><p class="eyebrow">Fotografie</p><h2 id="konzerte-title">Konzertfotografie</h2></div>
         </header>
-        <p class="section-lead">Eine Auswahl aus der Zeit von 2018 bis 2025.</p>
-        <nav class="filter-chips" aria-label="Nach Band filtern">
-            <a href="/fotos#konzerte" th:classappend="${activeBand == null} ? 'is-active'" th:attr="aria-current=${activeBand == null ? 'page' : null}" th:text="${'Alle (' + photoTotal + ')'}">Alle</a>
-            <a th:each="count : ${photoBands}" th:href="${'/fotos?band=' + count.band.slug + '#konzerte'}" th:text="${count.band.name + ' (' + count.photos + ')'}"
-               th:classappend="${activeBand == count.band.slug} ? 'is-active'" th:attr="aria-current=${activeBand == count.band.slug ? 'page' : null}">Band</a>
-        </nav>
+        <p class="section-lead" th:unless="${activeBand != null}">Eine Auswahl aus der Zeit von 2018 bis 2025.</p>
+        <p class="section-lead" th:if="${activeBand != null}">
+            Nur Fotos von <strong th:text="${activeBandName}">Band</strong>. <a href="/fotos#konzerte">Alle Konzertfotos anzeigen</a>
+        </p>
         <div class="photo-masonry">
             <button type="button" class="photo-tile photo-tile--natural" th:each="photo : ${photos}"
                     th:attr="data-full=${'/img/home/' + photo.file},data-alt=${photo.alt},data-title=${photo.band?.name},data-href=${photo.band != null ? '/entry/' + photo.band.slug : null}">
