@@ -1069,3 +1069,10 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
 .photo-rows .photo-tile { margin: 0; }
 @media (max-width: 760px) { .photo-rows { --row-h: 120px; } }
 
+/* Lightbox stepping for photos in a sequence. */
+.photo-lightbox-nav { display: flex; align-items: center; justify-content: center; gap: 1.2rem; margin: .8rem auto 0; font: .7rem var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+.photo-lightbox-nav[hidden] { display: none; }
+.photo-lightbox-nav button { min-width: 2.6rem; padding: .45rem .8rem; border: 1px solid rgba(246, 242, 234, .3); background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.photo-lightbox-nav button:hover:not(:disabled), .photo-lightbox-nav button:focus-visible { border-color: var(--ember); color: var(--ember-bright); }
+.photo-lightbox-nav button:disabled { opacity: .3; cursor: default; }
+.photo-lightbox-count { margin: 0; color: rgba(246, 242, 234, .6); }
