@@ -33,7 +33,7 @@ afterimage:
     title: ${AFTERIMAGE_SITE_TITLE:FotosVorJu}
     owner: ${AFTERIMAGE_SITE_OWNER:Julian Vornfeld}
     owner-slug: ${AFTERIMAGE_SITE_OWNER_SLUG:julian-vornfeld}
-    subtitle: ${AFTERIMAGE_SITE_SUBTITLE:Film · Fotografie · Visuelle Welten}
+    subtitle: ${AFTERIMAGE_SITE_SUBTITLE:Fotografie · Film · Gestaltung}
   wiki:
     base-url: ${AFTERIMAGE_WIKI_BASE_URL:https://wiki.fotosvorju.de}
     api-url: ${AFTERIMAGE_WIKI_API_URL:https://wiki.fotosvorju.de/w/api.php}
