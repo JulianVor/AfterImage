@@ -153,6 +153,7 @@ public class PublicSiteController {
         model.addAttribute("photoBands", bands);
         model.addAttribute("activeBand", active);
         model.addAttribute("photoTotal", HomePhotos.all().size());
+        model.addAttribute("analogPhotos", AnalogPhotos.all());
         return "public/fotos";
     }
 

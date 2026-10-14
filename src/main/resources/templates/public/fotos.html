@@ -6,14 +6,22 @@
 <main>
     <section class="page-intro" aria-labelledby="fotos-title">
         <p class="eyebrow">Fotografie</p>
-        <h1 id="fotos-title">Konzertfotografie</h1>
-        <p class="intro-lead">Eine Auswahl aus der Zeit von 2018 bis 2025. Ein Klick vergrößert das Foto.</p>
+        <h1 id="fotos-title">Fotos</h1>
+        <p class="intro-lead">Konzertfotografie und analoge Fotos. Ein Klick vergrößert das Foto.</p>
+        <nav class="filter-chips page-jumps" aria-label="Bereiche">
+            <a href="#konzerte">Konzertfotografie</a>
+            <a href="#analog">Analog</a>
+        </nav>
     </section>
 
-    <section class="home-section" aria-label="Fotos">
+    <section id="konzerte" class="home-section" aria-labelledby="konzerte-title">
+        <header class="home-head">
+            <div><p class="eyebrow">Fotografie</p><h2 id="konzerte-title">Konzertfotografie</h2></div>
+        </header>
+        <p class="section-lead">Eine Auswahl aus der Zeit von 2018 bis 2025.</p>
         <nav class="filter-chips" aria-label="Nach Band filtern">
-            <a href="/fotos" th:classappend="${activeBand == null} ? 'is-active'" th:attr="aria-current=${activeBand == null ? 'page' : null}" th:text="${'Alle (' + photoTotal + ')'}">Alle</a>
-            <a th:each="count : ${photoBands}" th:href="@{/fotos(band=${count.band.slug})}" th:text="${count.band.name + ' (' + count.photos + ')'}"
+            <a href="/fotos#konzerte" th:classappend="${activeBand == null} ? 'is-active'" th:attr="aria-current=${activeBand == null ? 'page' : null}" th:text="${'Alle (' + photoTotal + ')'}">Alle</a>
+            <a th:each="count : ${photoBands}" th:href="${'/fotos?band=' + count.band.slug + '#konzerte'}" th:text="${count.band.name + ' (' + count.photos + ')'}"
                th:classappend="${activeBand == count.band.slug} ? 'is-active'" th:attr="aria-current=${activeBand == count.band.slug ? 'page' : null}">Band</a>
         </nav>
         <div class="photo-masonry">
@@ -24,6 +32,22 @@
             </button>
         </div>
         <p class="page-note">Vollständige Galerien zu einzelnen Konzerten stehen bei den Einträgen im <a href="/archive">Archiv</a>.</p>
+    </section>
+
+    <section id="analog" class="home-section" aria-labelledby="analog-title" th:if="${!analogPhotos.isEmpty()}">
+        <header class="home-head">
+            <div><p class="eyebrow">Fotografie</p><h2 id="analog-title">Analog</h2></div>
+        </header>
+        <p class="section-lead">Eine Auswahl analoger Fotos: Städte, Landschaften und Alltag aus Hamburg, dem Harz, Norwegen, Malta, Mailand und New York.</p>
+        <ol class="photo-rows">
+            <li th:each="photo : ${analogPhotos}" th:style="'--ar:' + ${photo.ratio}">
+                <button type="button" class="photo-tile photo-tile--natural" data-group="analog"
+                        th:attr="data-full=${photo.fullUrl},data-alt=${photo.alt},data-title=${photo.caption}">
+                    <img th:src="${photo.thumbUrl}" th:alt="${photo.alt}"
+                         th:attr="width=${photo.width},height=${photo.height}" loading="lazy" decoding="async">
+                </button>
+            </li>
+        </ol>
     </section>
 
     <dialog class="photo-lightbox" id="photo-lightbox" aria-label="Fotoansicht">

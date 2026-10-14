@@ -1059,3 +1059,13 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
 .gd-card-more { margin-top: .6rem; color: var(--ember); font: .68rem var(--mono); letter-spacing: .1em; text-transform: uppercase; }
 .gd-card { max-width: 64rem; }
 @media (max-width: 760px) { .gd-card { grid-template-columns: minmax(0, 1fr); } }
+.section-lead { max-width: 44rem; margin: 0 0 1.4rem; color: var(--paper-muted); }
+.filter-chips.page-jumps { margin-top: 1.4rem; padding-bottom: 0; }
+
+/* Fixed-order gallery: rows read left to right, each row scaled to one common height. */
+.photo-rows { --row-h: 250px; list-style: none; display: flex; flex-wrap: wrap; gap: clamp(.4rem, .8vw, .7rem); margin: 0; padding: 0; }
+.photo-rows li { flex: calc(var(--ar) * 100) 1 calc(var(--ar) * var(--row-h)); min-width: 0; }
+.photo-rows::after { content: ""; flex-grow: 1000; }
+.photo-rows .photo-tile { margin: 0; }
+@media (max-width: 760px) { .photo-rows { --row-h: 120px; } }
+
