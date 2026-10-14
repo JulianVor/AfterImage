@@ -15,6 +15,7 @@
             <li th:if="${musicVideoTotal > 0}"><a href="#musikvideos">Musikvideos <span aria-hidden="true">↓</span></a></li>
             <li th:if="${liveVideoTotal > 0}"><a href="#livevideos">Livevideos <span aria-hidden="true">↓</span></a></li>
             <li th:if="${!workBands.isEmpty()}"><a href="#bands">Bandfotos <span aria-hidden="true">↓</span></a></li>
+            <li th:if="${!albums.isEmpty() or !posters.isEmpty()}"><a href="#artwork">Artwork <span aria-hidden="true">↓</span></a></li>
         </ul>
     </section>
 
