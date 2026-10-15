@@ -79,7 +79,10 @@ if (lightbox) {
 
     document.querySelectorAll('.photo-tile[data-full]').forEach(tile => tile.addEventListener('click', () => {
         const name = tile.dataset.group;
-        group = name ? [...document.querySelectorAll(`.photo-tile[data-group="${name}"]`)] : [];
+        group = name
+            ? [...document.querySelectorAll(`.photo-tile[data-group="${name}"]`)]
+                .sort((a, b) => Number(a.dataset.order ?? 0) - Number(b.dataset.order ?? 0))
+            : [];
         position = group.indexOf(tile);
         show(tile);
     }));
