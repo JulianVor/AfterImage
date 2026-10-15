@@ -133,7 +133,7 @@ public class PublicSiteController {
         model.addAttribute("albums", albumCatalog.all());
         model.addAttribute("posters", Posters.all());
         model.addAttribute("stats", catalog.stats());
-        model.addAttribute("homePhotos", HomePhotos.shuffled());
+        model.addAttribute("homePhotos", HomePhotos.startingAtRandom());
         model.addAttribute("analogPhotos", AnalogPhotos.all());
         model.addAttribute("analogPreview", AnalogPhotos.all().stream().limit(4).toList());
         return "public/show";
@@ -149,11 +149,11 @@ public class PublicSiteController {
 
     @GetMapping("/fotos")
     String photos(@RequestParam(required = false) String band, Model model) {
-        List<HomePhotos.BandCount> bands = HomePhotos.bands();
-        String active = bands.stream().map(count -> count.band().slug()).filter(slug -> slug.equals(band)).findFirst().orElse(null);
-        model.addAttribute("photos", active == null ? HomePhotos.all() : HomePhotos.forBand(active));
-        model.addAttribute("activeBand", active);
-        model.addAttribute("activeBandName", bands.stream().filter(count -> count.band().slug().equals(active)).map(count -> count.band().name()).findFirst().orElse(null));
+        List<HomePhotos.HomePhoto> ofBand = band == null ? List.of() : HomePhotos.forBand(band);
+        boolean filtered = !ofBand.isEmpty();
+        model.addAttribute("photos", filtered ? ofBand : HomePhotos.all());
+        model.addAttribute("activeBand", filtered ? band : null);
+        model.addAttribute("activeBandName", filtered ? ofBand.get(0).band().name() : null);
         model.addAttribute("analogPhotos", AnalogPhotos.all());
         return "public/fotos";
     }

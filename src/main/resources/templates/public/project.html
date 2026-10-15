@@ -246,8 +246,8 @@
             </div>
             <div class="photo-grid">
                 <button type="button" class="photo-tile" th:each="photo : ${bandPhotos}"
-                        th:attr="data-full=${'/img/home/' + photo.file},data-alt=${photo.alt},data-title=${photo.band.name}">
-                    <img th:src="@{/img/home/{file}(file=${photo.file})}" th:alt="${photo.alt}" loading="lazy" decoding="async"
+                        th:attr="data-full=${photo.fullUrl},data-alt=${photo.alt},data-title=${photo.band.name}">
+                    <img th:src="${photo.thumbUrl}" th:alt="${photo.alt}" loading="lazy" decoding="async"
                          th:attr="width=${photo.width},height=${photo.height}">
                 </button>
             </div>

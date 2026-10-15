@@ -22,10 +22,10 @@
         <p class="section-lead" th:if="${activeBand != null}">
             Nur Fotos von <strong th:text="${activeBandName}">Band</strong>. <a href="/fotos#konzerte">Alle Konzertfotos anzeigen</a>
         </p>
-        <div class="photo-masonry">
-            <button type="button" class="photo-tile photo-tile--natural" th:each="photo : ${photos}"
-                    th:attr="data-full=${'/img/home/' + photo.file},data-alt=${photo.alt},data-title=${photo.band?.name},data-href=${photo.band != null ? '/entry/' + photo.band.slug : null}">
-                <img th:src="@{/img/home/{file}(file=${photo.file})}" th:alt="${photo.alt}"
+        <div class="photo-masonry" data-ordered>
+            <button type="button" class="photo-tile photo-tile--natural" data-group="konzert" th:each="photo, stat : ${photos}"
+                    th:attr="data-order=${stat.index},data-full=${photo.fullUrl},data-alt=${photo.alt},data-title=${photo.band?.name},data-href=${photo.band != null ? '/entry/' + photo.band.slug : null}">
+                <img th:src="${photo.thumbUrl}" th:alt="${photo.alt}"
                      th:attr="width=${photo.width},height=${photo.height}" loading="lazy" decoding="async">
             </button>
         </div>
@@ -62,6 +62,7 @@
     </dialog>
 </main>
 <footer th:replace="~{fragments :: footer}"></footer>
+<script type="module" src="/js/ordered-masonry.js"></script>
 <script type="module" src="/js/piwigo-gallery.js"></script>
 </body>
 </html>

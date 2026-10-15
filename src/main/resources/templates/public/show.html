@@ -26,13 +26,13 @@
             <a class="home-more" href="/fotos">Alle Fotos ansehen</a>
         </header>
         <div class="slideshow-stage" aria-live="off">
-        <img class="slide" th:each="photo, stat : ${homePhotos}" th:src="@{/img/home/{file}(file=${photo.file})}"
+        <img class="slide" th:each="photo, stat : ${homePhotos}" th:src="${photo.fullUrl}"
              th:attr="width=${photo.width},height=${photo.height},loading=${stat.index >= 2 ? 'lazy' : null}"
              th:alt="${photo.alt}" decoding="async">
         </div>
         <div class="slideshow-controls">
             <button type="button" class="slideshow-prev" aria-label="Vorheriges Foto">←</button>
-            <p class="slideshow-count" aria-live="polite"><span class="slideshow-current">01</span> / <span class="slideshow-total" th:text="${#lists.size(homePhotos)}">17</span></p>
+            <p class="slideshow-count" aria-live="polite"><span class="slideshow-current">01</span> / <span class="slideshow-total" th:text="${#lists.size(homePhotos)}">24</span></p>
             <button type="button" class="slideshow-next" aria-label="Nächstes Foto">→</button>
             <button type="button" class="slideshow-toggle" aria-pressed="true">Pause</button>
         </div>
