@@ -22,6 +22,7 @@ html.album-theme {
 .album--belleza { --album-font: "Belleza", Optima, "Segoe UI", sans-serif; --album-weight: 400; --album-size: 1; --album-title-transform: uppercase; --album-title-tracking: .16em; }
 .album--jost { --album-font: "Jost", Futura, "Century Gothic", sans-serif; --album-weight: 300; --album-size: 1; --album-title-transform: uppercase; --album-title-tracking: .22em; }
 .album--barlow { --album-font: "Barlow", "DIN Alternate", "Arial Narrow", sans-serif; --album-weight: 500; --album-size: 1; }
+.album--plex { --album-font: "IBM Plex Sans", "Segoe UI", Arial, sans-serif; --album-weight: 400; --album-size: 1; --album-title-transform: uppercase; --album-title-tracking: .05em; }
 
 /* Overview */
 

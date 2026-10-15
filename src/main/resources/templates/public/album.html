@@ -22,7 +22,7 @@
                           th:classappend="${spineUrl != null} ? 'has-image'"
                           th:style="${spineUrl != null} ? ('background-image:url(' + ${spineUrl} + ')')">
                         <span class="album-spine-number" th:if="${spineUrl == null}" th:text="${album.number}">FA-001</span>
-                        <span class="album-spine-title" th:if="${spineUrl == null}" th:text="${album.title}">Titel</span>
+                        <span class="album-spine-title" th:if="${spineUrl == null}" th:lang="${album.lang}" th:text="${album.title}">Titel</span>
                     </span>
                     <span class="album-edge album-edge--right" aria-hidden="true"></span>
                     <span class="album-edge album-edge--top" aria-hidden="true"></span>
@@ -36,8 +36,8 @@
 
     <section class="album-info" aria-labelledby="album-title">
         <p class="eyebrow" th:text="${album.number + ' · ' + album.year}">FA-001 · 2026</p>
-        <h1 id="album-title" class="album-title" th:text="${album.title}">Titel</h1>
-        <ol class="album-tracks">
+        <h1 id="album-title" class="album-title" th:lang="${album.lang}" th:text="${album.title}">Titel</h1>
+        <ol class="album-tracks" th:lang="${album.lang}">
             <th:block th:each="track, stat : ${album.tracks}">
                 <li class="album-part"
                     th:if="${track.part != null and (stat.first or track.part != album.tracks[stat.index - 1].part)}"
@@ -59,11 +59,11 @@
         <a class="album-pager-prev" th:if="${previous != null}" th:href="@{/alben/{slug}(slug=${previous.slug})}">
             <span aria-hidden="true">←</span>
             <span class="album-pager-number" th:text="${previous.number}">FA-000</span>
-            <span th:text="${previous.title}">Vorheriges</span>
+            <span th:lang="${previous.lang}" th:text="${previous.title}">Vorheriges</span>
         </a>
         <a class="album-pager-all" href="/alben">Alle Arbeiten</a>
         <a class="album-pager-next" th:if="${next != null}" th:href="@{/alben/{slug}(slug=${next.slug})}">
-            <span th:text="${next.title}">Nächstes</span>
+            <span th:lang="${next.lang}" th:text="${next.title}">Nächstes</span>
             <span class="album-pager-number" th:text="${next.number}">FA-002</span>
             <span aria-hidden="true">→</span>
         </a>

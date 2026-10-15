@@ -1080,3 +1080,4 @@ img { -webkit-user-drag: none; -webkit-touch-callout: none; user-select: none; p
 .photo-lightbox-count { margin: 0; color: rgba(246, 242, 234, .6); }
 .photo-rows--single { flex-wrap: nowrap; }
 @media (max-width: 760px) { .photo-rows--single { flex-wrap: wrap; } }
+.home-grid--albums { grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); }

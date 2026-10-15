@@ -17,6 +17,11 @@ public record Album(String slug, String number, String title, int year, String f
 
     public String backThumbUrl() { return "/img/alben/" + number.toLowerCase() + "-back-s.webp"; }
 
+    /** "ru" for albums with Cyrillic titles so screen readers and hyphenation pick the right language, otherwise null. */
+    public String lang() {
+        return title.codePoints().anyMatch(c -> Character.UnicodeScript.of(c) == Character.UnicodeScript.CYRILLIC) ? "ru" : null;
+    }
+
     public String themeStyle() {
         return "--album-bg:" + theme.background() + ";--album-ink:" + theme.ink() + ";--album-accent:" + theme.accent()
                 + ";--album-edge:" + theme.edge() + ";--album-spine-ink:" + theme.spineInk();

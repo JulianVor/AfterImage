@@ -103,14 +103,14 @@
 
         <div class="artwork-block" th:if="${!albums.isEmpty()}">
             <h3 class="artwork-sub">Alben, die es nicht gibt</h3>
-            <ul class="home-grid home-grid--five">
+            <ul class="home-grid home-grid--albums">
                 <li th:each="album : ${albums}">
                     <a th:href="@{/alben/{slug}(slug=${album.slug})}">
                         <span class="home-thumb home-thumb--cover">
                             <img th:src="${album.frontThumbUrl}" width="700" height="700" th:alt="${'Cover von ' + album.title}" loading="lazy" decoding="async">
                         </span>
                         <span class="home-sub" th:text="${album.number}">FA-001</span>
-                        <span class="home-title home-title--small" th:text="${album.title}">Titel</span>
+                        <span class="home-title home-title--small" th:lang="${album.lang}" th:text="${album.title}">Titel</span>
                     </a>
                 </li>
             </ul>

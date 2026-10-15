@@ -76,7 +76,18 @@ public class AlbumCatalog {
                             "Hinterhofverbot",
                             "Wegen Müll gesperrt",
                             "Menschen unerwünscht",
-                            "Rohrreinigung (Reprise)")));
+                            "Rohrreinigung (Reprise)")),
+            new Album("pamyat-o-budushchem", "FA-006", "Память о будущем", 2026, "plex",
+                    new Theme("#4a5058", "#e9ecf1", "#8fc9b0", "#474d55", "#e9ecf1"),
+                    List.of(
+                            part(1, "Слои", "Сторона А"),
+                            part(2, "На этом месте", "Сторона А"),
+                            part(3, "Недострой", "Сторона А"),
+                            part(4, "Память о будущем", "Сторона А"),
+                            part(5, "Пустые окна", "Сторона Б"),
+                            part(6, "Между остановками", "Сторона Б"),
+                            part(7, "Стёртые имена", "Сторона Б"),
+                            part(8, "После нас", "Сторона Б"))));
 
     public List<Album> all() {
         return albums;
