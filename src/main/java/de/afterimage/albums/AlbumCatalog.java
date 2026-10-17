@@ -38,17 +38,6 @@ public class AlbumCatalog {
                             "lath",
                             "a window holding the whole forest",
                             "keep walking toward the bright part")),
-            new Album("wayside", "FA-003", "Wayside", 2026, "belleza",
-                    new Theme("#1f2522", "#e6e9e2", "#9db7c4", "#8c8982", "#22251f"),
-                    timed(
-                            "Three Steps", "2:48",
-                            "Moss on the North Side", "5:12",
-                            "Beech Line", "4:36",
-                            "A Bench Facing Nothing", "6:05",
-                            "Inscription, Unreadable", "3:20",
-                            "Tealight in a Jar", "3:58",
-                            "Low Cloud", "4:44",
-                            "Path Down", "7:30")),
             new Album("tracery", "FA-004", "Tracery", 2026, "jost",
                     new Theme("#ebe8df", "#2a2a28", "#77756c", "#ebe8de", "#2a2a28"),
                     untimed(
@@ -87,7 +76,16 @@ public class AlbumCatalog {
                             part(5, "Пустые окна", "Сторона Б"),
                             part(6, "Между остановками", "Сторона Б"),
                             part(7, "Стёртые имена", "Сторона Б"),
-                            part(8, "После нас", "Сторона Б"))));
+                            part(8, "После нас", "Сторона Б"))),
+            new Album("the-slow-beyond", "FA-007", "The Slow Beyond", 2026, "barlow",
+                    new Theme("#2a3f40", "#efdedc", "#5ec28d", "#d2b9b8", "#3a2a2b"),
+                    List.of(
+                            part(1, "The Turning", "The Call"),
+                            part(2, "Sunward", "The Call"),
+                            part(3, "The Unmapped", "The Call"),
+                            part(4, "Inner Oceans", "The Echo"),
+                            part(5, "No Fixed Star", "The Echo"),
+                            part(6, "Before the Turning", "The Echo"))));
 
     public List<Album> all() {
         return albums;
@@ -111,12 +109,6 @@ public class AlbumCatalog {
     public Album next(Album album) {
         int index = albums.indexOf(album);
         return index >= 0 && index < albums.size() - 1 ? albums.get(index + 1) : null;
-    }
-
-    private static List<Track> timed(String... titlesAndDurations) {
-        return IntStream.range(0, titlesAndDurations.length / 2)
-                .mapToObj(i -> new Track(i + 1, titlesAndDurations[2 * i], titlesAndDurations[2 * i + 1], null))
-                .toList();
     }
 
     private static List<Track> untimed(String... titles) {
